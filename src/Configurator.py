@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import yaml
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader
 
 CFG_FILE = "config.yml"
 
@@ -10,15 +10,14 @@ def configureJinja(config):
 
     return Environment(
         loader=PackageLoader('juliet', "themes/" + config["theme"] + "/templates"),
-        autoescape=select_autoescape(['html', 'xml'])
-    )
+        autoescape=True)
 
 def getConfig():
     """ Return parsed config file. """
 
-    config = dict()
+    config = {}
 
-    with open(CFG_FILE) as stream:
+    with open(CFG_FILE, 'r') as stream:
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as exc:

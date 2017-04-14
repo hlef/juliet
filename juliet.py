@@ -2,8 +2,7 @@
 
 import argparse, sys
 
-from config import Configurator
-from builder import Builder
+from src import Configurator, Builder, Loader
 
 def main():
     """ Parse command line arguments and execute passed subcommands. """
@@ -24,14 +23,21 @@ def build(args):
     """ Build website to configured location. """
 
     # Parse configuration and define Environment
-    config = Configurator.getConfig()
-    jinjaEnv = Configurator.configureJinja()
+    config = {}
+    config["site"] = Configurator.getConfig()
+    config["posts"] = Loader.getFromFolder("posts/", args)
+    config["pages"] = Loader.getFromFolder("pages/", args)
+    jinjaEnv = Configurator.configureJinja(config["site"])
+    print(config)
 
     # Build statics
-    Builder.buildStatics(config, jinjaEnv)
+    Builder.buildStatics(config)
 
     # Build posts and pages
     Builder.buildPosts(config, jinjaEnv)
+
+    # Build page and pages
+    #Builder.buildPages(config, jinjaEnv)
 
 if __name__ == "__main__":
     main()
