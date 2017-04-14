@@ -1,13 +1,27 @@
 #!/usr/bin/python3
 
-def setConfig(config):
-    """ Set local configuration to passed config. """
+import jinja2
+
+def getStatics():
     pass
 
-def buildStatics():
+def getPosts():
+    pass
+
+def build(template, params):
+    """ Build HTML documents from passed jinja files and parameters. """
+    pass
+
+def buildStatics(config):
     """ Build static pages. """
-    pass
 
-def buildTemplated():
+    statics = getStatics()
+    for staticPage in statics:
+        build(staticPage, config)
+
+def buildPosts(config, jinjaEnv):
     """ Build templated pages. """
-    pass
+
+    posts = getPosts()
+    for post in posts:
+        build(jinjaEnv.get_template("post.html"), post+config)

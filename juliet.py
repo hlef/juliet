@@ -25,13 +25,13 @@ def build(args):
 
     # Parse configuration and define Environment
     config = Configurator.getConfig()
-    Builder.setConfig(config)
+    jinjaEnv = Configurator.configureJinja()
 
     # Build statics
-    Builder.buildStatics()
+    Builder.buildStatics(config, jinjaEnv)
 
     # Build posts and pages
-    Builder.buildTemplated()
+    Builder.buildPosts(config, jinjaEnv)
 
 if __name__ == "__main__":
     main()
