@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import yaml
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, FileSystemLoader
 
 CFG_FILE = "config.yml"
 
@@ -9,7 +9,7 @@ def configureJinja(config):
     """ Configure and return Jinja2 Environment. """
 
     return Environment(
-        loader=PackageLoader('juliet', "themes/" + config["theme"] + "/templates"),
+        loader=FileSystemLoader("./themes/" + config["theme"]),
         autoescape=True)
 
 def getConfig():
