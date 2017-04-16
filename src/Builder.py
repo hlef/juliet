@@ -44,7 +44,7 @@ def buildPosts(args, jinjaEnv):
 
     for post in args["posts"]:
         html = _formatArgsAndRender(args, post, template)
-        _write(builddir + post["title-slugified"], html)
+        _write(builddir + post["slug"], html)
 
 def buildPages(args, jinjaEnv):
     """ Build pages. """

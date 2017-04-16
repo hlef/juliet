@@ -44,7 +44,7 @@ def getFromFolder(folder, args):
 
                 # If there's a title entry, provide a slugified form of it
                 if("title" in element.keys()):
-                    element["title-slugified"] = slugify(element["title"])
+                    element["slug"] = slugify(element["title"])
 
         elements.append(element)
     return elements
