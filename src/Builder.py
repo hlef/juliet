@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 import os
-from jinja2 import Template
+from distutils.dir_util import copy_tree
+from jinja2 import Template, FileSystemLoader
 from src import FileParser
 
 def _createIfNonExistent(directory):
@@ -24,15 +25,23 @@ def _formatArgsAndRender(args, page, template):
     renderingArgs["content"] = page["body"]
     return template.render(args)
 
-def buildStatics(args):
+def installData(args):
+    """ Install data. """
+
+    builddir = args["site"]["build-directory"]
+    _createIfNonExistent(builddir)
+
+    copy_tree("themes/" + args["site"]["theme"] + "/data/", builddir)
+
+def buildStatics(args, jinjaEnv):
     """ Build static pages. """
 
     builddir = args["site"]["build-directory"]
     _createIfNonExistent(builddir)
 
-    for static in args["statics"]:
-        html = Template(static["body"]).render(args)
-        _write(builddir + "/" + static["file-name"], html)
+    for element in os.listdir("themes/" + args["site"]["theme"] + "/statics/"):
+        html = jinjaEnv.get_template("statics/" + element).render(args)
+        _write(builddir + "/" + element, html)
 
 def buildPosts(args, jinjaEnv):
     """ Build posts. """

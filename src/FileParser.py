@@ -14,18 +14,20 @@ def getParsed(rawFile):
     firstBodyLine = False
     headerPart = False
 
-    if(splittedFile.pop(0) == "---"):
+    if(splittedFile[0] == "---"):
         # First line of passed file declares a header.
+        splittedFile.pop(0)
         headerPart = True
     else:
         result["header"] = []
         firstBodyLine = True
 
     for line in splittedFile:
-        if(firstBodyLine and line == ""):
-            # First line of the body is empty. Ignore it.
+        if(firstBodyLine):
             firstBodyLine = False
-            continue
+            if(line == ""):
+                # First line of the body is empty. Ignore it.
+                continue
 
         if(line == "---" and headerPart):
             # Header's end. Save content of header in result["header"] and
