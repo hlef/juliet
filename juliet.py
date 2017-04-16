@@ -22,11 +22,16 @@ def main():
 def build(args):
     """ Build website to configured location. """
 
-    # Parse configuration and define Environment
+    # Parse configuration
     config = {}
     config["site"] = Configurator.getConfig()
+
+    # Load articles, pages and static elements from the files
     config["posts"] = Loader.getFromFolder("posts/", args)
     config["pages"] = Loader.getFromFolder("pages/", args)
+    config["statics"] = Loader.getFromFolder("themes/" + config["site"]["theme"] + "/statics/", args)
+
+    # Configure Jinja2 environment
     jinjaEnv = Configurator.configureJinja(config["site"])
     print(config)
 
@@ -35,9 +40,7 @@ def build(args):
 
     # Build posts and pages
     Builder.buildPosts(config, jinjaEnv)
-
-    # Build page and pages
-    #Builder.buildPages(config, jinjaEnv)
+    Builder.buildPages(config, jinjaEnv)
 
 if __name__ == "__main__":
     main()
