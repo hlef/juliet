@@ -3,6 +3,7 @@
 import os, yaml
 from slugify import slugify
 from src import FileParser
+from markdown import markdown
 
 def getFromFolder(folder, args):
     """ Return a list of parsed files contained in passed folder.
@@ -28,7 +29,7 @@ def getFromFolder(folder, args):
                 exit(1)
 
             # Get body part and file name
-            element["body"] = parsed["body"]
+            element["body"] = markdown(parsed["body"])
             element["file-name"] = sourceFile
 
             # Get header part and parse it if not empty
