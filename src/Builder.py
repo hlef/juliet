@@ -26,12 +26,13 @@ def _formatArgsAndRender(args, page, template):
     return template.render(args)
 
 def installData(args):
-    """ Install data. """
+    """ Install data and assets. """
 
     builddir = args["site"]["build-directory"]
     _createIfNonExistent(builddir)
 
     copy_tree("themes/" + args["site"]["theme"] + "/data/", builddir)
+    copy_tree("assets/", builddir + "/assets")
 
 def buildStatics(args, jinjaEnv):
     """ Build static pages. """

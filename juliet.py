@@ -27,8 +27,8 @@ def build(args):
     config["site"] = Configurator.getConfig()
 
     # Load articles and pages from the files
-    config["posts"] = Loader.getFromFolder("posts/", args)
-    config["pages"] = Loader.getFromFolder("pages/", args)
+    config["posts"] = Loader.getFromFolder("posts/", config)
+    config["pages"] = Loader.getFromFolder("pages/", config)
 
     # Configure Jinja2 environment
     jinjaEnv = Configurator.configureJinja(config["site"])
