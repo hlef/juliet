@@ -1,7 +1,44 @@
 #!/usr/bin/python3
 
-import os
+import os, re
 from markdown import markdown
+
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
+
+def processPygments(body):
+    HIGHLIGHT = re.compile("{% ?highlight (\w+) ?%}")
+    ENDHIGHLIGHT = re.compile("{% ?endhighlight ?%}")
+
+    result = ""
+    bufferedResult = ""
+    pygmentsBlock = ""
+
+    for line in body.splitlines():
+        if(pygmentsBlock != ""):
+            if(ENDHIGHLIGHT.match(line) != None):
+                lexer = get_lexer_by_name(pygmentsBlock, stripall=True)
+                formatter = HtmlFormatter(linenos=True, cssclass="source")
+                result += highlight(bufferedResult, lexer, formatter) + "\n"
+                bufferedResult = ""
+                pygmentsBlock  = ""
+            else:
+                bufferedResult += line + "\n"
+            continue
+
+        if(HIGHLIGHT.match(line) != None):
+            pygmentsBlock = HIGHLIGHT.match(line).groups()[0]
+            print(pygmentsBlock)
+            continue
+
+        result += line + "\n"
+
+    if(pygmentsBlock != ""):
+        return None
+
+    return result
+
 
 def getParsed(rawFile, baseurl):
     """ Return a parsed form of passed page file.
@@ -73,7 +110,10 @@ def getParsed(rawFile, baseurl):
         line = line.replace("@BASEURL", baseurl)
         parsedLines += (line + "\n")
 
-    if(headerPart and "header" not in result.keys()):
+    parsedLines = processPygments(parsedLines)
+    print(parsedLines)
+
+    if((headerPart and "header" not in result.keys()) or parsedLines == None):
         # Header was declared, but never closed. Something gone wrong.
         return None
 
