@@ -65,4 +65,4 @@ def buildPages(args, jinjaEnv):
 
     for page in args["pages"]:
         html = _formatArgsAndRender(args, page, template)
-        _write(builddir + page["permalink"], html)
+        _write(builddir + "/" + page["permalink"], html)

@@ -16,7 +16,8 @@ def getFromFolder(folder, args):
      * the header's content (nothing if file has no header)"""
 
     elements = []
-    for sourceFile in os.listdir(folder):
+    entries = sorted(os.listdir(folder), reverse=True)
+    for sourceFile in entries:
         element = {}
         with open(folder + sourceFile, 'r') as stream:
             # Read raw file
