@@ -111,7 +111,6 @@ def getParsed(rawFile, baseurl):
         parsedLines += (line + "\n")
 
     parsedLines = processPygments(parsedLines)
-    print(parsedLines)
 
     if((headerPart and "header" not in result.keys()) or parsedLines == None):
         # Header was declared, but never closed. Something gone wrong.

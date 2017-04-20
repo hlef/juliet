@@ -32,7 +32,6 @@ def build(args):
 
     # Configure Jinja2 environment
     jinjaEnv = Configurator.configureJinja(config["site"])
-    print(config)
 
     # Build statics
     Builder.buildStatics(config, jinjaEnv)
