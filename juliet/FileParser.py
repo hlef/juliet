@@ -29,7 +29,6 @@ def processPygments(body):
 
         if(HIGHLIGHT.match(line) != None):
             pygmentsBlock = HIGHLIGHT.match(line).groups()[0]
-            print(pygmentsBlock)
             continue
 
         result += line + "\n"

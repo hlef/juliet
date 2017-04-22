@@ -8,4 +8,6 @@ setup(name='juliet',
       author_email='hle@owl.eu.com',
       license='MIT',
       packages=['juliet'],
-      zip_safe=False)
+      zip_safe=False,
+      test_suite='nose.collector',
+      tests_require=['nose'],)
