@@ -8,6 +8,8 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 def processPygments(body):
+    # TODO Write documentation
+
     HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
     ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
 
@@ -53,8 +55,10 @@ def getParsed(rawFile, baseurl):
     ""
 
     Returned file is represented by a dictionnary containing following entries:
-     * "body": a string containing the markdown body converted to HTML
-     * the header's content (nothing if file has no header)
+     * "body": a string containing the markdown body converted to HTML (empty if
+     file has no body)
+     * "header": a string caintaining the header's content (empty if file has no
+     header)
 
      For example, following file
 
@@ -66,9 +70,7 @@ def getParsed(rawFile, baseurl):
      bodyContent
      ""
 
-     would be returned as {"key": "value", "body": "bodyContent"}
-
-     If there's no body part, an empty string is returned in "body".
+     would be returned as {"key": "value\n", "body": "<p>bodyContent</p>"}
 
      If file is bad formatted, None is returned.
      """
@@ -86,7 +88,7 @@ def getParsed(rawFile, baseurl):
         headerPart = True
     else:
         # File has no header. Directly parse body.
-        result["header"] = []
+        result["header"] = ""
         firstBodyLine = True
 
     for line in splittedFile:

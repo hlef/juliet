@@ -34,7 +34,7 @@ def getFromFolder(folder, config):
 
             # Get header part and parse it if not empty
             header = parsed["header"]
-            if(header != []):
+            if(header != ""):
                 # Header isn't empty, parse it and append its entries to the
                 # file dictionnary
                 try:
