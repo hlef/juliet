@@ -8,9 +8,8 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 def processPygments(body):
-    # TODO accept several spaces in regex
-    HIGHLIGHT = re.compile("{% ?highlight (\w+) ?%}")
-    ENDHIGHLIGHT = re.compile("{% ?endhighlight ?%}")
+    HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
+    ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
 
     result = ""
     bufferedResult = ""
