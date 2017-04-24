@@ -30,6 +30,19 @@ dependencies (Debian dependencies in brackets):
  * [python-slugify](https://github.com/un33k/python-slugify), version 1.2.1 (python3-slugify)
  * [Pygments](http://pygments.org/), version 2.2.0 (python3-pygments)
 
+Required for tests:
+
+ * [nose](https://github.com/nose-devs/nose), version 1.3.7 (python3-nose)
+
+## Markdown implementation
+
+Juliet uses the python-markdown library for Markdown parsing. It is based on the
+original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax).
+
+However, Juliet has been implemented so that it doesn't depend on the Markdown
+implementation, and it is very easy to change it if you want to use Kramdown,
+for example.
+
 ## Contributing
 
 Bugs reports and pull-requests are welcome ! :smile:

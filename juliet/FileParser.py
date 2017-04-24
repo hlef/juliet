@@ -8,7 +8,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 def processPygments(body):
-    # TODO Write documentation
+    """ Parse and replace highlight blocks in passed body."""
 
     HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
     ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
