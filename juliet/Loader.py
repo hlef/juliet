@@ -2,7 +2,7 @@
 
 import os, yaml
 from slugify import slugify
-from src import FileParser
+from juliet import FileParser
 
 def getFromFolder(folder, config):
     """ Return a list of parsed files contained in passed folder.

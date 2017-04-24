@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
-import argparse, sys
-
-from src import Configurator, Builder, Loader
+import argparse
+from juliet import Configurator, Builder, Loader
 
 def main():
     """ Parse command line arguments and execute passed subcommands. """

@@ -3,7 +3,7 @@
 import os
 from distutils.dir_util import copy_tree
 from jinja2 import Template, FileSystemLoader
-from src import FileParser
+from juliet import FileParser
 
 def _createIfNonExistent(directory):
     """ Create passed directory if it doesn't exists already. """
