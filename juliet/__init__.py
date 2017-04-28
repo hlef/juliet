@@ -1,7 +1,5 @@
 import argparse
-from juliet import Configurator, Builder, Loader
-
-DEFAULT_CFG_FILE = "config.yml"
+from juliet import configurator, builder, loader, paths
 
 def main():
     """ Parse command line arguments and execute passed subcommands. """
@@ -10,9 +8,10 @@ def main():
     parser = argparse.ArgumentParser(description='The lightweight static website generator')
     subparsers = parser.add_subparsers(dest="sp", help="sub-command to be executed")
 
-    parser_build = subparsers.add_parser('build', help="Build static site from local directory to the directory specified in config.yml")
+    parser_build = subparsers.add_parser('build',
+    help="Build static site from local directory to the directory specified in config.yml")
 
-    parser_build.add_argument('--config', type=str, default=DEFAULT_CFG_FILE,
+    parser_build.add_argument('--config', type=str, default=paths.CFG_FILE,
                     help='alternative config file to use instead of config.yml')
 
     args = parser.parse_args()
@@ -25,21 +24,21 @@ def build(args):
     """ Build website to configured location. """
 
     # Parse configuration
-    config = {"site": Configurator.getConfig(args.config)}
+    config = {"site": configurator.getConfig(args.config)}
 
     # Load articles and pages from the files
-    config["posts"] = Loader.getFromFolder("posts/", config)
-    config["pages"] = Loader.getFromFolder("pages/", config)
+    config["posts"] = loader.getFromFolder(paths.POSTS_PATH, config)
+    config["pages"] = loader.getFromFolder(paths.PAGES_PATH, config)
 
     # Configure Jinja2 environment
-    jinjaEnv = Configurator.configureJinja(config["site"])
+    jinjaEnv = configurator.configureJinja(config["site"])
 
     # Build statics
-    Builder.buildStatics(config, jinjaEnv)
+    builder.buildStatics(config, jinjaEnv)
 
     # Build posts and pages
-    Builder.buildPosts(config, jinjaEnv)
-    Builder.buildPages(config, jinjaEnv)
+    builder.buildPosts(config, jinjaEnv)
+    builder.buildPages(config, jinjaEnv)
 
     # Install remaining data
-    Builder.installData(config)
+    builder.installData(config)

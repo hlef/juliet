@@ -1,5 +1,5 @@
 import unittest
-from juliet import FileParser
+from juliet import fileParser
 
 class fileParserTest(unittest.TestCase):
 
@@ -17,7 +17,7 @@ body"""
 
         result = {"header": "key: value\nwhatever: anothervalue\n22i: valuewithnumbers5", "body": "<p>body</p>"}
 
-        self.assertEqual(result, FileParser.process(validFile, "/whatever/baseurl"))
+        self.assertEqual(result, fileParser.process(validFile, "/whatever/baseurl"))
 
     def test_parsingValidFile2(self):
         """ Make sure that process() returns the excepted result when passing
@@ -43,10 +43,10 @@ body"""
         result4 = {"header": "", "body": ""}
 
         dummyUrl = "/whatever/baseurl"
-        self.assertEqual(result1, FileParser.process(validFile1, dummyUrl))
-        self.assertEqual(result1, FileParser.process(validFile2, dummyUrl))
-        self.assertEqual(result3, FileParser.process(validFile3, dummyUrl))
-        self.assertEqual(result4, FileParser.process(validFile4, dummyUrl))
+        self.assertEqual(result1, fileParser.process(validFile1, dummyUrl))
+        self.assertEqual(result1, fileParser.process(validFile2, dummyUrl))
+        self.assertEqual(result3, fileParser.process(validFile3, dummyUrl))
+        self.assertEqual(result4, fileParser.process(validFile4, dummyUrl))
 
     def test_pygments(self):
         """ Make sure that pygments is well integrated in the main process method."""
@@ -70,7 +70,7 @@ cat file
 </td></tr></table>"""}
 
         dummyUrl = "/whatever/baseurl"
-        self.assertEqual(result1, FileParser.process(file1, dummyUrl))
+        self.assertEqual(result1, fileParser.process(file1, dummyUrl))
 
     def test_invalidFile(self):
         """ Make sure that process() returns None if passed file is invalid."""
@@ -80,4 +80,4 @@ key: value
 
 body"""
 
-        self.assertEqual(None, FileParser.process(invalidFile, "/whatever/baseurl"))
+        self.assertEqual(None, fileParser.process(invalidFile, "/whatever/baseurl"))

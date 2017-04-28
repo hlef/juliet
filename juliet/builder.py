@@ -3,7 +3,7 @@
 import os
 from distutils.dir_util import copy_tree
 from jinja2 import Template, FileSystemLoader
-from juliet import FileParser
+from juliet import paths
 
 def _createIfNonExistent(directory):
     """ Create passed directory if it doesn't exists already. """
@@ -31,8 +31,9 @@ def installData(args):
     builddir = args["site"]["build-directory"]
     _createIfNonExistent(builddir)
 
-    copy_tree("themes/" + args["site"]["theme"] + "/data/", builddir)
-    copy_tree("assets/", builddir + "/assets")
+    copy_tree(paths.THEMES_PATH + "/" + args["site"]["theme"] + "/data/",
+              builddir + "/" + paths.DATA_BUILDDIR)
+    copy_tree(paths.ASSETS_PATH, builddir + "/" + paths.ASSETS_BUILDDIR)
 
 def buildStatics(args, jinjaEnv):
     """ Build static pages. """
@@ -40,14 +41,14 @@ def buildStatics(args, jinjaEnv):
     builddir = args["site"]["build-directory"]
     _createIfNonExistent(builddir)
 
-    for element in os.listdir("themes/" + args["site"]["theme"] + "/statics/"):
+    for element in os.listdir(paths.THEMES_PATH + "/" + args["site"]["theme"] + "/statics/"):
         html = jinjaEnv.get_template("statics/" + element).render(args)
         _write(builddir + "/" + element, html)
 
 def buildPosts(args, jinjaEnv):
     """ Build posts. """
 
-    builddir = args["site"]["build-directory"] + "/posts/"
+    builddir = args["site"]["build-directory"] + "/" + paths.POSTS_BUILDDIR
     _createIfNonExistent(builddir)
 
     template = jinjaEnv.get_template("templates/posts.html")

@@ -2,7 +2,7 @@
 
 import os, yaml
 from slugify import slugify
-from juliet import FileParser
+from juliet import fileParser
 
 def getFromFolder(folder, config):
     """ Return a list of parsed files contained in passed folder.
@@ -18,14 +18,14 @@ def getFromFolder(folder, config):
     entries = sorted(os.listdir(folder), reverse=True)
     for sourceFile in entries:
         element = {}
-        with open(folder + sourceFile, 'r') as stream:
+        with open(folder + "/" + sourceFile, 'r') as stream:
             # Read raw file
             raw = stream.read()
 
             # Parse file with FileParser and handle parsing errors.
-            parsed = FileParser.process(raw, config["site"]["baseurl"])
+            parsed = fileParser.process(raw, config["site"]["baseurl"])
             if(parsed == None):
-                print("Failed to parse file " + folder + sourceFile)
+                print("Error: Failed to parse file " + folder + sourceFile)
                 exit(1)
 
             # Get body part, get file name
@@ -40,7 +40,7 @@ def getFromFolder(folder, config):
                 try:
                     element = {**element, **yaml.load(header)}
                 except yaml.YAMLError as exc:
-                    print("Failed to parse file header: " + str(exc))
+                    print("Error: Failed to parse file header: " + str(exc))
                     exit(1)
 
                 # If there's a title entry, provide a slugified form of it

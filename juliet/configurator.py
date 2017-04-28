@@ -2,15 +2,16 @@
 
 import yaml, os
 from jinja2 import Environment, FileSystemLoader
+from juliet import paths
 
 def configureJinja(config):
     """ Configure and return Jinja2 Environment.
 
     Do not enable autoescape since we actually *do not* want it. Otherwise, we
-    wouldn't be able to integrate our html content in the templates proprely. """
+    wouldn't be able to integrate html content in the templates proprely. """
 
     return Environment(
-        loader=FileSystemLoader("./themes/" + config["theme"]),
+        loader=FileSystemLoader("./" + paths.THEMES_PATH + "/" + config["theme"]),
         autoescape=False)
 
 def getConfig(cfgFile):
