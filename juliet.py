@@ -22,7 +22,7 @@ def build(args):
     """ Build website to configured location. """
 
     # Parse configuration
-    config = {"site" = Configurator.getConfig()}
+    config = {"site": Configurator.getConfig()}
 
     # Load articles and pages from the files
     config["posts"] = Loader.getFromFolder("posts/", config)

@@ -2,54 +2,6 @@ import unittest
 from juliet import FileParser
 
 class fileParserTest(unittest.TestCase):
-    def test_process_pygments1(self):
-        """ Make sure that processPygments() is working well with simple
-        entries that declare a single highlight statement.
-
-        Also make sure that the highlight statement is recognized even if spaces
-        are missing or duplicated. """
-
-        # No additional or missing spaces
-        body1 = """This is a test.
-{% highlight shell %}
-cat file
-{% endhighlight %}"""
-
-        # Missing and additional spaces
-        body2 = """This is a test.
-{%  highlight shell%}
-cat file
-{%endhighlight  %}"""
-
-        result = """This is a test.
-<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
-</pre></div>
-</td></tr></table>
-"""
-        self.assertEqual(result, FileParser.processPygments(body1))
-        self.assertEqual(result, FileParser.processPygments(body2))
-
-    def test_process_pygments2(self):
-        """ Make sure that processPygments() is working well with more complex
-        entries that declare multiple highlight statements."""
-
-        body = """This is a test.
-{% highlight shell %}
-cat file
-{% endhighlight  %}
-{%highlight shell %}
-cat file
-{%endhighlight%}"""
-
-        result = """This is a test.
-<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
-</pre></div>
-</td></tr></table>
-<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
-</pre></div>
-</td></tr></table>
-"""
-        self.assertEqual(result, FileParser.processPygments(body))
 
     def test_parsingValidFile1(self):
         """ Make sure that process() returns the excepted result when passing
@@ -95,6 +47,30 @@ body"""
         self.assertEqual(result1, FileParser.process(validFile2, dummyUrl))
         self.assertEqual(result3, FileParser.process(validFile3, dummyUrl))
         self.assertEqual(result4, FileParser.process(validFile4, dummyUrl))
+
+    def test_pygments(self):
+        """ Make sure that pygments is well integrated in the main process method."""
+
+        file1 = """---
+---
+
+{% highlight shell %}
+cat file
+{% endhighlight  %}
+{%highlight shell %}
+cat file
+{%endhighlight%}"""
+
+        result1 = {"header": "", "body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
+</pre></div>
+</td></tr></table>
+
+<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
+</pre></div>
+</td></tr></table>"""}
+
+        dummyUrl = "/whatever/baseurl"
+        self.assertEqual(result1, FileParser.process(file1, dummyUrl))
 
     def test_invalidFile(self):
         """ Make sure that process() returns None if passed file is invalid."""

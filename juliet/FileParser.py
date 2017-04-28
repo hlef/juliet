@@ -7,22 +7,22 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
-def _processPygments(body):
+def _processPygments(splittedBody):
     """ Parse and replace highlight blocks in passed body."""
 
     HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
     ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
 
-    result = ""
+    result = []
     bufferedResult = ""
     pygmentsBlock = ""
 
-    for line in body.splitlines():
+    for line in splittedBody:
         if(pygmentsBlock != ""):
             if(ENDHIGHLIGHT.match(line) != None):
                 lexer = get_lexer_by_name(pygmentsBlock, stripall=True)
                 formatter = HtmlFormatter(linenos=True, cssclass="source")
-                result += highlight(bufferedResult, lexer, formatter) + "\n"
+                result.append(highlight(bufferedResult, lexer, formatter))
                 bufferedResult = ""
                 pygmentsBlock  = ""
             else:
@@ -33,7 +33,7 @@ def _processPygments(body):
             pygmentsBlock = HIGHLIGHT.match(line).groups()[0]
             continue
 
-        result += line + "\n"
+        result.append(line)
 
     if(pygmentsBlock != ""):
         # A pygments block was opened, but never closed
@@ -45,7 +45,6 @@ def _processBody(splittedBody, baseurl):
     """ Interpret passed body text as Markdown and return it as HTML. Replace
     all occurences of @BASEURL by passed baseurl. """
 
-    print(splittedBody)
     result = ""
 
     if(not splittedBody):
@@ -119,13 +118,15 @@ def process(rawFile, baseurl):
     result = {}
     splittedFile = rawFile.splitlines()
 
-    headerLimit = getHeaderLimit(splittedFile)
+    headerLimit = _getHeaderLimit(splittedFile)
 
     if(headerLimit is None):
         # Bad formatted file
         return None
 
     result["header"] = "\n".join(splittedFile[1:headerLimit])
-    result["body"] = processBody(splittedFile[headerLimit+1:], baseurl)
+
+    pygmentsProcessed = _processPygments(splittedFile[headerLimit+1:])
+    result["body"] = _processBody(pygmentsProcessed, baseurl)
 
     return result
