@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 
-import yaml
+import yaml, os
 from jinja2 import Environment, FileSystemLoader
-
-CFG_FILE = "config.yml"
 
 def configureJinja(config):
     """ Configure and return Jinja2 Environment.
@@ -15,12 +13,16 @@ def configureJinja(config):
         loader=FileSystemLoader("./themes/" + config["theme"]),
         autoescape=False)
 
-def getConfig():
+def getConfig(cfgFile):
     """ Return parsed config file. """
 
     config = {}
 
-    with open(CFG_FILE, 'r') as stream:
+    if(not os.path.isfile(cfgFile)):
+        print("Error: Could not find config file: " + cfgFile)
+        exit(1)
+
+    with open(cfgFile, 'r') as stream:
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as exc:

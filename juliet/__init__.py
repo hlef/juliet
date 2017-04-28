@@ -1,6 +1,8 @@
 import argparse
 from juliet import Configurator, Builder, Loader
 
+DEFAULT_CFG_FILE = "config.yml"
+
 def main():
     """ Parse command line arguments and execute passed subcommands. """
 
@@ -9,6 +11,9 @@ def main():
     subparsers = parser.add_subparsers(dest="sp", help="sub-command to be executed")
 
     parser_build = subparsers.add_parser('build', help="Build static site from local directory to the directory specified in config.yml")
+
+    parser_build.add_argument('--config', type=str, default=DEFAULT_CFG_FILE,
+                    help='alternative config file to use instead of config.yml')
 
     args = parser.parse_args()
 
@@ -20,7 +25,7 @@ def build(args):
     """ Build website to configured location. """
 
     # Parse configuration
-    config = {"site": Configurator.getConfig()}
+    config = {"site": Configurator.getConfig(args.config)}
 
     # Load articles and pages from the files
     config["posts"] = Loader.getFromFolder("posts/", config)
