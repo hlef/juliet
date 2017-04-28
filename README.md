@@ -8,21 +8,9 @@ except from a modern static websites generator. It uses Jinja2 templates,
 supports modular theming, markdown articles with Pygments syntax highlighting
 and is easily configurable via YAML configuration files.
 
-## Yet another static website generator ?
-
-Alright, there are already a lot of powerful, well-designed static websites
-generators. So, why Juliet over Pelican or Jekyll ?
-
-Is it quite simple: Pelican and Jekyll are great, but Pelican and Jekyll are
-*big* !
-
-Juliet is designed to stay small, simple, understandable and forkable. It
-provides everything you need, without superfluous features.
-
 ## Dependencies
 
-Juliet has been successfully tested on Debian Stretch with following
-dependencies (Debian dependencies in brackets):
+Juliet requires following dependencies to work properly (Debian dependencies in brackets):
 
  * [Jinja2](http://jinja.pocoo.org/) , version 2.8 (python3-jinja2)
  * [pyyaml](https://github.com/yaml/pyyaml), version 3.12 (python3-yaml)
@@ -39,9 +27,9 @@ Required for tests:
 Juliet uses the python-markdown library for Markdown parsing. It is based on the
 original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax).
 
-However, Juliet has been implemented so that it doesn't depend on the Markdown
-implementation, and it is very easy to change it if you want to use Kramdown,
-for example.
+However, Juliet has been implemented so that it doesn't really 'depend' on the
+Markdown implementation, and it is very easy to change it if you want to use
+Kramdown, for example.
 
 ## Contributing
 

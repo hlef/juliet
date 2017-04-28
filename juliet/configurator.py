@@ -27,7 +27,7 @@ def getConfig(cfgFile):
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as exc:
-            print("Failed to parse configuration file: " + str(exc))
+            print("Error: Failed to parse configuration file: " + str(exc))
             exit(1)
 
     return config
