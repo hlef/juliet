@@ -10,7 +10,13 @@ setup(name='juliet',
       author_email='hle@owl.eu.com',
       license='MIT',
       packages=['juliet'],
-      scripts=['juliet.py'],
+      entry_points={
+          'console_scripts': [
+              'juliet = juliet:main'
+          ]
+      },
       zip_safe=False,
+      install_requires = ['jinja2', 'pygments', 'pyyaml', 'markdown',
+      'python-slugify'],
       test_suite='nose.collector',
       tests_require=['nose'])

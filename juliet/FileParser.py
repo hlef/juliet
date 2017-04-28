@@ -8,7 +8,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 def _processPygments(splittedBody):
-    """ Parse and replace highlight blocks in passed body."""
+    """ Parse and replace highlight blocks in passed body. """
 
     HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
     ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
@@ -64,7 +64,7 @@ def _processBody(splittedBody, baseurl):
 
 def _getHeaderLimit(splittedFile):
     """ Return the position of header limiter "---". Return -1 if there's no
-    header, None if passed file is bad formatted."""
+    header, None if passed file is bad formatted. """
 
     if(not splittedFile or splittedFile[0] != "---"):
         # File is empty or doesn't start by a header limiter
