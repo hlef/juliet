@@ -23,7 +23,7 @@ def getFromFolder(folder, config):
             raw = stream.read()
 
             # Parse file with FileParser and handle parsing errors.
-            parsed = FileParser.getParsed(raw, config["site"]["baseurl"])
+            parsed = FileParser.process(raw, config["site"]["baseurl"])
             if(parsed == None):
                 print("Failed to parse file " + folder + sourceFile)
                 exit(1)

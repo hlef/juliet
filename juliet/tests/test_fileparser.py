@@ -52,7 +52,7 @@ cat file
         self.assertEqual(result, FileParser.processPygments(body))
 
     def test_parsingValidFile1(self):
-        """ Make sure that getParsed() returns the excepted result when passing
+        """ Make sure that process() returns the excepted result when passing
         simple, valid files."""
 
         validFile = """---
@@ -63,12 +63,12 @@ whatever: anothervalue
 
 body"""
 
-        result = {"header": "key: value\nwhatever: anothervalue\n22i: valuewithnumbers5\n", "body": "<p>body</p>"}
+        result = {"header": "key: value\nwhatever: anothervalue\n22i: valuewithnumbers5", "body": "<p>body</p>"}
 
-        self.assertEqual(result, FileParser.getParsed(validFile, "/whatever/baseurl"))
+        self.assertEqual(result, FileParser.process(validFile, "/whatever/baseurl"))
 
     def test_parsingValidFile2(self):
-        """ Make sure that getParsed() returns the excepted result when passing
+        """ Make sure that process() returns the excepted result when passing
         simple, valid files with empty header and body."""
 
         validFile1 = """---
@@ -84,18 +84,24 @@ body"""
 
 ---"""
 
-        result3 = {"header": "\n", "body": ""}
+        result3 = {"header": "", "body": ""}
 
-        self.assertEqual(result1, FileParser.getParsed(validFile1, "/whatever/baseurl"))
-        self.assertEqual(result1, FileParser.getParsed(validFile2, "/whatever/baseurl"))
-        self.assertEqual(result3, FileParser.getParsed(validFile3, "/whatever/baseurl"))
+        validFile4 = """"""
+
+        result4 = {"header": "", "body": ""}
+
+        dummyUrl = "/whatever/baseurl"
+        self.assertEqual(result1, FileParser.process(validFile1, dummyUrl))
+        self.assertEqual(result1, FileParser.process(validFile2, dummyUrl))
+        self.assertEqual(result3, FileParser.process(validFile3, dummyUrl))
+        self.assertEqual(result4, FileParser.process(validFile4, dummyUrl))
 
     def test_invalidFile(self):
-        """ Make sure that getParsed() returns None if passed file is invalid."""
+        """ Make sure that process() returns None if passed file is invalid."""
 
         invalidFile = """---
 key: value
 
 body"""
 
-        self.assertEqual(None, FileParser.getParsed(invalidFile, "/whatever/baseurl"))
+        self.assertEqual(None, FileParser.process(invalidFile, "/whatever/baseurl"))

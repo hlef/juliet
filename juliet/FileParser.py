@@ -7,7 +7,7 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
-def processPygments(body):
+def _processPygments(body):
     """ Parse and replace highlight blocks in passed body."""
 
     HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
@@ -36,12 +36,53 @@ def processPygments(body):
         result += line + "\n"
 
     if(pygmentsBlock != ""):
+        # A pygments block was opened, but never closed
         return None
 
     return result
 
+def _processBody(splittedBody, baseurl):
+    """ Interpret passed body text as Markdown and return it as HTML. Replace
+    all occurences of @BASEURL by passed baseurl. """
 
-def getParsed(rawFile, baseurl):
+    print(splittedBody)
+    result = ""
+
+    if(not splittedBody):
+        # File is empty. Nothing to do.
+        return result
+
+    starter = 0
+    if(splittedBody[0] == ""):
+        starter = 1
+
+    # Go through body. Ignore first line if it is empty
+    for line in splittedBody[starter:]:
+        line = line.replace("@BASEURL", baseurl)
+        result += line + "\n"
+
+    return markdown(result)
+
+def _getHeaderLimit(splittedFile):
+    """ Return the position of header limiter "---". Return -1 if there's no
+    header, None if passed file is bad formatted."""
+
+    if(not splittedFile or splittedFile[0] != "---"):
+        # File is empty or doesn't start by a header limiter
+        return -1
+
+    i = 1
+
+    # Find next header limiter. Ignore first line since we know it is the first
+    # header limiter
+    for line in splittedFile[1:]:
+        if(line == "---"):
+            return i
+        i+=1
+
+    return None
+
+def process(rawFile, baseurl):
     """ Return a parsed form of passed page file.
 
     Passed file should have the following format:
@@ -70,53 +111,21 @@ def getParsed(rawFile, baseurl):
      bodyContent
      ""
 
-     would be returned as {"key": "value\n", "body": "<p>bodyContent</p>"}
+     would be returned as {"header": "key: value", "body": "<p>bodyContent</p>"}
 
      If file is bad formatted, None is returned.
      """
 
     result = {}
-    parsedLines = ""
     splittedFile = rawFile.splitlines()
 
-    firstBodyLine = False
-    headerPart = False
+    headerLimit = getHeaderLimit(splittedFile)
 
-    if(splittedFile[0] == "---"):
-        # First line of passed file declares a header.
-        splittedFile.pop(0)
-        headerPart = True
-    else:
-        # File has no header. Directly parse body.
-        result["header"] = ""
-        firstBodyLine = True
-
-    for line in splittedFile:
-        if(firstBodyLine):
-            # line is the first line of body part.
-            firstBodyLine = False
-            if(line == ""):
-                # First line of the body is empty. Ignore it.
-                continue
-
-        if(line == "---" and headerPart):
-            # Header's end. Save content of header in result["header"] and
-            # reinitialize parsedLines for body
-            headerPart = False
-            firstBodyLine = True
-            result["header"] = parsedLines
-            parsedLines = ""
-            continue
-
-        line = line.replace("@BASEURL", baseurl)
-        parsedLines += (line + "\n")
-
-    parsedLines = processPygments(parsedLines)
-
-    if((headerPart and "header" not in result.keys()) or parsedLines == None):
-        # Header was declared, but never closed. Something gone wrong.
+    if(headerLimit is None):
+        # Bad formatted file
         return None
 
-    result["body"] = markdown(parsedLines)
+    result["header"] = "\n".join(splittedFile[1:headerLimit])
+    result["body"] = processBody(splittedFile[headerLimit+1:], baseurl)
 
     return result

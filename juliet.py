@@ -7,10 +7,10 @@ def main():
     """ Parse command line arguments and execute passed subcommands. """
 
     # Parse subcommand
-    parser = argparse.ArgumentParser(description='Pythonic static sites generator')
+    parser = argparse.ArgumentParser(description='The lightweight static website generator')
     subparsers = parser.add_subparsers(dest="sp", help="sub-command to be executed")
 
-    parser_build = subparsers.add_parser('build', help="Build static site from local directory")
+    parser_build = subparsers.add_parser('build', help="Build static site from local directory to the directory specified in config.yml")
 
     args = parser.parse_args()
 
@@ -22,8 +22,7 @@ def build(args):
     """ Build website to configured location. """
 
     # Parse configuration
-    config = {}
-    config["site"] = Configurator.getConfig()
+    config = {"site" = Configurator.getConfig()}
 
     # Load articles and pages from the files
     config["posts"] = Loader.getFromFolder("posts/", config)
