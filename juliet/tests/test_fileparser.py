@@ -5,7 +5,35 @@ class fileParserTest(unittest.TestCase):
 
     FILENAME = "filename"
 
-    def test_parsingValidFile1(self):
+    def test_check_header1(self):
+        """ Make sure that _check_header() is working properly when passing
+        invalid headers."""
+
+        invalid_header = {"body": "value"}
+
+        self.assertRaises(ValueError, fileParser._check_header, invalid_header)
+
+    def test_check_header2(self):
+        """ Make sure that _check_header() is working properly when passing
+        valid headers."""
+
+        valid_header = {"key": "value", "key2": "value2", "foo": "bar"}
+
+        fileParser._check_header(valid_header)
+
+    def test_process_header1(self):
+        """ Make sure that the _processHeader() method is working well with
+        simple headers."""
+
+        header = """key: value
+key2: value2
+foo: bar"""
+
+        result = {"key": "value", "key2": "value2", "foo": "bar"}
+
+        self.assertEqual(result, fileParser._processHeader(header))
+
+    def test_parsing_valid_file1(self):
         """ Make sure that process() returns the excepted result when passing
         simple, valid files."""
 
@@ -22,7 +50,7 @@ body"""
 
         self.assertEqual(result, fileParser.process(validFile, self.FILENAME, "/baseurl"))
 
-    def test_parsingValidFile2(self):
+    def test_parsing_valid_file2(self):
         """ Make sure that process() returns the excepted result when passing
         simple, valid files with empty header and body."""
 
@@ -51,7 +79,17 @@ body"""
         self.assertEqual(result3, fileParser.process(validFile3, self.FILENAME, dummyUrl))
         self.assertEqual(result4, fileParser.process(validFile4, self.FILENAME, dummyUrl))
 
-    def test_pygments(self):
+    def test_parsing_invalid_file(self):
+        """ Make sure that process() returns None if passed file is invalid."""
+
+        invalidFile = """---
+key: value
+
+body"""
+
+        self.assertRaises(ValueError, fileParser.process, invalidFile, self.FILENAME, "/url")
+
+    def test_pygments_integration(self):
         """ Make sure that pygments is well integrated in the main process method."""
 
         file1 = """---
@@ -73,13 +111,3 @@ cat file
 </td></tr></table>""", 'file-name': self.FILENAME}
 
         self.assertEqual(result1, fileParser.process(file1, self.FILENAME, "/url"))
-
-    def test_invalidFile(self):
-        """ Make sure that process() returns None if passed file is invalid."""
-
-        invalidFile = """---
-key: value
-
-body"""
-
-        self.assertRaises(ValueError, fileParser.process, invalidFile, self.FILENAME, "/url")

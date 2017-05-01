@@ -7,7 +7,7 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
-FORBIDDEN_HEADER_ENTRIES = set("body")
+FORBIDDEN_HEADER_ENTRIES = {'body'}
 
 def _processPygments(splittedBody):
     """ Parse and replace highlight blocks in passed body. Raise ValueError if
@@ -69,7 +69,7 @@ def _processBody(splittedBody, baseurl):
 def _check_header(header):
     """ Raise ValueError if passed header contains invalid entries. """
 
-    set_header = set(header)
+    set_header = set(header.keys())
     if(not FORBIDDEN_HEADER_ENTRIES.isdisjoint(set_header)):
         raise ValueError("Header contains forbidden entries " + str(FORBIDDEN_HEADER_ENTRIES & set_header))
 
