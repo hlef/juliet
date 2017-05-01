@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os
+import os, logging
 from distutils.dir_util import copy_tree
 from jinja2 import Template, FileSystemLoader
 from juliet import paths
@@ -9,7 +9,10 @@ def _createIfNonExistent(directory):
     """ Create passed directory if it doesn't exists already. """
 
     if not os.path.exists(directory):
+        logging.debug("Creating directory " + directory)
         os.makedirs(directory)
+    else:
+        logging.warning("Writing to existing directory " + directory)
 
 def _write(directory, string):
     """ Write passed string to passed directory. """

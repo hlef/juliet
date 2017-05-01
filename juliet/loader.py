@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os, yaml, sys
+import os, yaml, sys, logging
 from slugify import slugify
 from juliet import fileParser
 
@@ -17,6 +17,8 @@ def getFromFolder(folder, config):
     elements = []
     entries = sorted(os.listdir(folder), reverse=True)
     for sourceFile in entries:
+        logging.debug("Loading file " + sourceFile)
+
         element = {}
         with open(folder + "/" + sourceFile, 'r') as stream:
             # Read raw file
