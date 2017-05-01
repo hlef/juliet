@@ -1,12 +1,12 @@
 # Juliet
 
-Juliet is a powerful static websites generator written in Python. It is designed
-to be as lightweight and understandable as possible.
+Juliet is a powerful (yet experimental :D) static websites generator written in
+Python. It is designed to be as lightweight and understandable as possible.
 
-Juliet is easily adaptable, forkable, and provides all functionalities one could
-except from a modern static websites generator. It uses Jinja2 templates,
-supports modular theming, markdown articles with Pygments syntax highlighting
-and is easily configurable via YAML configuration files.
+Juliet is easily adaptable, forkable, and provides all functionalities a modern
+static websites generator should provide. It uses Jinja2 templates, supports
+modular theming, markdown articles with Pygments syntax highlighting and is
+easily configurable via YAML configuration files.
 
 ## Dependencies
 
