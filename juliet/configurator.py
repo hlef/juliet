@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import yaml, os
+import yaml, os, sys
 from jinja2 import Environment, FileSystemLoader
 from juliet import paths
 
@@ -20,14 +20,12 @@ def getConfig(cfgFile):
     config = {}
 
     if(not os.path.isfile(cfgFile)):
-        print("Error: Could not find config file: " + cfgFile)
-        exit(1)
+        sys.exit("Error: Could not find config file: " + cfgFile)
 
     with open(cfgFile, 'r') as stream:
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as exc:
-            print("Error: Failed to parse configuration file: " + str(exc))
-            exit(1)
+            sys.exit("Error: Failed to parse configuration file: " + str(exc))
 
     return config

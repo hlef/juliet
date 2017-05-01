@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os, yaml
+import os, yaml, sys
 from slugify import slugify
 from juliet import fileParser
 
@@ -25,8 +25,7 @@ def getFromFolder(folder, config):
             # Parse file with FileParser and handle parsing errors.
             parsed = fileParser.process(raw, config["site"]["baseurl"])
             if(parsed == None):
-                print("Error: Failed to parse file " + folder + sourceFile)
-                exit(1)
+                sys.exit("Error: Failed to parse file " + folder + sourceFile)
 
             # Get body part, get file name
             element["body"] = parsed["body"]
@@ -40,8 +39,7 @@ def getFromFolder(folder, config):
                 try:
                     element = {**element, **yaml.load(header)}
                 except yaml.YAMLError as exc:
-                    print("Error: Failed to parse file header: " + str(exc))
-                    exit(1)
+                    sys.exit("Error: Failed to parse file header: " + str(exc))
 
                 # If there's a title entry, provide a slugified form of it
                 if("title" in element.keys()):
