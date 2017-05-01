@@ -27,9 +27,9 @@ Required for tests:
 Juliet uses the python-markdown library for Markdown parsing. It is based on the
 original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax).
 
-However, Juliet has been implemented so that it doesn't really 'depend' on the
-Markdown implementation, and it is very easy to change it if you want to use
-Kramdown, for example.
+Juliet has been implemented so that it doesn't really 'depend' on the Markdown
+implementation, and it is very easy to change it if you want to use Kramdown,
+for example.
 
 ## Contributing
 

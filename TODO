@@ -5,7 +5,7 @@ Blockers for alpha.2:
   - missing HOWTO Edit a theme
 * Testing:
   - fileParser has ugly tests, should really be improved
-  - loader could also be tested
+* Refactor builder: create a class Builder
 
 Blockers for alpha.3 ?
 

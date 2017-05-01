@@ -1,14 +1,17 @@
 #!/usr/bin/python3
 
-import os, re
+import os, re, yaml
+from slugify import slugify
 from markdown import markdown
-
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
+FORBIDDEN_HEADER_ENTRIES = set("body")
+
 def _processPygments(splittedBody):
-    """ Parse and replace highlight blocks in passed body. """
+    """ Parse and replace highlight blocks in passed body. Raise ValueError if
+    passed body contains invalid pygments blocks. """
 
     HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
     ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
@@ -36,14 +39,13 @@ def _processPygments(splittedBody):
         result.append(line)
 
     if(pygmentsBlock != ""):
-        # A pygments block was opened, but never closed
-        return None
+        raise ValueError("Failed to parse pygments block: A pygments block was opened, but never closed")
 
     return result
 
 def _processBody(splittedBody, baseurl):
     """ Interpret passed body text as Markdown and return it as HTML. Replace
-    all occurences of @BASEURL by passed baseurl. """
+    all occurences of @BASEURL by passed baseurl. Process Pygments blocks. """
 
     result = ""
 
@@ -51,20 +53,50 @@ def _processBody(splittedBody, baseurl):
         # File is empty. Nothing to do.
         return result
 
+    pygmentsProcessed = _processPygments(splittedBody)
+
     starter = 0
-    if(splittedBody[0] == ""):
+    if(pygmentsProcessed[0] == ""):
         starter = 1
 
     # Go through body. Ignore first line if it is empty
-    for line in splittedBody[starter:]:
+    for line in pygmentsProcessed[starter:]:
         line = line.replace("@BASEURL", baseurl)
         result += line + "\n"
 
     return markdown(result)
 
+def _check_header(header):
+    """ Raise ValueError if passed header contains invalid entries. """
+
+    set_header = set(header)
+    if(not FORBIDDEN_HEADER_ENTRIES.isdisjoint(set_header)):
+        raise ValueError("Header contains forbidden entries " + str(FORBIDDEN_HEADER_ENTRIES & set_header))
+
+def _processHeader(header):
+    """ Parse passed header."""
+
+    parsedHeader = {}
+
+    if(header != ""):
+        parsedHeader = {}
+
+        try:
+            parsedHeader = yaml.load(header)
+        except yaml.YAMLError as exc:
+            raise ValueError("Failed to parse file header: " + str(exc))
+
+        _check_header(parsedHeader)
+
+        # If there's a title entry, provide a slugified form of it
+        if("title" in parsedHeader.keys()):
+            parsedHeader["slug"] = slugify(parsedHeader["title"])
+
+    return parsedHeader
+
 def _getHeaderLimit(splittedFile):
     """ Return the position of header limiter "---". Return -1 if there's no
-    header, None if passed file is bad formatted. """
+    header. Raise ValueError if passed file is bad formatted. """
 
     if(not splittedFile or splittedFile[0] != "---"):
         # File is empty or doesn't start by a header limiter
@@ -79,12 +111,11 @@ def _getHeaderLimit(splittedFile):
             return i
         i+=1
 
-    return None
+    raise ValueError("Failed to parse header: Header never closed")
 
-def process(rawFile, baseurl):
-    """ Return a parsed form of passed page file.
-
-    Passed file should have the following format:
+def process(rawFile, filename, baseurl):
+    """ Return a parsed form of passed page file. Passed file should have the
+    following format:
 
     ""
     ---
@@ -94,13 +125,14 @@ def process(rawFile, baseurl):
     BODY, 0->* lines of markdown content.
     ""
 
+    A ValueError is raised if file is bad formatted.
+
     Returned file is represented by a dictionnary containing following entries:
      * "body": a string containing the markdown body converted to HTML (empty if
-     file has no body)
-     * "header": a string caintaining the header's content (empty if file has no
-     header)
+     file has no body). Pygments blocks are processed.
+     * the header's content.
 
-     For example, following file
+     For instance, the following file
 
      ""
      ---
@@ -110,23 +142,21 @@ def process(rawFile, baseurl):
      bodyContent
      ""
 
-     would be returned as {"header": "key: value", "body": "<p>bodyContent</p>"}
-
-     If file is bad formatted, None is returned.
+     would be returned as {"key": "value", "body": "<p>bodyContent</p>"}.
      """
 
     result = {}
     splittedFile = rawFile.splitlines()
 
+    # Find header and process it
     headerLimit = _getHeaderLimit(splittedFile)
+    parsedHeader = _processHeader("\n".join(splittedFile[1:headerLimit]))
+    result = {**result, **parsedHeader}
 
-    if(headerLimit is None):
-        # Bad formatted file
-        return None
+    # Find body and process it
+    splittedBody = splittedFile[headerLimit+1:]
+    result["body"] = _processBody(splittedBody, baseurl)
 
-    result["header"] = "\n".join(splittedFile[1:headerLimit])
-
-    pygmentsProcessed = _processPygments(splittedFile[headerLimit+1:])
-    result["body"] = _processBody(pygmentsProcessed, baseurl)
+    result["file-name"] = filename
 
     return result

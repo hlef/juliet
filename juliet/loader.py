@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
-import os, yaml, sys, logging
-from slugify import slugify
+import os, sys, logging
 from juliet import fileParser
 
 def getFromFolder(folder, config):
@@ -10,9 +9,7 @@ def getFromFolder(folder, config):
     Files in passed folder should have a valid Page format (see FileParser)
     since they will be parsed by FileParser.
 
-    The returned list of files is sorted in inverse order.
-
-    Returned files also have a "file-name" entry containing their file name. """
+    The returned list of files is sorted in inverse order. """
 
     elements = []
     entries = sorted(os.listdir(folder), reverse=True)
@@ -21,31 +18,12 @@ def getFromFolder(folder, config):
 
         element = {}
         with open(folder + "/" + sourceFile, 'r') as stream:
-            # Read raw file
             raw = stream.read()
 
-            # Parse file with FileParser and handle parsing errors.
-            parsed = fileParser.process(raw, config["site"]["baseurl"])
-            if(parsed == None):
-                sys.exit("Error: Failed to parse file " + folder + sourceFile)
-
-            # Get body part, get file name
-            element["body"] = parsed["body"]
-            element["file-name"] = sourceFile
-
-            # Get header part and parse it if not empty
-            header = parsed["header"]
-            if(header != ""):
-                # Header isn't empty, parse it and append its entries to the
-                # file dictionnary
-                try:
-                    element = {**element, **yaml.load(header)}
-                except yaml.YAMLError as exc:
-                    sys.exit("Error: Failed to parse file header: " + str(exc))
-
-                # If there's a title entry, provide a slugified form of it
-                if("title" in element.keys()):
-                    element["slug"] = slugify(element["title"])
+            try:
+                element = fileParser.process(raw, sourceFile, config["site"]["baseurl"])
+            except ValueError as err:
+                sys.exit("Error while loading " + sourceFile + ": " + str(err))
 
         elements.append(element)
     return elements
