@@ -5,17 +5,17 @@ from jinja2 import Environment, FileSystemLoader
 from juliet import paths
 
 def configureJinja(config):
-    """ Configure and return Jinja2 Environment.
+    """ Configure and return Jinja2 Environment. """
 
-    Do not enable autoescape since we actually *do not* want it. Otherwise, we
-    wouldn't be able to integrate html content in the templates proprely. """
+    # Do not enable autoescape since we actually *do not* want it. Otherwise, we
+    # wouldn't be able to integrate html content in the templates proprely.
 
     return Environment(
         loader=FileSystemLoader("./" + paths.THEMES_PATH + "/" + config["theme"]),
         autoescape=False)
 
 def getConfig(cfgFile):
-    """ Return parsed config file. """
+    """ Parse and return passed configuration file. """
 
     config = {}
 

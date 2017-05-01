@@ -6,7 +6,7 @@ from jinja2 import Template, FileSystemLoader
 from juliet import paths
 
 def _createIfNonExistent(directory):
-    """ Create passed directory if it doesn't exists already. """
+    """ Create passed directory if it doesn't exist already. """
 
     if not os.path.exists(directory):
         logging.debug("Creating directory " + directory)
@@ -14,8 +14,8 @@ def _createIfNonExistent(directory):
     else:
         logging.warning("Writing to existing directory " + directory)
 
-def _write(directory, string):
-    """ Write passed string to passed directory. """
+def _write(path, string):
+    """ Write passed string to passed path. """
 
     with open(directory, 'w') as stream:
         stream.write(string)
@@ -32,19 +32,21 @@ def installData(args):
     """ Install data and assets. """
 
     builddir = args["site"]["build-directory"]
+    datadir = paths.THEMES_PATH + "/" + args["site"]["theme"] + "/data/"
+
     _createIfNonExistent(builddir)
 
-    copy_tree(paths.THEMES_PATH + "/" + args["site"]["theme"] + "/data/",
-              builddir + "/" + paths.DATA_BUILDDIR)
+    copy_tree(datadir, builddir + "/" + paths.DATA_BUILDDIR)
     copy_tree(paths.ASSETS_PATH, builddir + "/" + paths.ASSETS_BUILDDIR)
 
 def buildStatics(args, jinjaEnv):
     """ Build static pages. """
 
     builddir = args["site"]["build-directory"]
+    staticsdir = paths.THEMES_PATH + "/" + args["site"]["theme"] + "/statics/"
     _createIfNonExistent(builddir)
 
-    for element in os.listdir(paths.THEMES_PATH + "/" + args["site"]["theme"] + "/statics/"):
+    for element in os.listdir(staticsdir):
         html = jinjaEnv.get_template("statics/" + element).render(args)
         _write(builddir + "/" + element, html)
 
