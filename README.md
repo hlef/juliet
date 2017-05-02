@@ -12,6 +12,7 @@ easily configurable via YAML configuration files.
 
 Juliet requires following dependencies to work properly (Debian dependencies in brackets):
 
+ * Python >= 3.3
  * [Jinja2](http://jinja.pocoo.org/) , version 2.8 (python3-jinja2)
  * [pyyaml](https://github.com/yaml/pyyaml), version 3.12 (python3-yaml)
  * [python-markdown](https://github.com/waylan/Python-Markdown), version 2.6.8 (python3-markdown)
