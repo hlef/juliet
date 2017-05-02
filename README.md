@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/hlef/juliet.svg?branch=master)](https://travis-ci.org/hlef/juliet)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
+
 # Juliet
 
 Juliet is a powerful (yet experimental :D) static websites generator written in
