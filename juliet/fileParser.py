@@ -151,7 +151,7 @@ def process(rawFile, filename, baseurl):
     # Find header and process it
     headerLimit = _getHeaderLimit(splittedFile)
     parsedHeader = _processHeader("\n".join(splittedFile[1:headerLimit]))
-    result = {**result, **parsedHeader}
+    result.update(parsedHeader)
 
     # Find body and process it
     splittedBody = splittedFile[headerLimit+1:]
