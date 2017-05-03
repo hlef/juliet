@@ -5,7 +5,6 @@
   - missing HOWTO Edit a theme
 * More tests for fileParser
 * Make Pygments dependency optional, allow deactivation of pygments in config.yml
-* Also accept config.*yaml* as config file
 
 ## Blockers for alpha.3 ?
 
