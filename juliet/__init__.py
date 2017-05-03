@@ -60,7 +60,7 @@ def parse_arguments():
 def configure_logging(debugLevel):
     """ Configure logging according to passed debug level. """
 
-    if(args.debug == 1):
+    if(debugLevel == 1):
         logging.basicConfig(level=logging.INFO)
-    elif(args.debug >= 2):
+    elif(debugLevel >= 2):
         logging.basicConfig(level=logging.DEBUG)
