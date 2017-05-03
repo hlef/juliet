@@ -1,5 +1,6 @@
 import argparse, logging
-from juliet import configurator, builder, loader, paths
+from juliet import configurator, loader, paths
+from juliet.builder import Builder
 
 def main():
     """ Parse command line arguments and execute passed subcommands. """
@@ -26,15 +27,18 @@ def build(args):
     logging.debug("Configuring Jinja2 environment...")
     jinjaEnv = configurator.configureJinja(config["site"])
 
+    logging.debug("Initializing builder...")
+    builder = Builder(jinjaEnv, config)
+
     logging.info("Building static pages...")
-    builder.buildStatics(config, jinjaEnv)
+    builder.buildStatics()
 
     logging.info("Building posts and pages...")
-    builder.buildPosts(config, jinjaEnv)
-    builder.buildPages(config, jinjaEnv)
+    builder.buildPosts()
+    builder.buildPages()
 
     logging.info("Installing assets...")
-    builder.installData(config)
+    builder.installData()
 
 def parse_arguments():
     """ Parse and return arguments. """

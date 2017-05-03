@@ -5,71 +5,79 @@ from distutils.dir_util import copy_tree
 from jinja2 import Template, FileSystemLoader
 from juliet import paths
 
-def _createIfNonExistent(directory):
-    """ Create passed directory if it doesn't exist already. """
+class Builder:
+    def __init__(self, jinjaEnv, buildArgs):
+        """ Constructor for class Builder. Takes a jinja Environment and the
+        build arguments dictionnary as argument. """
 
-    if not os.path.exists(directory):
-        logging.debug("Creating directory " + directory)
-        os.makedirs(directory)
-    else:
-        logging.warning("Writing to existing directory " + directory)
+        self.jinjaEnv = jinjaEnv
+        self.buildArgs = buildArgs
 
-def _write(path, string):
-    """ Write passed string to passed path. """
+    def _createIfNonExistent(self, directory):
+        """ Create passed directory if it doesn't exist already. """
 
-    with open(directory, 'w') as stream:
-        stream.write(string)
+        if not os.path.exists(directory):
+            logging.debug("Creating directory " + directory)
+            os.makedirs(directory)
+        else:
+            logging.warning("Writing to existing directory " + directory)
 
-def _formatArgsAndRender(args, page, template):
-    """ Add required entries to rendering args and return rendered template. """
+    def _write(self, path, string):
+        """ Write passed string to passed path. """
 
-    renderingArgs = args
-    renderingArgs["page"] = page
-    renderingArgs["content"] = page["body"]
-    return template.render(args)
+        with open(path, 'w') as stream:
+            stream.write(string)
 
-def installData(args):
-    """ Install data and assets. """
+    def _formatArgsAndRender(self, page, template):
+        """ Add required entries to rendering args and return rendered template. """
 
-    builddir = args["site"]["build-directory"]
-    datadir = paths.THEMES_PATH + "/" + args["site"]["theme"] + "/data/"
+        renderingArgs = self.buildArgs
+        renderingArgs["page"] = page
+        renderingArgs["content"] = page["body"]
+        return template.render(renderingArgs)
 
-    _createIfNonExistent(builddir)
+    def installData(self):
+        """ Install data and assets. """
 
-    copy_tree(datadir, builddir + "/" + paths.DATA_BUILDDIR)
-    copy_tree(paths.ASSETS_PATH, builddir + "/" + paths.ASSETS_BUILDDIR)
+        builddir = self.buildArgs["site"]["build-directory"]
+        datadir = paths.THEMES_PATH + "/" + self.buildArgs["site"]["theme"] + "/data/"
 
-def buildStatics(args, jinjaEnv):
-    """ Build static pages. """
+        self._createIfNonExistent(builddir)
 
-    builddir = args["site"]["build-directory"]
-    staticsdir = paths.THEMES_PATH + "/" + args["site"]["theme"] + "/statics/"
-    _createIfNonExistent(builddir)
+        copy_tree(datadir, builddir + "/" + paths.DATA_BUILDDIR)
+        copy_tree(paths.ASSETS_PATH, builddir + "/" + paths.ASSETS_BUILDDIR)
 
-    for element in os.listdir(staticsdir):
-        html = jinjaEnv.get_template("statics/" + element).render(args)
-        _write(builddir + "/" + element, html)
+    def buildStatics(self):
+        """ Build static pages. """
 
-def buildPosts(args, jinjaEnv):
-    """ Build posts. """
+        builddir = self.buildArgs["site"]["build-directory"]
+        staticsdir = paths.THEMES_PATH + "/" + self.buildArgs["site"]["theme"] + "/statics/"
+        self._createIfNonExistent(builddir)
 
-    builddir = args["site"]["build-directory"] + "/" + paths.POSTS_BUILDDIR
-    _createIfNonExistent(builddir)
+        for element in os.listdir(staticsdir):
+            html = self.jinjaEnv.get_template("statics/" + element).render(self.buildArgs)
+            self._write(builddir + "/" + element, html)
 
-    template = jinjaEnv.get_template("templates/posts.html")
+    def buildPosts(self):
+        """ Build posts. """
 
-    for post in args["posts"]:
-        html = _formatArgsAndRender(args, post, template)
-        _write(builddir + "/" + post["slug"], html)
+        builddir = self.buildArgs["site"]["build-directory"] + "/" + paths.POSTS_BUILDDIR
+        self._createIfNonExistent(builddir)
 
-def buildPages(args, jinjaEnv):
-    """ Build pages. """
+        template = self.jinjaEnv.get_template("templates/posts.html")
 
-    builddir = args["site"]["build-directory"]
-    _createIfNonExistent(builddir)
+        for post in self.buildArgs["posts"]:
+            html = self._formatArgsAndRender(post, template)
+            self._write(builddir + "/" + post["slug"], html)
 
-    template = jinjaEnv.get_template("templates/pages.html")
+    def buildPages(self):
+        """ Build pages. """
 
-    for page in args["pages"]:
-        html = _formatArgsAndRender(args, page, template)
-        _write(builddir + "/" + page["permalink"], html)
+        builddir = self.buildArgs["site"]["build-directory"]
+        self._createIfNonExistent(builddir)
+
+        template = self.jinjaEnv.get_template("templates/pages.html")
+
+        for page in self.buildArgs["pages"]:
+            html = self._formatArgsAndRender(page, template)
+            self._write(builddir + "/" + page["permalink"], html)
