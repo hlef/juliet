@@ -13,6 +13,19 @@ class Builder:
         self.jinjaEnv = jinjaEnv
         self.buildArgs = buildArgs
 
+    def build(self):
+        """ Build and install the website as described in the configuration. """
+
+        logging.info("Building static pages...")
+        self._buildStatics()
+
+        logging.info("Building posts and pages...")
+        self._buildPosts()
+        self._buildPages()
+
+        logging.info("Installing assets...")
+        self._installData()
+
     def _createIfNonExistent(self, directory):
         """ Create passed directory if it doesn't exist already. """
 
@@ -29,14 +42,14 @@ class Builder:
             stream.write(string)
 
     def _formatArgsAndRender(self, page, template):
-        """ Add required entries to rendering args and return rendered template. """
+        """ Render passed template as a page/post template and return it. """
 
         renderingArgs = self.buildArgs
         renderingArgs["page"] = page
         renderingArgs["content"] = page["body"]
         return template.render(renderingArgs)
 
-    def installData(self):
+    def _installData(self):
         """ Install data and assets. """
 
         builddir = self.buildArgs["site"]["build-directory"]
@@ -47,8 +60,8 @@ class Builder:
         copy_tree(datadir, builddir + "/" + paths.DATA_BUILDDIR)
         copy_tree(paths.ASSETS_PATH, builddir + "/" + paths.ASSETS_BUILDDIR)
 
-    def buildStatics(self):
-        """ Build static pages. """
+    def _buildStatics(self):
+        """ Build static pages and install them. """
 
         builddir = self.buildArgs["site"]["build-directory"]
         staticsdir = paths.THEMES_PATH + "/" + self.buildArgs["site"]["theme"] + "/statics/"
@@ -58,8 +71,8 @@ class Builder:
             html = self.jinjaEnv.get_template("statics/" + element).render(self.buildArgs)
             self._write(builddir + "/" + element, html)
 
-    def buildPosts(self):
-        """ Build posts. """
+    def _buildPosts(self):
+        """ Build posts and install them. """
 
         builddir = self.buildArgs["site"]["build-directory"] + "/" + paths.POSTS_BUILDDIR
         self._createIfNonExistent(builddir)
@@ -70,8 +83,8 @@ class Builder:
             html = self._formatArgsAndRender(post, template)
             self._write(builddir + "/" + post["slug"], html)
 
-    def buildPages(self):
-        """ Build pages. """
+    def _buildPages(self):
+        """ Build pages and install them. """
 
         builddir = self.buildArgs["site"]["build-directory"]
         self._createIfNonExistent(builddir)

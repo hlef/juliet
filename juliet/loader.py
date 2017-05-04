@@ -4,12 +4,10 @@ import os, sys, logging
 from juliet import fileParser
 
 def getFromFolder(folder, config):
-    """ Return a list of parsed files contained in passed folder.
+    """ Load files contained in passed folder, pre-process them using fileParser
+    and return them as a list sorted in inverse alphabetical order.
 
-    Files in passed folder should have a valid Page format (see FileParser)
-    since they will be parsed by FileParser.
-
-    The returned list of files is sorted in inverse order. """
+    Files in passed folder should have a valid Page format (see FileParser). """
 
     elements = []
     entries = sorted(os.listdir(folder), reverse=True)

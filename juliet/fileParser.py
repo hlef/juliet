@@ -9,9 +9,13 @@ from pygments.formatters import HtmlFormatter
 
 FORBIDDEN_HEADER_ENTRIES = {'body'}
 
+# TODO Wrap in class 'Loader'
+
 def _processPygments(splittedBody):
     """ Parse and replace highlight blocks in passed body. Raise ValueError if
     passed body contains invalid pygments blocks. """
+
+    # TODO Cleanup. Yeah, really.
 
     HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
     ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")

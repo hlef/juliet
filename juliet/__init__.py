@@ -20,25 +20,16 @@ def build(args):
     logging.info("Parsing configuration...")
     config = {"site": configurator.getConfig(args.config)}
 
-    logging.info("Loading and parsing content...")
+    logging.info("Loading and pre-processing content...")
     config["posts"] = loader.getFromFolder(paths.POSTS_PATH, config)
     config["pages"] = loader.getFromFolder(paths.PAGES_PATH, config)
 
     logging.debug("Configuring Jinja2 environment...")
-    jinjaEnv = configurator.configureJinja(config["site"])
+    jinjaEnv = configurator.configureJinja(config["site"]["theme"])
 
     logging.debug("Initializing builder...")
     builder = Builder(jinjaEnv, config)
-
-    logging.info("Building static pages...")
-    builder.buildStatics()
-
-    logging.info("Building posts and pages...")
-    builder.buildPosts()
-    builder.buildPages()
-
-    logging.info("Installing assets...")
-    builder.installData()
+    builder.build()
 
 def parse_arguments():
     """ Parse and return arguments. """

@@ -1,10 +1,8 @@
 ## Blockers for alpha.2:
 
 * Documentation:
-  - missing HOWTO Build your first website
-  - missing HOWTO Edit a theme
-* More tests for fileParser
-* Make Pygments dependency optional, allow deactivation of pygments in config.yml
+  - finish HOWTO Build your first website
+* Process TODOs in fileParser
 
 ## Blockers for alpha.3 ?
 
