@@ -16,7 +16,7 @@ setup(name='juliet',
           ]
       },
       zip_safe=False,
-      install_requires = ['jinja2', 'pygments', 'pyyaml>=3.11', 'markdown',
+      install_requires = ['jinja2>=2.7', 'pygments', 'pyyaml>=3.11', 'markdown',
       'python-slugify'],
       test_suite='nose.collector',
       tests_require=['nose'])
