@@ -8,7 +8,7 @@ A Juliet website is organized as following.
 
     .
     ├── assets
-    │   ├── ...
+    │   └── ...
     ├── config.yml
     ├── pages
     │   └── ...
@@ -36,25 +36,59 @@ they are required by the build system:
 
 The set of required entries in the configuration file may vary depending on the
 theme you are using. You can find more informations about it in your theme
-directory, said under `themes/your_theme/README`.
-
-For instance, the *boots* theme requires the following configuration variables:
-
-    TODO
+directory, under `themes/your_theme/README`.
 
 ### Blog posts under *posts/*
 
-Juliet supports Markdown articles in the original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax).
-Articles go in the `posts/` directory.
+Juliet posts are divided in two parts.
+ * The *header*, containing YAML-formatted informations about the post
+ * The post's *body*, in in the original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax)
+
+For example:
+
+    ---
+    title: "Hello, world !"
+    date: 2016-04-06 16:07:35
+    ---
+
+    Hello, **world** !
+
+The set of required entries in post headers may vary depending on the
+theme you are using. You can find more informations about it in your theme
+directory, under `themes/your_theme/README`.
+
+Posts go in the `posts/` directory.
 
 ### Site pages under *pages/*
 
-Pages should also be written in Markdown. Pages go in the `pages/` directory.
+Pages follow the exact same template as posts and go in the `pages/` directory.
 
 ### Some words about themes
+
+Juliet themes are organized as following:
+
+    .
+    ├── data
+    │   ├── css
+    │   │   └── ...
+    │   ├── fonts
+    │   │   └── ...
+    │   └── js
+    │       └── ...
+    ├── includes
+    │   └── ... (ex: head.html, navbar.html, etc.)
+    ├── statics
+    │   ├── index.html
+    │   └── ...
+    └── templates
+        ├── pages.html
+        ├── posts.html
+        └── ...
 
 ## Building the website
 
 Build the website using the `juliet build` command. It will build the website
 in `build-area`. Alternatively, you may want to specify a destination using
-`--build-destination`.
+`--build-dst`.
+
+You can also specify the source directory via `--build-src`.
