@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import os, sys, logging
-from juliet import fileParser
+from juliet.pageprocessor import PageProcessor
 
 def getFromFolder(folder, config):
     """ Load files contained in passed folder, pre-process them using fileParser
@@ -11,6 +11,9 @@ def getFromFolder(folder, config):
 
     elements = []
     entries = sorted(os.listdir(folder), reverse=True)
+
+    processor = PageProcessor(config["site"]["baseurl"])
+
     for sourceFile in entries:
         logging.debug("Loading file " + sourceFile)
 
@@ -19,7 +22,7 @@ def getFromFolder(folder, config):
             raw = stream.read()
 
             try:
-                element = fileParser.process(raw, sourceFile, config["site"]["baseurl"])
+                element = processor.process(raw, sourceFile)
             except ValueError as err:
                 sys.exit("Error while loading " + sourceFile + ": " + str(err))
 
