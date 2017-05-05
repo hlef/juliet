@@ -47,10 +47,10 @@ def parse_arguments():
     parser_build = subparsers.add_parser('build', parents=[parent_parser],
     help="Build static site from local directory to the directory specified in config.yml")
 
-    parser_build.add_argument('--build-src', dest="src", type=str, default="",
+    parser_build.add_argument('--build-src', '-s', dest="src", type=str, default="",
                     help='directory to load source')
 
-    parser_build.add_argument('--build-destination', dest="dest", type=str,
+    parser_build.add_argument('--build-dst', '-ds', dest="dest", type=str,
                     default=paths.DEFAULT_BUILDDIR,
                     help='build and install website in passed directory')
 
