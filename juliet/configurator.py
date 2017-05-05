@@ -1,19 +1,19 @@
 #!/usr/bin/python3
 
-import yaml, os, sys
+import yaml, os, sys, logging
 from jinja2 import Environment, FileSystemLoader
 from juliet import paths
 
-def configureJinja(theme):
-    """ Configure and return Jinja2 Environment. Takes the theme directory as
-    argument. """
+def configureJinja(theme, src):
+    """ Configure and return Jinja2 Environment. """
 
     # Do not enable autoescape since we actually *do not* want it. Otherwise, we
     # wouldn't be able to integrate html content in the templates properly.
 
-    return Environment(
-        loader=FileSystemLoader("./" + paths.THEMES_PATH + "/" + theme),
-        autoescape=False)
+    themePath = os.path.join(src, paths.THEMES_PATH, theme)
+    logging.debug("Setting up environment at " + themePath)
+
+    return Environment(loader=FileSystemLoader(themePath), autoescape=False)
 
 def getConfig(cfgFile):
     """ Parse and return passed configuration file. """

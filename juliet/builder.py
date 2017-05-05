@@ -6,15 +6,19 @@ from jinja2 import Template, FileSystemLoader
 from juliet import paths
 
 class Builder:
-    def __init__(self, jinjaEnv, buildArgs):
+    def __init__(self, jinjaEnv, buildArgs, src, dest):
         """ Constructor for class Builder. Takes a jinja Environment and the
         build arguments dictionnary as argument. """
 
         self.jinjaEnv = jinjaEnv
         self.buildArgs = buildArgs
+        self.source = src
+        self.destination = dest
 
     def build(self):
         """ Build and install the website as described in the configuration. """
+
+        self._createIfNonExistent(self.destination)
 
         logging.info("Building static pages...")
         self._buildStatics()
@@ -52,45 +56,38 @@ class Builder:
     def _installData(self):
         """ Install data and assets. """
 
-        builddir = self.buildArgs["site"]["build-directory"]
-        datadir = paths.THEMES_PATH + "/" + self.buildArgs["site"]["theme"] + "/data/"
+        assets_path = os.path.join(self.source, paths.ASSETS_PATH)
+        data_path = os.path.join(self.source, paths.THEMES_PATH, self.buildArgs["site"]["theme"], "data")
 
-        self._createIfNonExistent(builddir)
-
-        copy_tree(datadir, builddir + "/" + paths.DATA_BUILDDIR)
-        copy_tree(paths.ASSETS_PATH, builddir + "/" + paths.ASSETS_BUILDDIR)
+        copy_tree(data_path, os.path.join(self.destination, paths.DATA_BUILDDIR))
+        copy_tree(assets_path, os.path.join(self.destination, paths.ASSETS_BUILDDIR))
 
     def _buildStatics(self):
         """ Build static pages and install them. """
 
-        builddir = self.buildArgs["site"]["build-directory"]
-        staticsdir = paths.THEMES_PATH + "/" + self.buildArgs["site"]["theme"] + "/statics/"
-        self._createIfNonExistent(builddir)
+        staticsdir = os.path.join(self.source, paths.THEMES_PATH, self.buildArgs["site"]["theme"], "statics")
 
         for element in os.listdir(staticsdir):
-            html = self.jinjaEnv.get_template("statics/" + element).render(self.buildArgs)
-            self._write(builddir + "/" + element, html)
+            html = self.jinjaEnv.get_template(os.path.join("statics", element)).render(self.buildArgs)
+            self._write(os.path.join(self.destination, element), html)
 
     def _buildPosts(self):
         """ Build posts and install them. """
 
-        builddir = self.buildArgs["site"]["build-directory"] + "/" + paths.POSTS_BUILDDIR
+        builddir = os.path.join(self.destination, paths.POSTS_BUILDDIR)
         self._createIfNonExistent(builddir)
 
-        template = self.jinjaEnv.get_template("templates/posts.html")
+        template = self.jinjaEnv.get_template(os.path.join("templates", "posts.html"))
 
         for post in self.buildArgs["posts"]:
             html = self._formatArgsAndRender(post, template)
-            self._write(builddir + "/" + post["slug"], html)
+            self._write(os.path.join(builddir, post["slug"]), html)
 
     def _buildPages(self):
         """ Build pages and install them. """
 
-        builddir = self.buildArgs["site"]["build-directory"]
-        self._createIfNonExistent(builddir)
-
-        template = self.jinjaEnv.get_template("templates/pages.html")
+        template = self.jinjaEnv.get_template(os.path.join("templates", "pages.html"))
 
         for page in self.buildArgs["pages"]:
             html = self._formatArgsAndRender(page, template)
-            self._write(builddir + "/" + page["permalink"], html)
+            self._write(os.path.join(self.destination, page["permalink"]), html)

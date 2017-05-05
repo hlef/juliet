@@ -1,4 +1,4 @@
-import argparse, logging
+import argparse, logging, os
 from juliet import configurator, loader, paths
 from juliet.builder import Builder
 
@@ -18,17 +18,17 @@ def build(args):
     """ Build website to configured location. """
 
     logging.info("Parsing configuration...")
-    config = {"site": configurator.getConfig(args.config)}
+    config = {"site": configurator.getConfig(os.path.join(args.src, paths.CFG_FILE))}
 
     logging.info("Loading and pre-processing content...")
-    config["posts"] = loader.getFromFolder(paths.POSTS_PATH, config)
-    config["pages"] = loader.getFromFolder(paths.PAGES_PATH, config)
+    config["posts"] = loader.getFromFolder(os.path.join(args.src, paths.POSTS_PATH), config)
+    config["pages"] = loader.getFromFolder(os.path.join(args.src, paths.PAGES_PATH), config)
 
     logging.debug("Configuring Jinja2 environment...")
-    jinjaEnv = configurator.configureJinja(config["site"]["theme"])
+    jinjaEnv = configurator.configureJinja(config["site"]["theme"], args.src)
 
     logging.debug("Initializing builder...")
-    builder = Builder(jinjaEnv, config)
+    builder = Builder(jinjaEnv, config, args.src, args.dest)
     builder.build()
 
 def parse_arguments():
@@ -47,8 +47,12 @@ def parse_arguments():
     parser_build = subparsers.add_parser('build', parents=[parent_parser],
     help="Build static site from local directory to the directory specified in config.yml")
 
-    parser_build.add_argument('--config', type=str, default=paths.CFG_FILE,
-                    help='alternative config file to use instead of config.yml')
+    parser_build.add_argument('--build-src', dest="src", type=str, default="",
+                    help='directory to load source')
+
+    parser_build.add_argument('--build-destination', dest="dest", type=str,
+                    default=paths.DEFAULT_BUILDDIR,
+                    help='build and install website in passed directory')
 
     return main_parser.parse_args()
 

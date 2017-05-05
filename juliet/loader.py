@@ -15,7 +15,7 @@ def getFromFolder(folder, config):
         logging.debug("Loading file " + sourceFile)
 
         element = {}
-        with open(folder + "/" + sourceFile, 'r') as stream:
+        with open(os.path.join(folder, sourceFile), 'r') as stream:
             raw = stream.read()
 
             try:
