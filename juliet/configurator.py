@@ -4,7 +4,7 @@ import yaml, os, sys, logging
 from jinja2 import Environment, FileSystemLoader
 from juliet import paths
 
-def configureJinja(theme, src):
+def configure_jinja(theme, src):
     """ Configure and return Jinja2 Environment. """
 
     # Do not enable autoescape since we actually *do not* want it. Otherwise, we
@@ -15,7 +15,7 @@ def configureJinja(theme, src):
 
     return Environment(loader=FileSystemLoader(themePath), autoescape=False)
 
-def getConfig(cfgFile):
+def get_config(cfgFile):
     """ Parse and return passed configuration file. """
 
     config = {}

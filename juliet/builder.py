@@ -18,19 +18,19 @@ class Builder:
     def build(self):
         """ Build and install the website as described in the configuration. """
 
-        self._createIfNonExistent(self.destination)
+        self._create_if_non_existent(self.destination)
 
         logging.info("Building static pages...")
-        self._buildStatics()
+        self._build_statics()
 
         logging.info("Building posts and pages...")
-        self._buildPosts()
-        self._buildPages()
+        self._build_posts()
+        self._build_pages()
 
         logging.info("Installing assets...")
-        self._installData()
+        self._install_data()
 
-    def _createIfNonExistent(self, directory):
+    def _create_if_non_existent(self, directory):
         """ Create passed directory if it doesn't exist already. """
 
         if not os.path.exists(directory):
@@ -45,7 +45,7 @@ class Builder:
         with open(path, 'w') as stream:
             stream.write(string)
 
-    def _formatArgsAndRender(self, page, template):
+    def _format_args_and_render(self, page, template):
         """ Render passed template as a page/post template and return it. """
 
         renderingArgs = self.buildArgs
@@ -53,7 +53,7 @@ class Builder:
         renderingArgs["content"] = page["body"]
         return template.render(renderingArgs)
 
-    def _installData(self):
+    def _install_data(self):
         """ Install data and assets. """
 
         assets_path = os.path.join(self.source, paths.ASSETS_PATH)
@@ -62,7 +62,7 @@ class Builder:
         copy_tree(data_path, os.path.join(self.destination, paths.DATA_BUILDDIR))
         copy_tree(assets_path, os.path.join(self.destination, paths.ASSETS_BUILDDIR))
 
-    def _buildStatics(self):
+    def _build_statics(self):
         """ Build static pages and install them. """
 
         staticsdir = os.path.join(self.source, paths.THEMES_PATH, self.buildArgs["site"]["theme"], "statics")
@@ -71,23 +71,23 @@ class Builder:
             html = self.jinjaEnv.get_template(os.path.join("statics", element)).render(self.buildArgs)
             self._write(os.path.join(self.destination, element), html)
 
-    def _buildPosts(self):
+    def _build_posts(self):
         """ Build posts and install them. """
 
         builddir = os.path.join(self.destination, paths.POSTS_BUILDDIR)
-        self._createIfNonExistent(builddir)
+        self._create_if_non_existent(builddir)
 
         template = self.jinjaEnv.get_template(os.path.join("templates", "posts.html"))
 
         for post in self.buildArgs["posts"]:
-            html = self._formatArgsAndRender(post, template)
+            html = self._format_args_and_render(post, template)
             self._write(os.path.join(builddir, post["slug"]), html)
 
-    def _buildPages(self):
+    def _build_pages(self):
         """ Build pages and install them. """
 
         template = self.jinjaEnv.get_template(os.path.join("templates", "pages.html"))
 
         for page in self.buildArgs["pages"]:
-            html = self._formatArgsAndRender(page, template)
+            html = self._format_args_and_render(page, template)
             self._write(os.path.join(self.destination, page["permalink"]), html)

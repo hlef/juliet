@@ -3,7 +3,7 @@
 import os, sys, logging
 from juliet.pageprocessor import PageProcessor
 
-def getFromFolder(folder, config):
+def get_from_folder(folder, config):
     """ Load files contained in passed folder, pre-process them using fileParser
     and return them as a list sorted in inverse alphabetical order.
 

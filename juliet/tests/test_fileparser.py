@@ -8,6 +8,17 @@ class fileParserTest(unittest.TestCase):
     def setUp(self):
         self.processor = PageProcessor("/base/url")
 
+    def test_get_header_limit1(self):
+        """ Make sure that _get_header_limit() is working well with simple files. """
+
+        splittedFile1 = ["---", "---", "body"]
+        splittedFile2 = ["body"]
+        splittedFile3 = ["---", "key:value", "---", "body"]
+
+        self.assertEqual(1, self.processor._get_header_limit(splittedFile1))
+        self.assertEqual(-1, self.processor._get_header_limit(splittedFile2))
+        self.assertEqual(2, self.processor._get_header_limit(splittedFile3))
+
     def test_check_header1(self):
         """ Make sure that _check_header() is working properly when passing
         invalid headers."""
@@ -25,7 +36,7 @@ class fileParserTest(unittest.TestCase):
         self.processor._check_header(valid_header)
 
     def test_process_header1(self):
-        """ Make sure that the _processHeader() method is working well with
+        """ Make sure that the _process_header() method is working well with
         simple headers."""
 
         header = """key: value
@@ -34,7 +45,7 @@ foo: bar"""
 
         result = {"key": "value", "key2": "value2", "foo": "bar"}
 
-        self.assertEqual(result, self.processor._processHeader(header))
+        self.assertEqual(result, self.processor._process_header(header))
 
     def test_parsing_valid_file1(self):
         """ Make sure that process() returns the excepted result when passing

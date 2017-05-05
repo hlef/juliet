@@ -18,14 +18,14 @@ def build(args):
     """ Build website to configured location. """
 
     logging.info("Parsing configuration...")
-    config = {"site": configurator.getConfig(os.path.join(args.src, paths.CFG_FILE))}
+    config = {"site": configurator.get_config(os.path.join(args.src, paths.CFG_FILE))}
 
     logging.info("Loading and pre-processing content...")
-    config["posts"] = loader.getFromFolder(os.path.join(args.src, paths.POSTS_PATH), config)
-    config["pages"] = loader.getFromFolder(os.path.join(args.src, paths.PAGES_PATH), config)
+    config["posts"] = loader.get_from_folder(os.path.join(args.src, paths.POSTS_PATH), config)
+    config["pages"] = loader.get_from_folder(os.path.join(args.src, paths.PAGES_PATH), config)
 
     logging.debug("Configuring Jinja2 environment...")
-    jinjaEnv = configurator.configureJinja(config["site"]["theme"], args.src)
+    jinjaEnv = configurator.configure_jinja(config["site"]["theme"], args.src)
 
     logging.debug("Initializing builder...")
     builder = Builder(jinjaEnv, config, args.src, args.dest)

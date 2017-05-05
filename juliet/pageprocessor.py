@@ -13,7 +13,7 @@ class PageProcessor:
     def __init__(self, baseurl):
         self.baseurl = baseurl
 
-    def _processPygments(self, splittedBody):
+    def _process_pygments(self, splittedBody):
         """ Parse and replace highlight blocks in passed body. Raise ValueError if
         passed body contains invalid pygments blocks. """
 
@@ -47,7 +47,7 @@ class PageProcessor:
 
         return result
 
-    def _processBody(self, splittedBody, baseurl):
+    def _process_body(self, splittedBody, baseurl):
         """ Interpret passed body text as Markdown and return it as HTML. Replace
         all occurences of @BASEURL by passed baseurl. Process Pygments blocks. """
 
@@ -57,7 +57,7 @@ class PageProcessor:
             # File is empty. Nothing to do.
             return result
 
-        pygmentsProcessed = self._processPygments(splittedBody)
+        pygmentsProcessed = self._process_pygments(splittedBody)
 
         starter = 0
         if(pygmentsProcessed[0] == ""):
@@ -78,7 +78,7 @@ class PageProcessor:
             invalid_entries = str(self.FORBIDDEN_HEADER_ENTRIES & set_header)
             raise ValueError("Header contains forbidden entries " + invalid_entries)
 
-    def _processHeader(self, header):
+    def _process_header(self, header):
         """ Parse passed header."""
 
         parsedHeader = {}
@@ -99,7 +99,7 @@ class PageProcessor:
 
         return parsedHeader
 
-    def _getHeaderLimit(self, splittedFile):
+    def _get_header_limit(self, splittedFile):
         """ Return the position of header limiter "---". Return -1 if there's no
         header. Raise ValueError if passed file is bad formatted. """
 
@@ -154,13 +154,13 @@ class PageProcessor:
         splittedFile = rawFile.splitlines()
 
         # Find header and process it
-        headerLimit = self._getHeaderLimit(splittedFile)
-        parsedHeader = self._processHeader("\n".join(splittedFile[1:headerLimit]))
+        headerLimit = self._get_header_limit(splittedFile)
+        parsedHeader = self._process_header("\n".join(splittedFile[1:headerLimit]))
         result.update(parsedHeader)
 
         # Find body and process it
         splittedBody = splittedFile[headerLimit+1:]
-        result["body"] = self._processBody(splittedBody, self.baseurl)
+        result["body"] = self._process_body(splittedBody, self.baseurl)
 
         result["file-name"] = filename
 
