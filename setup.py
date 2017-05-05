@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='juliet',
-      version='0.1-alpha.1',
+      version='0.1-alpha2',
       description='The lightweight static website generator',
       url='http://github.com/hlef/juliet',
       author='Hugo Lefeuvre',
