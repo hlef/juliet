@@ -14,6 +14,12 @@ Some examples of what Juliet can:
  * markdown articles and pages with Pygments syntax highlighting
  * easy configuration in YAML syntax
 
+## Examples
+
+Some sites using Juliet:
+
+ * [Hugo's Haunt](https://www.owl.eu.com), *[boots](https://github.com/hlef/juliet-boots-theme)* theme
+
 ## Dependencies
 
 Juliet requires Python **>= 3.3** to work properly ([why](http://jinja.pocoo.org/docs/2.9/faq/#why-is-there-no-python-2-3-2-4-2-5-3-1-3-2-support)).
@@ -40,9 +46,12 @@ Juliet uses the [python-markdown](https://github.com/waylan/Python-Markdown) lib
 original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax).
 
 Juliet has been implemented so that it doesn't really *depend* on the Markdown
-implementation, and it is very easy to change it if you want to use Kramdown,
-for example.
+implementation. Changing it is quite simple if you want to use Kramdown, for example.
 
 ## Contributing
+
+* Release blockers and improvements ideas are in `TODO`
+* Design themes for Juliet, and add it in `docs/recommended-themes.md` !
+* You are using Juliet ? Add a link to your website here !
 
 Bugs reports and pull-requests are welcome ! :smile:

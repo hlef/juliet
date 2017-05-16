@@ -20,11 +20,11 @@ A Juliet website is organized as following.
 
 `juliet init` can initialize this file structure for you in the current directory.
 
-Please, note that Juliet won't install a theme in themes/. You'll have to pick one
+Please, note that Juliet won't install a theme in `themes/̀ . You'll have to pick one
 somewhere and install it, or design it by yourself (more informations available in
-docs/themes-howto.md).
+`docs/themes-howto.md`).
 
-We also provide a list of recommended themes in docs/recommended-themes.md.
+We also provide a list of recommended themes in ̀`docs/recommended-themes.md`.
 
 ### The configuration, *config.yml*
 
@@ -102,9 +102,9 @@ The most important things:
 
  * files placed under data/ will be copied as-is to the root directory of your website.
  * files placed at the root of the theme directory are ignored by the build system. Thus,
-   README, LICENSE, config.yml.EX are only present for the sake of documentation.
+   `README`, `LICENSE`, `config.yml.EX` are only present for the sake of documentation.
 
-You can find more informations about theming in docs/themes-howto.md.
+You can find more informations about theming in `docs/themes-howto.md`.
 
 ## Building the website
 
