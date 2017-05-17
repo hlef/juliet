@@ -18,7 +18,7 @@ class Builder:
     def build(self):
         """ Build and install the website as described in the configuration. """
 
-        self._create_if_non_existent(self.destination)
+        os.makedirs(self.destination, exist_ok=True)
 
         logging.info("Building static pages...")
         self._build_statics()
@@ -29,15 +29,6 @@ class Builder:
 
         logging.info("Installing assets...")
         self._install_data()
-
-    def _create_if_non_existent(self, directory):
-        """ Create passed directory if it doesn't exist already. """
-
-        if not os.path.exists(directory):
-            logging.debug("Creating directory " + directory)
-            os.makedirs(directory)
-        else:
-            logging.warning("Writing to existing directory " + directory)
 
     def _write(self, path, string):
         """ Write passed string to passed path. """
@@ -75,7 +66,7 @@ class Builder:
         """ Build posts and install them. """
 
         builddir = os.path.join(self.destination, paths.POSTS_BUILDDIR)
-        self._create_if_non_existent(builddir)
+        os.makedirs(builddir, exist_ok=True)
 
         template = self.jinjaEnv.get_template(os.path.join("templates", "posts.html"))
 
