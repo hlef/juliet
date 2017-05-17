@@ -6,6 +6,7 @@ PAGES_PATH = "pages"
 
 # builddirs
 DEFAULT_BUILDDIR = "build-area"
+DEFAULT_INITDIR = ""
 POSTS_BUILDDIR = "posts"
 PAGES_BUILDDIR = ""
 DATA_BUILDDIR = ""

@@ -9,8 +9,11 @@ def main():
     configure_logging(args.debug)
 
     if(args.subcommand == "build"):
-        logging.debug("Executing sub-command build")
+        logging.debug("Executing sub-command " + args.subcommand)
         build(args)
+    elif(args.subcommand == "init"):
+        logging.debug("Executing sub-command " + args.subcommand)
+        init(args)
 
     logging.debug("Done. Exiting.")
 
@@ -30,6 +33,11 @@ def build(args):
     logging.debug("Initializing builder...")
     builder = Builder(jinjaEnv, config, args.src, args.dest)
     builder.build()
+
+def init(args):
+    """ Initialize a new, clean website in passed directory."""
+
+    raise NotImplementedError("Not implemented yet")
 
 def parse_arguments():
     """ Parse and return arguments. """
@@ -53,6 +61,13 @@ def parse_arguments():
     parser_build.add_argument('--build-dst', '-ds', dest="dest", type=str,
                     default=paths.DEFAULT_BUILDDIR,
                     help='build and install website in passed directory')
+
+    parser_init = subparsers.add_parser('init', parents=[parent_parser],
+    help="Initialize a new, clean website in current directory.")
+
+    parser_init.add_argument('--dir', dest="dir", type=str,
+                    default=paths.DEFAULT_INITDIR,
+                    help='Initialize website in passed directory')
 
     return main_parser.parse_args()
 
