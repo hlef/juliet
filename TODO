@@ -1,6 +1,5 @@
 ## Blockers for alpha.3 ?
 
-* init subcommand, thats initiates a new, basic website in passed directory
 * Update docstrings to use the numpy convention
 * Use camel case variable names
 * Documentation:
@@ -9,6 +8,7 @@
 * Also accept config.yaml as config file
 * Cleanup build directory before writing to it, with a warning. Add option --force.
 * Add --log-file option for redirecting logs to a file
+* Process TODOs
 
 => go for -rc1 ?
 
