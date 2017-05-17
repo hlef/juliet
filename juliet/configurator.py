@@ -15,15 +15,15 @@ def configure_jinja(theme, src):
 
     return Environment(loader=FileSystemLoader(themePath), autoescape=False)
 
-def get_config(cfgFile):
+def get_config(config_file):
     """ Parse and return passed configuration file. """
 
     config = {}
 
-    if(not os.path.isfile(cfgFile)):
-        sys.exit("Error: Could not find config file: " + cfgFile)
+    if(not os.path.isfile(config_file)):
+        sys.exit("Error: Could not find config file: " + config_file)
 
-    with open(cfgFile, 'r') as stream:
+    with open(config_file, 'r') as stream:
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as exc:

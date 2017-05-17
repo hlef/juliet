@@ -1,7 +1,7 @@
 ## Blockers for alpha.3 ?
 
 * Update docstrings to use the numpy convention
-* Use camel case variable names
+* Use snake case variable names
 * Documentation:
   - theming howto
   - Q&A

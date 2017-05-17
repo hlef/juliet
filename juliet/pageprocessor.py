@@ -13,7 +13,7 @@ class PageProcessor:
     def __init__(self, baseurl):
         self.baseurl = baseurl
 
-    def _process_pygments(self, splittedBody):
+    def _process_pygments(self, splitted_body):
         """ Parse and replace highlight blocks in passed body. Raise ValueError if
         passed body contains invalid pygments blocks. """
 
@@ -21,50 +21,51 @@ class PageProcessor:
         ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
 
         result = []
-        bufferedResult = ""
-        pygmentsBlock = ""
+        buffered_result = ""
+        pygments_block = ""
 
-        for line in splittedBody:
-            if(pygmentsBlock != ""):
+        for line in splitted_body:
+            if(pygments_block != ""):
                 if(ENDHIGHLIGHT.match(line) is not None):
-                    lexer = get_lexer_by_name(pygmentsBlock, stripall=True)
+                    lexer = get_lexer_by_name(pygments_block, stripall=True)
                     formatter = HtmlFormatter(linenos=True, cssclass="source")
-                    result.append(highlight(bufferedResult, lexer, formatter))
-                    bufferedResult = ""
-                    pygmentsBlock  = ""
+                    result.append(highlight(buffered_result, lexer, formatter))
+                    buffered_result = ""
+                    pygments_block  = ""
                 else:
-                    bufferedResult += line + "\n"
+                    buffered_result += line + "\n"
                 continue
 
             if(HIGHLIGHT.match(line) is not None):
-                pygmentsBlock = HIGHLIGHT.match(line).groups()[0]
+                pygments_block = HIGHLIGHT.match(line).groups()[0]
                 continue
 
             result.append(line)
 
-        if(pygmentsBlock != ""):
+        if(pygments_block != ""):
             raise ValueError("Failed to parse pygments block: A pygments block was opened, but never closed")
 
         return result
 
-    def _process_body(self, splittedBody, baseurl):
+    def _process_body(self, splitted_body, baseurl):
         """ Interpret passed body text as Markdown and return it as HTML. Replace
         all occurences of @BASEURL by passed baseurl. Process Pygments blocks. """
 
         result = ""
 
-        if(not splittedBody):
+        if(not splitted_body):
             # File is empty. Nothing to do.
             return result
 
-        pygmentsProcessed = self._process_pygments(splittedBody)
+        pygments_processed = self._process_pygments(splitted_body)
 
         starter = 0
-        if(pygmentsProcessed[0] == ""):
+        if(pygments_processed[0] == ""):
             starter = 1
 
+        # TODO This should be in a separate method
         # Go through body. Ignore first line if it is empty
-        for line in pygmentsProcessed[starter:]:
+        for line in pygments_processed[starter:]:
             line = line.replace("@BASEURL", baseurl)
             result += line + "\n"
 
@@ -81,29 +82,29 @@ class PageProcessor:
     def _process_header(self, header):
         """ Parse passed header."""
 
-        parsedHeader = {}
+        parsed_header = {}
 
         if(header != ""):
-            parsedHeader = {}
+            parsed_header = {}
 
             try:
-                parsedHeader = yaml.load(header)
+                parsed_header = yaml.load(header)
             except yaml.YAMLError as exc:
                 raise ValueError("Failed to parse file header: " + str(exc))
 
-            self._check_header(parsedHeader)
+            self._check_header(parsed_header)
 
             # If there's a title entry, provide a slugified form of it
-            if("title" in parsedHeader.keys()):
-                parsedHeader["slug"] = slugify(parsedHeader["title"])
+            if("title" in parsed_header.keys()):
+                parsed_header["slug"] = slugify(parsed_header["title"])
 
-        return parsedHeader
+        return parsed_header
 
-    def _get_header_limit(self, splittedFile):
+    def _get_header_limit(self, splitted_file):
         """ Return the position of header limiter "---". Return -1 if there's no
         header. Raise ValueError if passed file is bad formatted. """
 
-        if(not splittedFile or splittedFile[0] != "---"):
+        if(not splitted_file or splitted_file[0] != "---"):
             # File is empty or doesn't start by a header limiter
             return -1
 
@@ -111,14 +112,14 @@ class PageProcessor:
 
         # Find next header limiter. Ignore first line since we know it is the first
         # header limiter
-        for line in splittedFile[1:]:
+        for line in splitted_file[1:]:
             if(line == "---"):
                 return i
             i+=1
 
         raise ValueError("Failed to parse header: Header never closed")
 
-    def process(self, rawFile, filename):
+    def process(self, raw_file, filename):
         """ Return a parsed form of passed page file. Passed file should have the
         following format:
 
@@ -151,16 +152,16 @@ class PageProcessor:
          """
 
         result = {}
-        splittedFile = rawFile.splitlines()
+        splitted_file = raw_file.splitlines()
 
         # Find header and process it
-        headerLimit = self._get_header_limit(splittedFile)
-        parsedHeader = self._process_header("\n".join(splittedFile[1:headerLimit]))
-        result.update(parsedHeader)
+        header_limit = self._get_header_limit(splitted_file)
+        parsed_header = self._process_header("\n".join(splitted_file[1:header_limit]))
+        result.update(parsed_header)
 
         # Find body and process it
-        splittedBody = splittedFile[headerLimit+1:]
-        result["body"] = self._process_body(splittedBody, self.baseurl)
+        splitted_body = splitted_file[header_limit+1:]
+        result["body"] = self._process_body(splitted_body, self.baseurl)
 
         result["file-name"] = filename
 
