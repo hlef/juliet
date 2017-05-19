@@ -6,7 +6,6 @@
   - theming howto
   - Q&A
 * Also accept config.yaml as config file
-* Cleanup build directory before writing to it, with a warning. Add option --force.
 * Add --log-file option for redirecting logs to a file
 * Process TODOs
 

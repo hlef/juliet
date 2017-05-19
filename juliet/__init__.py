@@ -31,7 +31,7 @@ def build(args):
     jinjaEnv = configurator.configure_jinja(config["site"]["theme"], args.src)
 
     logging.debug("Initializing builder...")
-    builder = Builder(jinjaEnv, config, args.src, args.dest)
+    builder = Builder(jinjaEnv, config, args.src, args.dest, args.noclean)
     builder.build()
 
 def init(args):
@@ -76,6 +76,10 @@ def parse_arguments():
     parser_build.add_argument('--build-dst', '-ds', dest="dest", type=str,
                     default=paths.DEFAULT_BUILDDIR,
                     help='build and install website in passed directory')
+
+    parser_build.add_argument('--no-clean', '-nc', dest="noclean",
+                    default=False, action='store_true',
+                    help='do not clean build directory before installation')
 
     parser_init = subparsers.add_parser('init', parents=[parent_parser],
     help="Initialize a new, clean website in current directory.")

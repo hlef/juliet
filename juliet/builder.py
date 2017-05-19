@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
-import os, logging
+import os, logging, shutil
 from distutils.dir_util import copy_tree
 from jinja2 import Template, FileSystemLoader
 from juliet import paths
 
 class Builder:
-    def __init__(self, jinjaEnv, buildArgs, src, dest):
+    def __init__(self, jinjaEnv, buildArgs, src, dest, noclean):
         """ Constructor for class Builder. Takes a jinja Environment and the
         build arguments dictionnary as argument. """
 
@@ -14,9 +14,14 @@ class Builder:
         self.buildArgs = buildArgs
         self.source = src
         self.destination = dest
+        self.noclean = noclean
 
     def build(self):
         """ Build and install the website as described in the configuration. """
+
+        if(not self.noclean):
+            logging.info("Cleaning build folder " + self.destination)
+            shutil.rmtree(self.destination, ignore_errors=True)
 
         os.makedirs(self.destination, exist_ok=True)
 
