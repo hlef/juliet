@@ -10,10 +10,10 @@ def configure_jinja(theme, src):
     # Do not enable autoescape since we actually *do not* want it. Otherwise, we
     # wouldn't be able to integrate html content in the templates properly.
 
-    themePath = os.path.join(src, paths.THEMES_PATH, theme)
-    logging.debug("Setting up environment at " + themePath)
+    theme_path = os.path.join(src, paths.THEMES_PATH, theme)
+    logging.debug("Setting up environment at " + theme_path)
 
-    return Environment(loader=FileSystemLoader(themePath), autoescape=False)
+    return Environment(loader=FileSystemLoader(theme_path), autoescape=False)
 
 def get_config(config_file):
     """ Parse and return passed configuration file. """
