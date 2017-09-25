@@ -20,19 +20,19 @@ A Juliet website is organized as following.
 
 `juliet init` can initialize this file structure for you in the current directory.
 
-Please, note that Juliet won't install a theme in `themes/̀ . You'll have to pick one
+Please, note that Juliet won't install a theme in `themes/`. You'll have to pick one
 somewhere and install it, or design it by yourself (more informations available in
 `docs/themes-howto.md`).
 
-We also provide a list of recommended themes in ̀`docs/recommended-themes.md`.
+We also provide a list of recommended themes in `docs/recommended-themes.md`.
 
 ### The configuration, *config.yml*
 
 `config.yml` is the configuration file of your website. It defines *variables*
 needed by the build system, the theme, and static pages.
 
-Config files should define at least the following variables since they are
-required by the build system:
+Following variables are required by the build system and are thus mandatory for
+all config files:
 
     # useful when your website isn't located at the root of your server
     baseurl: ""
@@ -40,13 +40,13 @@ required by the build system:
     # the directory in themes/ that contain your theme
     theme: sample
 
-The set of required entries in the configuration file may vary depending on the
-theme you are using. You can find more informations about it in your theme
-directory, under `themes/your_theme/README`.
+The set of required entries in the configuration file may vary depending on your
+theme. You can find more informations about it in your theme directory, under
+`themes/your_theme/README`.
 
 ### Blog posts under *posts/*
 
-Juliet posts are divided in two parts.
+Juliet posts go to the `posts/` directory and are divided in two parts:
  * The *header*, containing YAML-formatted informations about the post
  * The post's *body*, in in the original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax)
 
@@ -59,19 +59,32 @@ For example:
 
     Hello, **world** !
 
-The set of required entries in post headers may vary depending on the
-theme you are using. You can find more informations about it in your theme
-directory, under `themes/your_theme/README`.
-
-Posts go to the `posts/` directory.
+The set of required entries in post headers may vary depending on your theme.
+You can find more informations about it in your theme directory, under
+`themes/your_theme/README`.
 
 ### Site pages under *pages/*
 
-Pages follow the same header/body structure as posts.
+Pages go to the `pages/` directory and follow the same header/body structure as
+posts.
 
 Required header entries should also be defined in the README file of your theme.
 
-pages go to the `pages/` directory.
+### Pygments syntax highlighting
+
+Juliet provides native integration of [Pygments](http://pygments.org/) syntax
+highlighting.
+
+To highlight code using Pygments, you'll simply need to embrace your code with
+`{% highlight LANG %}` (replace *LANG* by a lexer name) and `{% endhighlight %}`
+tags.
+
+For example, highlighting a shell script:
+
+    {% highlight shell %}
+    # This is a shell script.
+    echo "Hello, World"
+    {% endhighlight %}
 
 ### Some words about themes
 
@@ -109,7 +122,7 @@ You can find more informations about theming in `docs/themes-howto.md`.
 ## Building the website
 
 Build the website using the `juliet build` command. It will build the website
-in `build-area`. Alternatively, you may want to specify a destination using
-`--build-dst`.
+in `build-area` by default. Alternatively, you may want to specify a destination
+using `--build-dst`.
 
 You can also specify the source directory via `--build-src`.

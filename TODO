@@ -5,8 +5,6 @@
 * Documentation:
   - theming howto
   - Q&A
-* Also accept config.yaml as config file
-* Add --log-file option for redirecting logs to a file
 * Process TODOs
 
 => go for -rc1 ?
