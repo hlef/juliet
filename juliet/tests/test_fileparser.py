@@ -102,8 +102,49 @@ body"""
 
         self.assertRaises(ValueError, self.processor.process, invalidFile, self.FILENAME)
 
+    def test_invalid_pygments_blocks(self):
+        """ Make sure that parsing hangs on invalid pygments blocks."""
+
+        opened_but_never_closed = """---
+---
+
+{% highlight shell %}
+cat file"""
+
+        self.assertRaises(ValueError, self.processor.process, opened_but_never_closed, self.FILENAME)
+
+        closed_but_never_opened = """---
+---
+
+cat file
+{%endhighlight%}"""
+
+        self.assertRaises(ValueError, self.processor.process, closed_but_never_opened, self.FILENAME)
+
+        both_on_the_same_line1 = """---
+---
+
+{% highlight shell %}{%endhighlight%}"""
+
+        both_on_the_same_line2 = """---
+---
+
+{%endhighlight%}{% highlight shell %}
+{%endhighlight%}{% highlight shell %}"""
+
+        both_on_the_same_line3 = """---
+---
+
+{%endhighlight%}{% highlight shell %}
+{% highlight shell %}{%endhighlight%}"""
+
+        self.assertRaises(ValueError, self.processor.process, both_on_the_same_line1, self.FILENAME)
+        self.assertRaises(ValueError, self.processor.process, both_on_the_same_line2, self.FILENAME)
+        self.assertRaises(ValueError, self.processor.process, both_on_the_same_line3, self.FILENAME)
+
     def test_pygments_integration(self):
         """ Make sure that pygments is well integrated in the main process method."""
+        self.maxDiff = None
 
         file1 = """---
 ---
@@ -124,3 +165,19 @@ cat file
 </td></tr></table>""", 'file-name': self.FILENAME}
 
         self.assertEqual(result1, self.processor.process(file1, self.FILENAME))
+
+        invalid_inclusion = """---
+---
+
+{% highlight shell %}
+cat file
+{% endhighlight  %}
+{% endhighlight  %}"""
+
+        result_invalid_inclusion = {"body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
+<span class="o">{</span>% endhighlight  %<span class="o">}</span>
+</pre></div>
+</td></tr></table>""", 'file-name': self.FILENAME}
+
+        self.assertEqual(result_invalid_inclusion, self.processor.process(invalid_inclusion, self.FILENAME))
