@@ -102,7 +102,7 @@ body"""
 
         self.assertRaises(ValueError, self.processor.process, invalidFile, self.FILENAME)
 
-    def test_invalid_pygments_blocks(self):
+    def test_invalid_pygments(self):
         """ Make sure that parsing hangs on invalid pygments blocks."""
 
         opened_but_never_closed = """---
@@ -181,3 +181,17 @@ cat file
 </td></tr></table>""", 'file-name': self.FILENAME}
 
         self.assertEqual(result_invalid_inclusion, self.processor.process(invalid_inclusion, self.FILENAME))
+
+        inclusion = """---
+---
+
+{% highlight shell %}
+cat file
+{%highlight shell %}
+{% endhighlight  %}
+cat file
+{%endhighlight%}"""
+
+        result_inclusion = {"body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1\n2\n3\n4</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file\n<span class="o">{</span>%highlight shell %<span class="o">}</span>\n<span class="o">{</span>% endhighlight  %<span class="o">}</span>\ncat file\n</pre></div>\n</td></tr></table>""", 'file-name': self.FILENAME}
+
+        self.assertEqual(result_inclusion, self.processor.process(inclusion, self.FILENAME))

@@ -19,30 +19,57 @@ class PageProcessor:
 
         HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
         ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
+        formatter = HtmlFormatter(linenos=True, cssclass="source")
 
         result = []
-        buffered_result = ""
-        pygments_block = ""
+        open_blocks = 0
+        reached_endhighlight = False
+        current_blocktype = None
+        current_buffer = ""
+        temporary_buffer = ""
 
         for line in splitted_body:
-            if(pygments_block != ""):
-                if(ENDHIGHLIGHT.match(line) is not None):
-                    lexer = get_lexer_by_name(pygments_block, stripall=True)
-                    formatter = HtmlFormatter(linenos=True, cssclass="source")
-                    result.append(highlight(buffered_result, lexer, formatter))
-                    buffered_result = ""
-                    pygments_block  = ""
+            if(ENDHIGHLIGHT.match(line) is not None):
+                if(not reached_endhighlight):
+                    open_blocks -= 1
+                    if(open_blocks < 0):
+                        raise ValueError("Failed to parse pygments block: A pygments block was closed, but never opened")
+                    elif(open_blocks == 0):
+                        reached_endhighlight = True
                 else:
-                    buffered_result += line + "\n"
-                continue
+                    print(temporary_buffer)
+                    current_buffer += temporary_buffer
+                    temporary_buffer = ""
+            elif(HIGHLIGHT.match(line) is not None):
+                if(reached_endhighlight):
+                    lexer = get_lexer_by_name(current_blocktype, stripall=True)
+                    result.append(highlight(current_buffer, lexer, formatter))
+                    result += temporary_buffer.splitlines()[1:]
+                    reached_endhighlight = False
+                    current_buffer = ""
+                    temporary_buffer = ""
 
-            if(HIGHLIGHT.match(line) is not None):
-                pygments_block = HIGHLIGHT.match(line).groups()[0]
-                continue
+                open_blocks += 1
+                if(open_blocks == 1):
+                    current_blocktype = HIGHLIGHT.match(line).groups()[0]
+                    continue
 
-            result.append(line)
+            if(reached_endhighlight):
+                temporary_buffer += line + "\n"
+            elif(open_blocks != 0):
+                current_buffer += line + "\n"
+            else:
+                result.append(line)
 
-        if(pygments_block != ""):
+        if(reached_endhighlight):
+            lexer = get_lexer_by_name(current_blocktype, stripall=True)
+            result.append(highlight(current_buffer, lexer, formatter))
+            result += temporary_buffer.splitlines()[1:]
+            reached_endhighlight = False
+            current_buffer = ""
+            temporary_buffer = ""
+
+        if(open_blocks != 0):
             raise ValueError("Failed to parse pygments block: A pygments block was opened, but never closed")
 
         return result
