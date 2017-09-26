@@ -144,7 +144,6 @@ cat file
 
     def test_pygments_integration(self):
         """ Make sure that pygments is well integrated in the main process method."""
-        self.maxDiff = None
 
         file1 = """---
 ---

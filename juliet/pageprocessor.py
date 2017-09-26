@@ -37,7 +37,6 @@ class PageProcessor:
                     elif(open_blocks == 0):
                         reached_endhighlight = True
                 else:
-                    print(temporary_buffer)
                     current_buffer += temporary_buffer
                     temporary_buffer = ""
             elif(HIGHLIGHT.match(line) is not None):
