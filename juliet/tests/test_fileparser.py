@@ -102,6 +102,30 @@ body"""
 
         self.assertRaises(ValueError, self.processor.process, invalidFile, self.FILENAME)
 
+    def test_baseurl_tags_parsing(self):
+        """ Make sure that baseurl tags are well parsed. """
+
+        baseurl = "/home/user/test/"
+
+        body_with_baseurl1 = ["{{baseurl}}",
+                              "{{ baseurl}}",
+                              "{{baseurl     }}",
+                              "{{    baseurl}}"]
+
+        result_body_with_baseurl1 = [baseurl, baseurl, baseurl, baseurl]
+
+        body_with_baseurl2 = ["How, well, here it is: {{ baseurl}}."]
+
+        result_body_with_baseurl2 = ["How, well, here it is: " + baseurl + "."]
+
+        body_with_baseurl3 = ["several lines", "{{baseurl }}", "because thats fun"]
+
+        result_body_with_baseurl3 = ["several lines", baseurl, "because thats fun"]
+
+        self.assertEqual(result_body_with_baseurl1, self.processor._process_baseurl_tags(body_with_baseurl1, baseurl))
+        self.assertEqual(result_body_with_baseurl2, self.processor._process_baseurl_tags(body_with_baseurl2, baseurl))
+        self.assertEqual(result_body_with_baseurl3, self.processor._process_baseurl_tags(body_with_baseurl3, baseurl))
+
     def test_invalid_pygments(self):
         """ Make sure that parsing hangs on invalid pygments blocks."""
 

@@ -73,29 +73,41 @@ class PageProcessor:
 
         return result
 
-    def _process_body(self, splitted_body, baseurl):
-        """ Interpret passed body text as Markdown and return it as HTML. Replace
-        all occurences of @BASEURL by passed baseurl. Process Pygments blocks. """
+    def _process_baseurl_tags(self, splitted_body, baseurl):
+        """ Replace {{ baseurl }} tags in passed body text. """
 
-        result = ""
+        result = []
+        regex = re.compile(r"""{{\s*?baseurl\s*?}}""")
+
+        for line in splitted_body:
+            result.append(regex.sub(baseurl, line))
+
+        return result
+
+    def _process_body(self, splitted_body, baseurl):
+        """ Return fully HTML-converted passed body text.
+        First preprocess it using Pygments and replacing {{ baseurl }} tags,
+        then markdown process it using markdown library. """
 
         if(not splitted_body):
             # File is empty. Nothing to do.
-            return result
+            return ""
 
-        pygments_processed = self._process_pygments(splitted_body)
-
+        # Remove first line if blank.
         starter = 0
-        if(pygments_processed[0] == ""):
+        if(splitted_body[0] == ""):
             starter = 1
 
-        # TODO This should be in a separate method
-        # Go through body. Ignore first line if it is empty
-        for line in pygments_processed[starter:]:
-            line = line.replace("@BASEURL", baseurl)
-            result += line + "\n"
+        splitted_body = splitted_body[starter:]
 
-        return markdown(result)
+        # Process Pygments blocks
+        splitted_body = self._process_pygments(splitted_body)
+
+        # Process baseurl tags
+        splitted_body = self._process_baseurl_tags(splitted_body, baseurl)
+        print(splitted_body)
+
+        return markdown("\n".join(splitted_body))
 
     def _check_header(self, header):
         """ Raise ValueError if passed header contains invalid entries. """
