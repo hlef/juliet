@@ -1,13 +1,15 @@
-## Blockers for alpha.3 ?
+## Blockers for 0.1-final
 
-* Update docstrings to use the numpy convention
-* Use snake case variable names
 * Documentation:
   - theming howto
-  - Q&A
 * Process TODOs
 
-=> go for -rc1 ?
+## Misc improvements
+
+* Use snake case variable names
+* Update docstrings to use the numpy convention
+* Documentation:
+  - Q&A
 
 ## Patching ideas
 

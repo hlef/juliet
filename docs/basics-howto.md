@@ -1,10 +1,8 @@
 # Juliet *- basics*
 
-**WiP, some features mentioned here may still be in development stage !**
-
 ## File structure
 
-A Juliet website is organized as following.
+Juliet website sources are organized as following:
 
     .
     ├── assets
@@ -26,13 +24,13 @@ somewhere and install it, or design it by yourself (more informations available 
 
 We also provide a list of recommended themes in `docs/recommended-themes.md`.
 
-### The configuration, *config.yml*
+### Build configuration, *config.yml*
 
 `config.yml` is the configuration file of your website. It defines *variables*
-needed by the build system, the theme, and static pages.
+needed by the build system, by your theme, and static pages.
 
 Following variables are required by the build system and are thus mandatory for
-all config files:
+any Juliet config file:
 
     # useful when your website isn't located at the root of your server
     baseurl: ""
@@ -44,7 +42,7 @@ The set of required entries in the configuration file may vary depending on your
 theme. You can find more informations about it in your theme directory, under
 `themes/your_theme/README`.
 
-### Blog posts under *posts/*
+### Blog posts, *posts/*
 
 Juliet posts go to the `posts/` directory and are divided in two parts:
  * The *header*, containing YAML-formatted informations about the post
@@ -63,12 +61,16 @@ The set of required entries in post headers may vary depending on your theme.
 You can find more informations about it in your theme directory, under
 `themes/your_theme/README`.
 
-### Site pages under *pages/*
+Please, note that even if it is empty, the header has to be present. Otherwise,
+Juliet might be upset ! :)
+
+### Site pages, *pages/*
 
 Pages go to the `pages/` directory and follow the same header/body structure as
 posts.
 
-Required header entries should also be defined in the README file of your theme.
+Required header entries might be different to the ones required for posts and
+should also be defined in the README file of your theme.
 
 ### Pygments syntax highlighting
 
@@ -76,15 +78,26 @@ Juliet provides native integration of [Pygments](http://pygments.org/) syntax
 highlighting.
 
 To highlight code using Pygments, you'll simply need to embrace your code with
-`{% highlight LANG %}` (replace *LANG* by a lexer name) and `{% endhighlight %}`
-tags.
+Jinja-like `{% highlight LANG %}` (replace *LANG* by a lexer name) and
+`{% endhighlight %}` tags.
 
-For example, highlighting a shell script:
+For example, highlighting a shell script works as following:
 
     {% highlight shell %}
     # This is a shell script.
     echo "Hello, World"
     {% endhighlight %}
+
+Escaping with backslash is also supported. For example if you want to include a
+`{% endhighlight %}` without having it processed by the preprocessor, you'll
+have to write it `\{% endhighlight %}`.
+
+### Base url inclusion
+
+If you want to refer to the baseurl variable specified in the config file,
+simply use the Jinja-like `{{ baseurl }}` tag.
+
+This tag can also be escaped: `\{{ baseurl }}`.
 
 ### Some words about themes
 
@@ -111,7 +124,7 @@ Juliet themes are organized as following:
         ├── posts.html
         └── ...
 
-The most important things:
+Most important things:
 
  * files placed under data/ will be copied as-is to the root directory of your website.
  * files placed at the root of the theme directory are ignored by the build system. Thus,
