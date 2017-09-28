@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
-import os, re, yaml
-from slugify import slugify
-from markdown import markdown
-from pygments import highlight
+import os, re, yaml, slugify, markdown, pygments
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
@@ -14,22 +11,33 @@ class PageProcessor:
         self.baseurl = baseurl
 
     def _process_pygments(self, splitted_body):
-        """ Parse and replace highlight blocks in passed body. Raise ValueError if
+        """ Process highlight blocks in passed body. Raise ValueError if
         passed body contains invalid pygments blocks. """
 
-        HIGHLIGHT = re.compile("{%\s*?highlight (\w+)\s*?%}")
-        ENDHIGHLIGHT = re.compile("{%\s*?endhighlight\s*?%}")
+        # FIXME Ugly looking method. This is way too big, and pretty ununderstandable.
+
+        escaped = r"(\\)+"
+        highlight = r"\{%\s*?highlight (\w+)\s*?%\}"
+        endhighlight = r"\{%\s*?endhighlight\s*?%\}"
+        regex_highlight = re.compile(highlight)
+        regex_endhighlight = re.compile(endhighlight)
+        regex_escaped_highlight = re.compile(escaped + highlight)
+        regex_escaped_endhighlight = re.compile(escaped + endhighlight)
         formatter = HtmlFormatter(linenos=True, cssclass="source")
 
         result = []
         open_blocks = 0
         reached_endhighlight = False
-        current_blocktype = None
+        current_lexer = None
         current_buffer = ""
         temporary_buffer = ""
 
         for line in splitted_body:
-            if(ENDHIGHLIGHT.match(line) is not None):
+            if(regex_escaped_endhighlight.match(line) is not None or regex_escaped_highlight.match(line) is not None):
+                line = self._unescape_tags(endhighlight, line)
+                line = self._unescape_tags(highlight, line)
+
+            elif(regex_endhighlight.match(line) is not None):
                 if(not reached_endhighlight):
                     open_blocks -= 1
                     if(open_blocks < 0):
@@ -39,10 +47,10 @@ class PageProcessor:
                 else:
                     current_buffer += temporary_buffer
                     temporary_buffer = ""
-            elif(HIGHLIGHT.match(line) is not None):
+
+            elif(regex_highlight.match(line) is not None):
                 if(reached_endhighlight):
-                    lexer = get_lexer_by_name(current_blocktype, stripall=True)
-                    result.append(highlight(current_buffer, lexer, formatter))
+                    result.append(pygments.highlight(current_buffer, current_lexer, formatter))
                     result += temporary_buffer.splitlines()[1:]
                     reached_endhighlight = False
                     current_buffer = ""
@@ -50,7 +58,8 @@ class PageProcessor:
 
                 open_blocks += 1
                 if(open_blocks == 1):
-                    current_blocktype = HIGHLIGHT.match(line).groups()[0]
+                    block_type = regex_highlight.match(line).groups()[0]
+                    current_lexer = get_lexer_by_name(block_type, stripall=True)
                     continue
 
             if(reached_endhighlight):
@@ -61,12 +70,8 @@ class PageProcessor:
                 result.append(line)
 
         if(reached_endhighlight):
-            lexer = get_lexer_by_name(current_blocktype, stripall=True)
-            result.append(highlight(current_buffer, lexer, formatter))
+            result.append(pygments.highlight(current_buffer, current_lexer, formatter))
             result += temporary_buffer.splitlines()[1:]
-            reached_endhighlight = False
-            current_buffer = ""
-            temporary_buffer = ""
 
         if(open_blocks != 0):
             raise ValueError("Failed to parse pygments block: A pygments block was opened, but never closed")
@@ -74,19 +79,29 @@ class PageProcessor:
         return result
 
     def _process_baseurl_tags(self, splitted_body, baseurl):
-        """ Replace {{ baseurl }} tags in passed body text. """
+        """ Process {{ baseurl }} tags in passed body text. """
 
         result = []
-        regex = re.compile(r"""{{\s*?baseurl\s*?}}""")
+
+        baseurl_tag = r"(\{\{\s*?baseurl\s*?\}\})"
+        regex_baseurl_tag = re.compile(r"(?<!\\)" + baseurl_tag)
 
         for line in splitted_body:
-            result.append(regex.sub(baseurl, line))
+            line = regex_baseurl_tag.sub(baseurl, line)
+            line = self._unescape_tags(baseurl_tag, line)
+            result.append(line)
 
         return result
 
+    def _unescape_tags(self, regex_as_string, line):
+        """ Unescape tags matching passed regex in passed line. """
+
+        regex_unescape_tag = re.compile(r"\\(" + regex_as_string + ")")
+        return regex_unescape_tag.sub(r"\1", line)
+
     def _process_body(self, splitted_body, baseurl):
         """ Return fully HTML-converted passed body text.
-        First preprocess it using Pygments and replacing {{ baseurl }} tags,
+        First preprocess it using Pygments and replace {{ baseurl }} tags,
         then markdown process it using markdown library. """
 
         if(not splitted_body):
@@ -105,11 +120,10 @@ class PageProcessor:
 
         # Process baseurl tags
         splitted_body = self._process_baseurl_tags(splitted_body, baseurl)
-        print(splitted_body)
 
-        return markdown("\n".join(splitted_body))
+        return markdown.markdown("\n".join(splitted_body))
 
-    def _check_header(self, header):
+    def _check_header_content(self, header):
         """ Raise ValueError if passed header contains invalid entries. """
 
         set_header = set(header.keys())
@@ -118,7 +132,8 @@ class PageProcessor:
             raise ValueError("Header contains forbidden entries " + invalid_entries)
 
     def _process_header(self, header):
-        """ Parse passed header."""
+        """ Parse passed header. Raise ValueError if header can't be parsed
+        properly. """
 
         parsed_header = {}
 
@@ -130,21 +145,21 @@ class PageProcessor:
             except yaml.YAMLError as exc:
                 raise ValueError("Failed to parse file header: " + str(exc))
 
-            self._check_header(parsed_header)
+            self._check_header_content(parsed_header)
 
             # If there's a title entry, provide a slugified form of it
             if("title" in parsed_header.keys()):
-                parsed_header["slug"] = slugify(parsed_header["title"])
+                parsed_header["slug"] = slugify.slugify(parsed_header["title"])
 
         return parsed_header
 
     def _get_header_limit(self, splitted_file):
-        """ Return the position of header limiter "---". Return -1 if there's no
-        header. Raise ValueError if passed file is bad formatted. """
+        """ Return line number of the last header limiter "---" starting by 0.
+        Raise ValueError if passed file is bad formatted. """
 
         if(not splitted_file or splitted_file[0] != "---"):
             # File is empty or doesn't start by a header limiter
-            return -1
+            raise ValueError("Failed to parse file header: no header.")
 
         i = 1
 
@@ -158,46 +173,69 @@ class PageProcessor:
         raise ValueError("Failed to parse header: Header never closed")
 
     def process(self, raw_file, filename):
-        """ Return a parsed form of passed page file. Passed file should have the
-        following format:
+        """ Return a parsed form of passed file.
+
+        ### 1) Format
+
+        Passed file should have the following format:
 
         ""
-        ---
-        HEADER, 0->* lines of "key: value" entries.
-        ---
+         ---
+         HEADER, 0->* lines of "key: value" entries.
+         ---
 
-        BODY, 0->* lines of markdown content.
+         BODY, 0->* lines of markdown content.
         ""
+
+        Even if header part is empty, it should be present.
+
+        For example,
+
+        ""
+         BODY
+        ""
+
+        or
+
+        ""
+         ---
+         BODY
+        ""
+
+        are *not* valid files.
+
+        ### 1) Returned value
 
         A ValueError is raised if file is bad formatted.
 
         Returned file is represented by a dictionnary containing following entries:
          * "body": a string containing the markdown body converted to HTML (empty if
-         file has no body). Pygments blocks are processed.
+           file has no body). Pygments blocks are processed.
          * the header's content.
 
-         For instance, the following file
+        ### 3) Examples
 
-         ""
+        The following file
+
+        ""
          ---
          key: value
          ---
 
          bodyContent
-         ""
+        ""
 
-         would be returned as {"key": "value", "body": "<p>bodyContent</p>"}.
-         """
+        would be returned as {"key": "value", "body": "<p>bodyContent</p>"}. """
 
         result = {}
         splitted_file = raw_file.splitlines()
 
-        # Find header and process it
+        # Find header, check and process it
         header_limit = self._get_header_limit(splitted_file)
         parsed_header = self._process_header("\n".join(splitted_file[1:header_limit]))
         result.update(parsed_header)
 
-        # Find body and process it
+        # Find body, process it
         splitted_body = splitted_file[header_limit+1:]
         result["body"] = self._process_body(splitted_body, self.baseurl)
 
