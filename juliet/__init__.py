@@ -1,5 +1,5 @@
 import argparse, logging, os
-from juliet import configurator, loader, paths
+from juliet import configurator, loader, paths, defaults
 from juliet.builder import Builder
 
 def main():
@@ -41,18 +41,9 @@ def init(args):
     for directory in paths.SOURCE_DIRS:
         os.makedirs(os.path.join(args.dir, directory), exist_ok=True)
 
-    # TODO Not very elegant implementation, import config.yml in a different way
-    default_config = """# useful when your website isn't located at the root of your server
-baseurl: ""
-
-# the directory in themes/ that contain your theme
-# WARNING: No theme under themes/ yet ! More informations in the documentation:
-# https://github.com/hlef/juliet
-theme:"""
-
     logging.debug("Importing default config.yml")
     with open(os.path.join(args.dir, paths.CFG_FILE), 'w') as stream:
-        stream.write(default_config)
+        stream.write(defaults.default_config)
 
 def parse_arguments():
     """ Parse and return arguments. """
