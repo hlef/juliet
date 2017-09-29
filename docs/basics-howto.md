@@ -64,15 +64,8 @@ You can find more informations about it in your theme directory, under
 Please, note that even if it is empty, the header has to be present. Otherwise,
 Juliet might be upset ! :)
 
-### Site pages, *pages/*
-
-Pages go to the `pages/` directory and follow the same header/body structure as
-posts.
-
-Required header entries might be different to the ones required for posts and
-should also be defined in the README file of your theme.
-
-### Pygments syntax highlighting
+### Preprocessor tags
+#### Pygments syntax highlighting
 
 Juliet provides native integration of [Pygments](http://pygments.org/) syntax
 highlighting.
@@ -88,16 +81,24 @@ For example, highlighting a shell script works as following:
     echo "Hello, World"
     {% endhighlight %}
 
-Escaping with backslash is also supported. For example if you want to include a
-`{% endhighlight %}` without having it processed by the preprocessor, you'll
-have to write it `\{% endhighlight %}`.
-
-### Base url inclusion
+#### Base url inclusion
 
 If you want to refer to the baseurl variable specified in the config file,
 simply use the Jinja-like `{{ baseurl }}` tag.
 
-This tag can also be escaped: `\{{ baseurl }}`.
+#### Tag escaping
+
+Escaping with backslash is supported. For example if you want to write
+`{% endhighlight %}` without having it replaced by the preprocessor, you'll
+have to write it `\{% endhighlight %}`, same for base url tags: `\{{ baseurl }}`.
+
+### Site pages, *pages/*
+
+Pages go to the `pages/` directory and follow the same header/body structure as
+posts with the same rules.
+
+Required header entries might be different to the ones required for posts. You
+can find more informations about it in the README file of your theme.
 
 ### Some words about themes
 
@@ -127,7 +128,7 @@ Juliet themes are organized as following:
 Most important things:
 
  * files placed under data/ will be copied as-is to the root directory of your website.
- * files placed at the root of the theme directory are ignored by the build system. Thus,
+ * files placed at the root of the theme directory are ignored by the build system.
    `README`, `LICENSE`, `config.yml.EX` are only present for the sake of documentation.
 
 You can find more informations about theming in `docs/themes-howto.md`.
