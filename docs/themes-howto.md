@@ -1,4 +1,4 @@
-# Juliet *- theming howto*
+# Juliet *- theming*
 
 ## File structure
 
@@ -75,7 +75,7 @@ This directory is perfect to include your site-wide ressources, like:
 
 * css files
 * fonts
-* javsacript files
+* javascript files
 * favicons
 
 so one and so forth.

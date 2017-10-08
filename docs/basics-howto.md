@@ -46,7 +46,8 @@ theme. You can find more informations about it in your theme directory, under
 
 Juliet posts go to the `posts/` directory and are divided in two parts:
  * The *header*, containing YAML-formatted informations about the post
- * The post's *body*, in in the original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax)
+ * The post's *body*, in in the original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax) with
+ preprocessor tags (see dedicated paragraph)
 
 For example:
 
@@ -71,8 +72,8 @@ Juliet provides native integration of [Pygments](http://pygments.org/) syntax
 highlighting.
 
 To highlight code using Pygments, you'll simply need to embrace your code with
-Jinja-like `{% highlight LANG %}` (replace *LANG* by a lexer name) and
-`{% endhighlight %}` tags.
+Jinja-like `{% highlight LANG %}` and `{% endhighlight %}` tags (replace *LANG*
+by a lexer name).
 
 For example, highlighting a shell script works as following:
 
@@ -90,7 +91,8 @@ simply use the Jinja-like `{{ baseurl }}` tag.
 
 Escaping with backslash is supported. For example if you want to write
 `{% endhighlight %}` without having it replaced by the preprocessor, you'll
-have to write it `\{% endhighlight %}`, same for base url tags: `\{{ baseurl }}`.
+simply have to write it `\{% endhighlight %}`, same for base url tags:
+`\{{ baseurl }}`.
 
 ### Site pages, *pages/*
 
