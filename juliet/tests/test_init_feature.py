@@ -10,8 +10,7 @@ class initSiteTest(unittest.TestCase):
         shutil.rmtree(self.test_dir)
 
     def test_without_dir(self):
-        """ Make sure new article files are well generated with minimal set of
-        options. """
+        """ Make sure new article files are well generated with minimal set of options. """
 
         # Go to temporary directory
         os.chdir(self.test_dir)
@@ -32,8 +31,7 @@ class initSiteTest(unittest.TestCase):
         os.chdir(self.cur_dir)
 
     def test_with_dir(self):
-        """ Make sure new article files are well generated when date option is
-        passed. """
+        """ Make sure new article files are well generated when date option is passed. """
 
         # Generate base site
         args = juliet.parse_arguments(['init', '--dir', self.test_dir])
