@@ -24,7 +24,7 @@ somewhere and install it, or design it by yourself (more informations available 
 
 We also provide a list of recommended themes in `docs/recommended-themes.md`.
 
-### Build configuration, *config.yml*
+### :wrench: Build configuration, *config.yml*
 
 `config.yml` is the configuration file of your website. It defines *variables*
 needed by the build system, by your theme, and static pages.
@@ -39,10 +39,10 @@ any Juliet config file:
     theme: sample
 
 The set of required entries in the configuration file may vary depending on your
-theme. You can find more informations about it in your theme directory, under
-`themes/your_theme/README`.
+theme. You can usually find more informations about it in your theme directory,
+under `themes/your_theme/README`.
 
-### Blog posts, *posts/*
+### :pencil: Blog posts, *posts/*
 
 Juliet posts go to the `posts/` directory and are divided in two parts:
  * The *header*, containing YAML-formatted informations about the post
@@ -63,9 +63,16 @@ You can find more informations about it in your theme directory, under
 `themes/your_theme/README`.
 
 Please, note that even if it is empty, the header has to be present. Otherwise,
-Juliet might be upset ! :)
+Juliet might get upset ! :)
 
-### Preprocessor tags
+#### Creating a fresh article file
+
+Because creating a fresh article structure each and every time you write a new
+article is repetitive and annoying, Juliet >= 0.2 adds support for the
+`juliet new` feature which will take care of it for you (pro tip: you can get
+more information about this feature via `juliet new --help` !).
+
+### :bookmark: Preprocessor tags
 #### Pygments syntax highlighting
 
 Juliet provides native integration of [Pygments](http://pygments.org/) syntax
@@ -94,7 +101,7 @@ Escaping with backslash is supported. For example if you want to write
 simply have to write it `\{% endhighlight %}`, same for base url tags:
 `\{{ baseurl }}`.
 
-### Site pages, *pages/*
+### :house: Site pages, *pages/*
 
 Pages go to the `pages/` directory and follow the same header/body structure as
 posts with the same rules.
@@ -102,7 +109,7 @@ posts with the same rules.
 Required header entries might be different to the ones required for posts. You
 can find more informations about it in the README file of your theme.
 
-### Some words about themes
+### :metal: Themes
 
 Juliet themes are organized as following:
 
