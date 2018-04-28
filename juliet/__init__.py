@@ -2,14 +2,14 @@ __version__ = '0.1-final'
 __author__ = 'Hugo Lefeuvre'
 __author_email__ = 'hle@owl.eu.com'
 
-import argparse, logging, os, slugify, datetime
+import argparse, logging, os, slugify, datetime, sys
 from juliet import configurator, loader, paths, defaults
 from juliet.builder import Builder
 
 def main():
     """ Parse command line arguments and execute passed subcommands. """
 
-    args = parse_arguments()
+    args = parse_arguments(sys.argv[1:])
     configure_logging(args.debug)
 
     if(args.subcommand == "build"):
@@ -65,7 +65,7 @@ def init_new_article(args):
 
     logging.debug("Done creating article.")
 
-def parse_arguments():
+def parse_arguments(args):
     """ Parse and return arguments. """
 
     parent_parser = argparse.ArgumentParser(add_help=False)
@@ -114,7 +114,7 @@ def parse_arguments():
     parser_new.add_argument('--title', '-t', dest="title", type=str, required=True,
                     help='title of the article')
 
-    return main_parser.parse_args()
+    return main_parser.parse_args(args)
 
 def _valid_date_argparse(s):
     try:
