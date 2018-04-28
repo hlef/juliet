@@ -49,19 +49,34 @@ def init(args):
         os.makedirs(os.path.join(args.dir, directory), exist_ok=True)
 
     logging.debug("Importing default config.yml")
-    with open(os.path.join(args.dir, paths.CFG_FILE), 'w') as stream:
+    with open(os.path.join(args.dir, paths.CFG_FILE), 'w+') as stream:
         stream.write(defaults.default_config)
+
+def _get_article_name(args):
+    """ Return article name matching passed args. """
+
+    return args.date + '-' + slugify.slugify(args.title) + '.md'
+
+def _get_article_path(args):
+    """ Return article path matching passed args. """
+
+    return os.path.join(args.src, paths.POSTS_BUILDDIR, _get_article_name(args))
+
+def _get_default_article(args):
+    """ Return default article matching passed args. """
+
+    # TODO: Support importing header generator from juliet template
+    return defaults.default_article.format(args.title, args.date)
 
 def init_new_article(args):
     """ Initialize a fresh, new article file. """
 
-    file_name = os.path.join(args.src, paths.POSTS_BUILDDIR, args.date + '-' + slugify.slugify(args.title))
+    file_name = _get_article_path(args)
 
     logging.debug("Creating new article file...")
 
-    with open(file_name, 'w') as stream:
-        # TODO: Support importing header generator from juliet template
-        stream.write(defaults.default_article.format(args.title, args.date))
+    with open(file_name, 'w+') as stream:
+        stream.write(_get_default_article(args))
 
     logging.debug("Done creating article.")
 
