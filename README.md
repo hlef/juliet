@@ -27,18 +27,18 @@ Juliet requires Python **>= 3.3** to work properly ([why](http://jinja.pocoo.org
 Additionally, Juliet requires following dependencies (Debian dependencies in
 brackets):
 
- * [Jinja2](http://jinja.pocoo.org/) , version 2.8 (python3-jinja2)
- * [pyyaml](https://github.com/yaml/pyyaml), version 3.12 (python3-yaml)
- * [python-markdown](https://github.com/waylan/Python-Markdown), version 2.6.8 (python3-markdown)
- * [python-slugify](https://github.com/un33k/python-slugify), version 1.2.1 (python3-slugify)
- * [Pygments](http://pygments.org/), version 2.2.0 (python3-pygments)
+ * [Jinja2](http://jinja.pocoo.org/) , version >= 2.8 (python3-jinja2)
+ * [pyyaml](https://github.com/yaml/pyyaml), version >= 3.12 (python3-yaml)
+ * [python-markdown](https://github.com/waylan/Python-Markdown), version >= 2.6.8 (python3-markdown)
+ * [python-slugify](https://github.com/un33k/python-slugify), version >= 1.2.1 (python3-slugify)
+ * [Pygments](http://pygments.org/), version >= 2.2.0 (python3-pygments)
 
 You may also need to install [setuptools](https://github.com/pypa/setuptools) to
 use Juliet's setup program.
 
 Required for tests:
 
- * [nose](https://github.com/nose-devs/nose), version 1.3.7 (python3-nose)
+ * [nose](https://github.com/nose-devs/nose), version >= 1.3.7 (python3-nose)
 
 ## Markdown implementation
 
