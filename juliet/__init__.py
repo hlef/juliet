@@ -1,9 +1,5 @@
-__version__ = '0.1-final'
-__author__ = 'Hugo Lefeuvre'
-__author_email__ = 'hle@owl.eu.com'
-
 import argparse, logging, os, slugify, datetime, sys
-from juliet import configurator, loader, paths, defaults
+from juliet import configurator, loader, paths, defaults, version
 from juliet.builder import Builder
 
 def main():
@@ -86,7 +82,7 @@ def parse_arguments(args):
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument('--debug', '-d', action='count', default=0)
     parent_parser.add_argument('--version', action='version',
-                       version='%(prog)s {version}'.format(version=__version__))
+                       version='%(prog)s {version}'.format(version=version.__version__))
 
     main_parser = argparse.ArgumentParser(parents=[parent_parser],
                         description='The lightweight static website generator')

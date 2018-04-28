@@ -1,0 +1,6 @@
+__version__ = '0.1-final'
+__author__ = 'Hugo Lefeuvre'
+__author_email__ = 'hle@owl.eu.com'
+__license__ = 'MIT'
+__description__ = 'The lightweight static website generator'
+__url__ = 'http://github.com/hlef/juliet'
