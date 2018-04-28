@@ -1,13 +1,8 @@
-## Blockers for 0.2-alpha1
-
-* Write tests for juliet new article feature
-* Add a manpage
-* Add a quick-step-in doc
-
 ## Blockers for 0.2-alpha2
 
 * Support default article header generator from Juliet templates
 * Tests for new feature
+* Add a quick-step-in doc
 
 ## Blockers for 0.2-alpha3
 
