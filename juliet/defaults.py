@@ -6,3 +6,8 @@ baseurl: ""
 # WARNING: No theme under themes/ yet ! More informations in the documentation:
 # https://github.com/hlef/juliet
 theme:""")
+
+default_article = ("""---
+title: {0}
+date:{1}
+---""")

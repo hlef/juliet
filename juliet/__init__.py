@@ -1,4 +1,4 @@
-import argparse, logging, os
+import argparse, logging, os, slugify, datetime
 from juliet import configurator, loader, paths, defaults
 from juliet.builder import Builder
 
@@ -14,6 +14,9 @@ def main():
     elif(args.subcommand == "init"):
         logging.debug("Executing sub-command " + args.subcommand)
         init(args)
+    elif(args.subcommand == "new"):
+        logging.debug("Executing sub-command " + args.subcommand)
+        init_new_article(args)
 
     logging.debug("Done. Exiting.")
 
@@ -44,6 +47,19 @@ def init(args):
     logging.debug("Importing default config.yml")
     with open(os.path.join(args.dir, paths.CFG_FILE), 'w') as stream:
         stream.write(defaults.default_config)
+
+def init_new_article(args):
+    """ Initialize a fresh, new article file. """
+
+    file_name = os.path.join(args.src, paths.POSTS_BUILDDIR, args.date + '-' + slugify.slugify(args.title))
+
+    logging.debug("Creating new article file...")
+
+    with open(file_name, 'w') as stream:
+        # TODO: Support importing header generator from juliet template
+        stream.write(defaults.default_article.format(args.title, args.date))
+
+    logging.debug("Done creating article.")
 
 def parse_arguments():
     """ Parse and return arguments. """
@@ -79,7 +95,28 @@ def parse_arguments():
                     default=paths.DEFAULT_INITDIR,
                     help='Initialize website in passed directory')
 
+    parser_new = subparsers.add_parser('new', parents=[parent_parser],
+    help="Initialize a fresh, new article file.")
+
+    parser_new.add_argument('--build-src', '-s', dest="src", type=str, default="",
+                    help='juliet source directory where to initialize article')
+
+    parser_new.add_argument('--date', dest="date", type=_valid_date_argparse,
+                    default=datetime.date.today().strftime("%Y-%m-%d"),
+                    help='date of the article - format YYYY-MM-DD')
+
+    parser_new.add_argument('--title', '-t', dest="title", type=str, required=True,
+                    help='title of the article')
+
     return main_parser.parse_args()
+
+def _valid_date_argparse(s):
+    try:
+        datetime.datetime.strptime(s, "%Y-%m-%d")
+        return s
+    except ValueError:
+        msg = "Passed date is incorrectly formatted: '{0}' (YYYY-MM-DD expected).".format(s)
+        raise argparse.ArgumentTypeError(msg)
 
 def configure_logging(debugLevel):
     """ Configure logging according to passed debug level. """

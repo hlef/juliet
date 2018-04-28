@@ -1,10 +1,19 @@
+## Blockers for 0.2-alpha1
+
+* Document juliet new article feature
+* Write tests for juliet new article feature
+
+## Blockers for 0.2
+
+* Support default article header generator from Juliet templates
+
 ## Misc improvements
 
-* Use snake case variable names
+* Use snake case variable names everywhere
 * Update docstrings to use the numpy convention
 * Documentation:
   - Q&A
 
 ## Patching ideas
 
-* Support emojis
+* Support emojis ?
