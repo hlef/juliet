@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 
 from setuptools import setup
+import juliet
 
 setup(name='juliet',
-      version='0.1-final',
+      version=juliet.__version__,
       description='The lightweight static website generator',
       url='http://github.com/hlef/juliet',
-      author='Hugo Lefeuvre',
-      author_email='hle@owl.eu.com',
+      author=juliet.__author__,
+      author_email=juliet.__author_email__,
       license='MIT',
       packages=['juliet'],
       entry_points={
