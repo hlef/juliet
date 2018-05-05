@@ -21,71 +21,58 @@ optional arguments:
 
 ### Article generation example
 
-In the most simple and common case, you would probably call `juliet new --
-title = "Title of the article"` to generate a new article, and Juliet would
-generate `posts/{current date}-title-of-the-article.md` with the following
-content:
+`juliet new -- title = "Title of the article"` will generate
+`posts/{current date}-title-of-the-article.md` with the following content:
 
-```
----
-title: "Title of the article"
-date: {current date} {current time}
----
-```
+    ---
+    title: "Title of the article"
+    date: {current date} {current time}
+    ---
 
 ## Customization
 
-### File name format
+While `juliet new` is designed to work out-of-the-box with a well-specified
+default behavior, it is also very customizable, both on user and template
+designer sides.
 
-Juliet is designed to be as modular as possible. That's why you are free to
-choose the file name format you want if you want to change it.
+### User: file name format
 
 By default, the file name format is `{current date in YYYYMMDD format}-{slugified
 article title}.md` for articles and `{slugified page title}.md` for pages.
 
-This can be changed by the user in the `config.yml` file with the
-`post-filename-format` and `page-filename-format` entries.
+This behavior can be easily changed by the user:
+ * specify a custom generator function in `.addons/file-name-formatting.py`. The
+   interface will be specified later.
+ * Set `override-post-filename-format` (or `override-page-filename-format`) to
+   true in your `config.yml` to tell Juliet to use these generators instead of
+   the default one.
 
-The value should be formatted as following: **TODO**.
+### Theme designer: default entries set
 
-### Default entries set
-
-By default, generated articles will only contain `title` and `date` header
-entries. This behavior can be changed themewise by defining `.cfg/.newpost.yml`
-and `.cfg/.newpage.yml`. These YAML formatted files specify the different
-entries to include, whether they are mandatory or not, and if not, what default
-value to use or, if applicable, how to generate it. Entries defining no fallback
-value will simply not be included.
+By default, `juliet new` will generate articles templates with `title` and `date`
+header entries. This behavior can be changed themewise by defining `.cfg/.postheader.yml`
+and `.cfg/.pageheader.yml`. These YAML formatted files specify the different
+entries to include, and if applicable, how to generate their value.
 
 The required format is:
 
-```
-mandatory_fields:
-    - entry
+    handfilled:
+        - entry: fallback value
 
-optional_fields_val:
-    - entry: string value
-
-optional_fields_func:
-    - entry : function
-```
+    generated:
+        - entry : function
 
 For example:
 
-```
-mandatory_fields:
-    - title
+    handfilled:
+        - title:
+        - archived: "false"
 
-optional_fields_val:
-    - archived: "false"
+    optional_fields_func:
+        - date : current_datetime
 
-optional_fields_func:
-    - date : get_current_date
-```
+Available generator functions will later be specified in a public API.
 
-Available generator functions will later be specified in a public API. It will
-be possible to extend this set of function via a plugin system.
-
-If mandatory arguments didn't get passed via command line arguments after `--`,
-Juliet will either fail or interactively ask the user to enter them. This is why
-you shouldn't specify too many mandatory args.
+If Juliet doesn't specify the generator functions you need, you can also define
+your own ones under `.cfg/.addons/header-generators.py`. The interface will be
+specified later.

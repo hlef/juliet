@@ -8,6 +8,8 @@ Juliet website sources are organized as following:
     ├── assets
     │   └── ...
     ├── config.yml
+    ├── .addons
+    │   └── ...
     ├── pages
     │   └── ...
     ├── posts
@@ -42,6 +44,10 @@ The set of required entries in the configuration file may vary depending on your
 theme. You can usually find more informations about it in your theme directory,
 under `themes/your_theme/README`.
 
+Also, some features define customization options which you can read about under
+
+ * `dev/juliet-new` for `juliet new` (currently in development)
+
 ### :pencil: Blog posts, *posts/*
 
 Juliet posts go to the `posts/` directory and are divided in two parts:
@@ -58,9 +64,13 @@ For example:
 
     Hello, **world** !
 
-The set of required entries in post headers may vary depending on your theme.
-You can find more informations about it in your theme directory, under
-`themes/your_theme/README`.
+Juliet defines some special entries which will alter the behavior of the engine:
+ * `permalink` allows you to specify *where exactly* to install the article.
+   Works for both posts and pages.
+
+Apart from these, the set of required entries in post headers varies depending
+on your theme. You can find more informations about it in your theme directory,
+under `themes/your_theme/README`.
 
 Please, note that even if it is empty, the header has to be present. Otherwise,
 Juliet might get upset ! :)
@@ -69,7 +79,7 @@ Juliet might get upset ! :)
 
 Because creating a fresh article structure each and every time you write a new
 article is repetitive and annoying, Juliet >= 0.2 adds support for the
-`juliet new` feature which will take care of it for you (pro tip: you can get
+`juliet new` feature which takes care of it for you (pro tip: you can get
 more information about this feature via `juliet new --help` !).
 
 ### :bookmark: Preprocessor tags
@@ -149,3 +159,33 @@ in `build-area` by default. Alternatively, you may want to specify a destination
 using `--build-dst`.
 
 You can also specify the source directory via `--build-src`.
+
+### :file_folder: Installed structure
+
+    .
+    ├── page1
+    ├── page2
+    ├── ...
+    ├── static1.html
+    ├── static2.html
+    ├── ...
+    ├── assets
+    │   ├── ...
+    ├── css
+    │   ├── ...
+    ├── favicon
+    │   ├── ...
+    ├── fonts
+    │   ├── ...
+    ├── index.html
+    ├── js
+    │   └── ...
+    └── posts
+        ├── ...
+
+Unless `permalink` is defined in page/post headers, pages are installed at the
+root of the build area, and post under `posts/`. The name of the pages is, unless
+`permalink` is defined, defined by the file naming variable. By default, the file
+naming variable is the title, and if no title is defined, the first variable
+defined in the header. The default file naming variable can be defined via
+`file_naming_variable` in `config.yml`.
