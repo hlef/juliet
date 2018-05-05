@@ -184,8 +184,9 @@ You can also specify the source directory via `--build-src`.
         ├── ...
 
 Unless `permalink` is defined in page/post headers, pages are installed at the
-root of the build area, and post under `posts/`. The name of the pages is, unless
-`permalink` is defined, defined by the file naming variable. By default, the file
-naming variable is the title, and if no title is defined, the first variable
-defined in the header. The default file naming variable can be defined via
-`file_naming_variable` in `config.yml`.
+root of the build area, and posts under `posts/`. Unless `permalink` is defined,
+the name under which pages/posts will be installed is defined by the file naming
+variable. By default the file naming variable is defined as the "title" entry,
+but this can be changed by defining the `file_naming_variable` field in
+your `config.yml`. If the file naming variable is not present, the source file
+name will be used (but this is something you should rather consider avoiding).

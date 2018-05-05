@@ -1,13 +1,15 @@
 import unittest
 from juliet.pageprocessor import PageProcessor
+from juliet import defaults
 
 class fileParserTest(unittest.TestCase):
 
     FILENAME = "filename"
     baseurl = "/base/url"
+    file_naming_variable = defaults.DEFAULT_FILE_NAMING_VARIABLE
 
     def setUp(self):
-        self.processor = PageProcessor(self.baseurl)
+        self.processor = PageProcessor(self.baseurl, self.file_naming_variable)
 
     def test_get_header_limit(self):
         """ Make sure that _get_header_limit() is working well with simple files. """
@@ -56,30 +58,53 @@ class fileParserTest(unittest.TestCase):
 
         header = """key: value\nkey2: value2\nfoo: bar"""
 
-        result = {"key": "value", "key2": "value2", "foo": "bar"}
+        result = {"key": "value", "key2": "value2", "foo": "bar", "slug": self.FILENAME}
 
-        self.assertEqual(result, self.processor._process_header(header))
+        self.assertEqual(result, self.processor._process_header(header, self.FILENAME))
 
-    def test_parsing_valid_file1(self):
+    def test_process_header_with_file_naming_var_defined(self):
+        """ Make sure that the _process_header() method is working well with
+        simple headers defining the file naming variable."""
+
+        header = """key: value\nkey2: value2\nfoo: bar\ntitle: \"this\""""
+
+        result = {"key": "value", "key2": "value2", "foo": "bar", "title": "this", "slug": "this"}
+
+        self.assertEqual(result, self.processor._process_header(header, self.FILENAME))
+
+    def test_process_header_with_permalink_defined(self):
+        """ Make sure that the _process_header() method is working well with
+        simple headers defining the permalink variable."""
+
+        header = """foo: bar\npermalink: \"perma\""""
+        header2 = """foo: bar\npermalink: \"perma\"\ntitle: this"""
+
+        result = {"foo": "bar", "permalink": "perma", "slug": self.FILENAME}
+        result2 = {"foo": "bar", "title": "this", "permalink": "perma", "slug": "this"}
+
+        self.assertEqual(result, self.processor._process_header(header, self.FILENAME))
+        self.assertEqual(result2, self.processor._process_header(header2, self.FILENAME))
+
+    def test_parsing_simple_valid_file(self):
         """ Make sure that process() returns the excepted result when passing
         simple, valid files."""
 
         validFile = """---\nkey: value\nwhatever: anothervalue\n22i: valuewithnumbers5\n---\n\nbody"""
 
         result = {"key": "value", "whatever": "anothervalue", "22i": "valuewithnumbers5",
-                  "body": "<p>body</p>", 'file-name': self.FILENAME}
+                  "slug": self.FILENAME, "body": "<p>body</p>", 'file-name': self.FILENAME}
 
         self.assertEqual(result, self.processor.process(validFile, self.FILENAME))
 
-    def test_parsing_valid_file2(self):
+    def test_parsing_valid_without_header_or_body(self):
         """ Make sure that process() returns the excepted result when passing
         simple, valid files with empty header and body."""
 
         validFile1 = """---\n---\n\nbody"""
-        result1 = {"body": "<p>body</p>", 'file-name': self.FILENAME}
+        result1 = {"body": "<p>body</p>", 'file-name': self.FILENAME, "slug": self.FILENAME}
 
         validFile2 = """---\n\n---"""
-        result2 = {"body": "", 'file-name': self.FILENAME}
+        result2 = {"body": "", 'file-name': self.FILENAME, "slug": self.FILENAME}
 
         self.assertEqual(result1, self.processor.process(validFile1, self.FILENAME))
         self.assertEqual(result2, self.processor.process(validFile2, self.FILENAME))
@@ -188,7 +213,7 @@ cat file
 cat file
 {%endhighlight%}"""
 
-        result1 = {"body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
+        result1 = {"slug": self.FILENAME, "body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
 </pre></div>
 </td></tr></table>
 
@@ -206,7 +231,7 @@ cat file
 {% endhighlight  %}
 {% endhighlight  %}"""
 
-        result_invalid_inclusion = {"body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+        result_invalid_inclusion = {"slug": self.FILENAME, "body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
 <span class="o">{</span>% endhighlight  %<span class="o">}</span>
 </pre></div>
@@ -224,6 +249,6 @@ cat file
 cat file
 {%endhighlight%}"""
 
-        result_inclusion = {"body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1\n2\n3\n4</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file\n<span class="o">{</span>%highlight shell %<span class="o">}</span>\n<span class="o">{</span>% endhighlight  %<span class="o">}</span>\ncat file\n</pre></div>\n</td></tr></table>""", 'file-name': self.FILENAME}
+        result_inclusion = {"slug": self.FILENAME, "body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1\n2\n3\n4</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file\n<span class="o">{</span>%highlight shell %<span class="o">}</span>\n<span class="o">{</span>% endhighlight  %<span class="o">}</span>\ncat file\n</pre></div>\n</td></tr></table>""", 'file-name': self.FILENAME}
 
         self.assertEqual(result_inclusion, self.processor.process(inclusion, self.FILENAME))

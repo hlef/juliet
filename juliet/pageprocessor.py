@@ -7,8 +7,9 @@ from pygments.formatters import HtmlFormatter
 class PageProcessor:
     FORBIDDEN_HEADER_ENTRIES = {'body'}
 
-    def __init__(self, baseurl):
+    def __init__(self, baseurl, file_naming_variable):
         self.baseurl = baseurl
+        self.file_naming_variable = file_naming_variable
 
     def _process_pygments(self, splitted_body):
         """ Process highlight blocks in passed body. Raise ValueError if
@@ -131,25 +132,26 @@ class PageProcessor:
             invalid_entries = str(self.FORBIDDEN_HEADER_ENTRIES & set_header)
             raise ValueError("Header contains forbidden entries " + invalid_entries)
 
-    def _process_header(self, header):
+    def _process_header(self, header, filename):
         """ Parse passed header. Raise ValueError if header can't be parsed
         properly. """
 
         parsed_header = {}
 
-        if(header != ""):
-            parsed_header = {}
+        # Set up fallback value for slug, which has to be defined anyways
+        parsed_header["slug"] = slugify.slugify(os.path.splitext(filename)[0])
 
+        if(header != ""):
             try:
-                parsed_header = yaml.load(header)
+                parsed_header.update(yaml.load(header))
             except yaml.YAMLError as exc:
                 raise ValueError("Failed to parse file header: " + str(exc))
 
             self._check_header_content(parsed_header)
 
-            # If there's a title entry, provide a slugified form of it
-            if("title" in parsed_header.keys()):
-                parsed_header["slug"] = slugify.slugify(parsed_header["title"])
+            if(self.file_naming_variable in parsed_header.keys()):
+                # If there's a file_naming_variable entry, provide a slugified form of it.
+                parsed_header["slug"] = slugify.slugify(parsed_header[self.file_naming_variable])
 
         return parsed_header
 
@@ -176,7 +178,6 @@ class PageProcessor:
         """ Return a parsed form of passed file.
 
         ### 1) Format
-
         Passed file should have the following format:
 
         ""
@@ -189,23 +190,14 @@ class PageProcessor:
 
         Even if header part is empty, it should be present.
 
-        For example,
+        For example, ""BODY"" or
 
-        ""
-         BODY
-        ""
-
-        or
-
-        ""
-         ---
-         BODY
-        ""
+        ""---
+         BODY""
 
         are *not* valid files.
 
-        ### 1) Returned value
-
+        ### 2) Returned value
         A ValueError is raised if file is bad formatted.
 
         Returned file is represented by a dictionnary containing following entries:
@@ -214,25 +206,21 @@ class PageProcessor:
          * the header's content.
 
         ### 3) Examples
-
         The following file
 
-        ""
-         ---
-         key: value
-         ---
+        ""---
+          key: value
+          ---
+          bodyContent""
 
-         bodyContent
-        ""
-
-        would be returned as {"key": "value", "body": "<p>bodyContent</p>"}. """
+        would be returned as {"key": "value", "body": "<p>bodyContent</p>", "slug": filename}. """
 
         result = {}
         splitted_file = raw_file.splitlines()
 
         # Find header, check and process it
         header_limit = self._get_header_limit(splitted_file)
-        parsed_header = self._process_header("\n".join(splitted_file[1:header_limit]))
+        parsed_header = self._process_header("\n".join(splitted_file[1:header_limit]), filename)
         result.update(parsed_header)
 
         # Find body, process it

@@ -11,3 +11,5 @@ default_article = ("""---
 title: {0}
 date:{1}
 ---""")
+
+DEFAULT_FILE_NAMING_VARIABLE = "title"

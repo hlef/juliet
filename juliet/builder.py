@@ -38,6 +38,9 @@ class Builder:
     def _write(self, path, string):
         """ Write passed string to passed path. """
 
+        if(not _is_safe_path(path)):
+            raise ValueError("Trying to build element to unsafe path.")
+
         with open(path, 'w') as stream:
             stream.write(string)
 
@@ -77,7 +80,11 @@ class Builder:
 
         for post in self.build_args["posts"]:
             html = self._format_args_and_render(post, template)
-            self._write(os.path.join(builddir, post["slug"]), html)
+
+            if("permalink" in post.keys()):
+                self._build_permalinked(post, html)
+            else:
+                self._write(os.path.join(builddir, post["slug"]), html)
 
     def _build_pages(self):
         """ Build pages and install them. """
@@ -86,4 +93,23 @@ class Builder:
 
         for page in self.build_args["pages"]:
             html = self._format_args_and_render(page, template)
-            self._write(os.path.join(self.destination, page["permalink"]), html)
+
+            if("permalink" in page.keys()):
+                self._build_permalinked(page, html)
+            else:
+                self._write(os.path.join(self.destination, post["slug"]), html)
+
+    def _build_permalinked(self, p, html):
+        """ Build page/post to permalink. """
+
+        if(not "permalink" in p.keys()):
+            raise ValueError("Called _build_permalinked with header that doesn't define permalink entry")
+
+        self._write(os.path.join(self.destination, p["permalink"]), html)
+
+    def _is_safe_path(path, follow_symlinks=False):
+        """ Check directories before writing to avoid directory traversal. """
+
+        if follow_symlinks:
+            return os.path.realpath(path).startswith(self.destination)
+        return os.path.abspath(path).startswith(self.destination)

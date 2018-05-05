@@ -12,7 +12,7 @@ def get_from_folder(folder, config):
     elements = []
     entries = sorted(os.listdir(folder), reverse=True)
 
-    processor = PageProcessor(config["site"]["baseurl"])
+    processor = PageProcessor(config["site"]["baseurl"], config["site"]["file_naming_variable"])
 
     for sourceFile in entries:
         logging.debug("Loading file " + sourceFile)
