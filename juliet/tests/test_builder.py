@@ -22,8 +22,8 @@ class builderTest(unittest.TestCase):
         build_args = configurator.get_config(self.test_cfg_path)
         args = [jinja_env, build_args, self.test_data_path, self.dest]
 
-        self.builderclean = Builder(*args, False)
-        self.buildernoclean = Builder(*args, True)
+        self.builderclean = Builder(*args, noclean=False)
+        self.buildernoclean = Builder(*args, noclean=True)
 
     def test_is_safe_path(self):
         """ Make sure that the is_safe_path function acts as excepted when valid

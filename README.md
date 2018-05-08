@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/hlef/juliet.svg?branch=master)](https://travis-ci.org/hlef/juliet)
+[![Coverage Status](https://coveralls.io/repos/github/hlef/juliet/badge.svg?branch=master)](https://coveralls.io/github/hlef/juliet?branch=master)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.txt)
 
 # Juliet
