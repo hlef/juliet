@@ -4,14 +4,13 @@
 
 - [ ] Finish feature specification
 - [ ] Support default article header generator from Juliet templates
-- [ ] Tests for default article header generator
+- [ ] Test coverage at least 90%
 
 ### Blockers for 0.2-alpha3
 
 - [ ] Add a documentation index
 - [ ] Add a quick-step-in doc
 - [ ] Support file name format customization
-- [ ] Tests for file name format customization
 
 ### Blockers for 0.3
 
