@@ -38,8 +38,12 @@ class Builder:
     def _write(self, path, string):
         """ Write passed string to passed path. """
 
-        if(not _is_safe_path(path)):
-            raise ValueError("Trying to build element to unsafe path.")
+        if(not self._is_safe_path(path)):
+            raise ValueError("Trying to build element to unsafe path (" +
+                             path + " outside of " + self.destination + ").")
+
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path)) # may raise OSError
 
         with open(path, 'w') as stream:
             stream.write(string)
@@ -107,7 +111,7 @@ class Builder:
 
         self._write(os.path.join(self.destination, p["permalink"]), html)
 
-    def _is_safe_path(path, follow_symlinks=False):
+    def _is_safe_path(self, path, follow_symlinks=False):
         """ Check directories before writing to avoid directory traversal. """
 
         if follow_symlinks:
