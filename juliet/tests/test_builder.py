@@ -25,6 +25,29 @@ class builderTest(unittest.TestCase):
         self.builderclean = Builder(*args, False)
         self.buildernoclean = Builder(*args, True)
 
+    def test_is_safe_path(self):
+        """ Make sure that the is_safe_path function acts as excepted when valid
+        and invalid (out of tree, etc.) paths. """
+
+        v_path1 = os.path.join(self.dest, "file")
+        v_path2 = os.path.join(self.dest, "subfolder", "file")
+        v_path3 = os.path.join(self.dest, "subfolder", "subfolder", "file")
+        valids = [v_path1, v_path2, v_path3]
+
+        for path in valids:
+            self.assertTrue(self.builderclean._is_safe_path(path))
+            self.assertTrue(self.buildernoclean._is_safe_path(path))
+
+        inv_path1 = os.path.join(self.dest, "..", "file")
+        inv_path2 = os.path.join("etc", "apache2")
+        inv_path3 = os.path.join(self.dest, "..", "..", "..", "file")
+        inv_path4 = ""
+        invalids = [inv_path1, inv_path2, inv_path3, inv_path4]
+
+        for path in invalids:
+            self.assertFalse(self.builderclean._is_safe_path(path))
+            self.assertFalse(self.buildernoclean._is_safe_path(path))
+
     def test_write(self):
         """ Make sure that the internal write function is working well with
         simple tasks. """
