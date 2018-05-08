@@ -1,4 +1,5 @@
 language: python
+
 python:
   - "3.3"
   - "3.4"
@@ -8,9 +9,23 @@ python:
   - "3.6-dev" # 3.6 development branch
   - "3.7-dev" # 3.7 development branch
   - "nightly" # currently points to 3.7-dev
+
+# Allow failures on the latest Python versions, currently
+# necessary since pyyaml FTBFS
+matrix:
+  # fast_finish: true
+  allow_failures:
+    - python: 3.7-dev
+    - python: nightly
+
 before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y python3-setuptools
+    - pip install coveralls
+
 install: "pip install ."
+
 # command to run tests
-script: nosetests
+script:
+    - coverage run --source=juliet setup.py test
+    - coveralls
