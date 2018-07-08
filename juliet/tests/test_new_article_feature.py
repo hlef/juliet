@@ -14,6 +14,67 @@ class newArticleFileTest(unittest.TestCase):
         args = juliet.parse_arguments(['init', '--dir', self.test_dir])
         juliet.init(args)
 
+    def test_parse_valid_raw_header_entries(self):
+        """ Make sure valid command line passed raw header entries are well parsed. """
+
+        args1 = ["title=", "\"some title\"",
+                 "date   ", "=", "\"1997-12-11\"",
+                 "author", "=\"The Bird\""]
+        res1 = {"title": "some title", "date": "1997-12-11", "author": "The Bird"}
+        self.assertEqual(juliet._parse_raw_header_entries(args1), res1)
+
+        args2 = [" title    =", "\"some title with escaped \\\"\"    "]
+        res2 = {"title": "some title with escaped \""}
+        self.assertEqual(juliet._parse_raw_header_entries(args2), res2)
+
+        args3 = ["title=", "    \"some title with escaped \\\\\""]
+        res3 = {"title": "some title with escaped \\"}
+        self.assertEqual(juliet._parse_raw_header_entries(args3), res3)
+
+        # Spaces should not be removed between the "s
+        args4 = ["title=", "\" some title with escaped \\\\\""]
+        res4 = {"title": " some title with escaped \\"}
+        self.assertEqual(juliet._parse_raw_header_entries(args4), res4)
+
+    def test_parse_broken_raw_header_entries(self):
+        """ Make sure valid command line passed raw header entries are well parsed. """
+
+        # Missing "s
+        args1 = ["title=", "some title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args1)
+
+        # Missing '='
+        args2 = ["title", "\"some title\""]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args2)
+
+        # First two combined
+        args3 = ["title", "some title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args3)
+
+        # Only one "
+        args4 = ["title=", "\"some title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args4)
+
+        # Bad key
+        args5 = ["_title=", "\"some title\""]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args5)
+
+        # Bad key
+        args6 = ["title_=", "\"some title\""]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args6)
+
+        # Bad key
+        args7 = ["my title=", "\"some title\""]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args7)
+
+        # String doesn't start directly
+        args8 = ["my title=", " something \"some title\""]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args8)
+
+        # Several =s
+        args9 = ["my title=", " = \"some title\""]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args9)
+
     def test_generate(self):
         """ Make sure new article files are generated. Doesn't check for content. """
 
@@ -57,16 +118,20 @@ class newArticleFileTest(unittest.TestCase):
         # Make sure article was created
         file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
         article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
-        self.assertTrue(os.path.exists(article_path))
+        self.assertTrue(os.path.exists(article_path),
+            "Expected article to be generated at {} but couldn't find it"
+            .format(article_path))
 
         # Make sure it was created at the right place
         self.assertEqual(os.path.dirname(article_path),
-                         os.path.join(self.test_dir, juliet.paths.POSTS_PATH))
+                         os.path.join(self.test_dir, juliet.paths.POSTS_PATH),
+                             "Expected article to be generated in {} but in fact it was generated at {}"
+                             .format(os.path.join(self.test_dir, juliet.paths.POSTS_PATH), os.path.dirname(article_path)))
 
         # Go back to current directory
         os.chdir(self.cur_dir)
 
-    def test_missing_posts_folder(self):
+    def test_missing_content(self):
         """ Make sure Juliet behaves correctly when folder content is missing. """
 
         # Do *not* generate base site

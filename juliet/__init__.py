@@ -117,19 +117,30 @@ def _parse_raw_header_entries(header_entries):
 
     joined = ' '.join(header_entries)
 
-    while (len(joined)):
+    while (1):
         # Retrieve key
         key = joined.split('=', 1)[0]
         joined = joined[len(key):].strip()
+        if (not joined):
+            raise ValueError("incorrectly formatted key value list (missing '=' at some point ?)")
+
+        # Clean & check key
         key = key.strip()
         if (not __check_key(key)):
-            raise ValueError("Invalid key {}: contains '_' or ' '". format(key))
+            raise ValueError("invalid key {}: contains '_' or ' '". format(key))
+
+        # Remove leading '=' sign
+        joined = joined[1:].strip()
+        if (not joined):
+            raise ValueError("missing value for key {}".format(key))
 
         # Retrieve corresponding value
         value = ""
         escaped = False
+        value_size = 0
         counter = 0
         for c in joined:
+            value_size += 1
             if (c == "\\"):
                 # Escaping
                 if escaped:
@@ -142,18 +153,22 @@ def _parse_raw_header_entries(header_entries):
                 if escaped:
                     value += c
                     escaped = False
-                elif (++counter ==  2):
-                    break
+                else:
+                    counter += 1
+                    if (counter ==  2):
+                        break
             else:
                 value += c
 
         if (counter != 2):
-            raise ValueError("Invalid key value list: missing \"")
-
-        joined = joined[len(value):]
+            raise ValueError("Invalid key value list: missing \" (counted {} \"s)".format(counter))
 
         # Add key-value to dictionary
         result[key] = value
+
+        joined = joined[value_size:]
+        if(not len(joined)):
+            break
 
     return result
 
@@ -198,7 +213,6 @@ def _process_header_dict(theme_config, parsed_entries):
     if ("date_" not in result.keys()):
         result["date_"] = datetime.date.today().strftime("%Y-%m-%d")
 
-    print(result)
     return result
 
 def _finalize_header_dict(theme_config, processed_entries):
