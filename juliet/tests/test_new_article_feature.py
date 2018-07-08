@@ -75,6 +75,10 @@ class newArticleFileTest(unittest.TestCase):
         args9 = ["my title=", " = \"some title\""]
         self.assertRaises(ValueError, juliet._parse_raw_header_entries, args9)
 
+        # Missing value
+        args10 = ["title="]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args10)
+
     def test_generate(self):
         """ Make sure new article files are generated. Doesn't check for content. """
 
@@ -93,7 +97,7 @@ class newArticleFileTest(unittest.TestCase):
 
         # Make sure article was created
         file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
-        article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
+        article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, file_name)
         self.assertTrue(os.path.exists(article_path),
             "Expected article to be generated at {} but couldn't find it"
             .format(article_path))
@@ -127,6 +131,45 @@ class newArticleFileTest(unittest.TestCase):
                          os.path.join(self.test_dir, juliet.paths.POSTS_PATH),
                              "Expected article to be generated in {} but in fact it was generated at {}"
                              .format(os.path.join(self.test_dir, juliet.paths.POSTS_PATH), os.path.dirname(article_path)))
+
+        # Go back to current directory
+        os.chdir(self.cur_dir)
+
+    def test_pass_filename(self):
+        """ Make sure new article is generated at the right place when file name
+        is passed."""
+
+        # Go to temporary directory
+        os.chdir(self.test_dir)
+
+        # Generate base site
+        self._init_juliet_structure_in_test_dir()
+
+        # Prepare args
+        b_file_name = 'hello_world.md'
+        base_args = ['new', b_file_name]
+        comp_args = ['new']
+        b_args = juliet.parse_arguments(base_args)
+        c_args = juliet.parse_arguments(comp_args)
+
+        # Generate articles
+        juliet.init_new_article(b_args)
+        juliet.init_new_article(c_args)
+
+        # Make sure article was created where it is expected to be created
+        b_article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, b_file_name)
+
+        self.assertTrue(os.path.exists(b_article_path),
+            "Expected article to be generated at {} but couldn't find it"
+            .format(b_article_path))
+
+        # Make sure it is the same as the default article (passing a file name should only change the file name)
+        c_file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
+        c_article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, c_file_name)
+
+        with open(b_article_path) as b_f:
+            with open(c_article_path) as c_f:
+                self.assertEqual(b_f.read(), c_f.read(), "passing file name modifies article content")
 
         # Go back to current directory
         os.chdir(self.cur_dir)
