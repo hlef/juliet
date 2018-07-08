@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os, sys, logging
+import os, sys, logging, juliet
 from juliet.pageprocessor import PageProcessor
 
 def get_from_folder(folder, config):
@@ -12,7 +12,12 @@ def get_from_folder(folder, config):
     elements = []
     entries = sorted(os.listdir(folder), reverse=True)
 
-    processor = PageProcessor(config["site"]["baseurl"], config["site"]["file_naming_variable"])
+    file_naming_var = ""
+    if ("file_naming_variable" in config["site"].keys()):
+        file_naming_var = config["site"]["file_naming_variable"]
+    else:
+        file_naming_var = juliet.defaults.DEFAULT_FILE_NAMING_VARIABLE
+    processor = PageProcessor(config["site"]["baseurl"], file_naming_var)
 
     for sourceFile in entries:
         logging.debug("Loading file " + sourceFile)

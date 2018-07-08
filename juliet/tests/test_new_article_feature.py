@@ -1,4 +1,5 @@
 import unittest, shutil, tempfile, juliet, os
+from string import Template
 
 class newArticleFileTest(unittest.TestCase):
 
@@ -14,7 +15,7 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init(args)
 
     def test_generate(self):
-        """ Make sure new article files are well generated with minimal set of options. """
+        """ Make sure new article files are generated. Doesn't check for content. """
 
         # Go to temporary directory
         os.chdir(self.test_dir)
@@ -23,70 +24,54 @@ class newArticleFileTest(unittest.TestCase):
         self._init_juliet_structure_in_test_dir()
 
         # Prepare args
-        base_args = ['new', '--title', '"Test article"']
-        args1 = juliet.parse_arguments(base_args)
-        args2 = juliet.parse_arguments(base_args + ['--date', '1970-01-01'])
-        args3 = juliet.parse_arguments(base_args + ['--date', '9999-12-12'])
+        base_args = ['new']
+        args = juliet.parse_arguments(base_args)
 
-        for args in [args1, args2, args3]:
-            # Generate article
-            juliet.init_new_article(args)
+        # Generate article
+        juliet.init_new_article(args)
 
-            # Make sure article was created and contains expected content
-            article_path = juliet._get_article_path(args)
-            with open(article_path) as f:
-                self.assertEqual(f.read(), juliet._get_default_article(args))
+        # Make sure article was created
+        file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
+        article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
+        self.assertTrue(os.path.exists(article_path),
+            "Expected article to be generated at {} but couldn't find it"
+            .format(article_path))
 
         # Go back to current directory
         os.chdir(self.cur_dir)
 
     def test_with_dest_folder(self):
-        """ Make sure new article files are well generated when a destination folder is specified. """
+        """ Make sure new article files are generated when a destination folder
+        is specified. Doesn't check for content. """
 
         # Generate base site
         self._init_juliet_structure_in_test_dir()
 
         # Prepare args
-        base_args = ['new', '--title', '"Test article"', '--build-src', self.test_dir]
-        args1 = juliet.parse_arguments(base_args)
-        args2 = juliet.parse_arguments(base_args + ['--date', '1970-01-01'])
-        args3 = juliet.parse_arguments(base_args + ['--date', '9999-12-12'])
+        base_args = ['new', '--build-src', self.test_dir]
+        args = juliet.parse_arguments(base_args)
 
-        for args in [args1, args2, args3]:
-            # Generate article
-            juliet.init_new_article(args)
+        # Generate article
+        juliet.init_new_article(args)
 
-            # Make sure article was created and contains expected content
-            article_path = juliet._get_article_path(args)
-            with open(article_path) as f:
-                self.assertEqual(f.read(), juliet._get_default_article(args))
+        # Make sure article was created
+        file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
+        article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
+        self.assertTrue(os.path.exists(article_path))
 
-    def test_invalid_date(self):
-        """ Make sure date parsing is correct. """
+        # Make sure it was created at the right place
+        self.assertEqual(os.path.dirname(article_path),
+                         os.path.join(self.test_dir, juliet.paths.POSTS_PATH))
 
-        # Generate base site
-        self._init_juliet_structure_in_test_dir()
-
-        # Prepare invalid args
-        base_args = ['new', '--title', '"Test article"', '--build-src', self.test_dir]
-        args1 = base_args + ['--date']
-        args2 = args1 + ['01-01']
-        args3 = args1 + ['hello']
-
-        # Make sure Juliet exits when it encouters them
-        for args in [args1, args2, args3]:
-            with self.assertRaises(SystemExit):
-                juliet.parse_arguments(args)
+        # Go back to current directory
+        os.chdir(self.cur_dir)
 
     def test_missing_posts_folder(self):
-        """ Make sure Juliet behaves correctly when posts folder is missing. """
+        """ Make sure Juliet behaves correctly when folder content is missing. """
 
         # Do *not* generate base site
-        base_args = ['new', '--title', '"Test article"', '--build-src', self.test_dir]
-        args1 = juliet.parse_arguments(base_args)
-        args2 = juliet.parse_arguments(base_args + ['--date', '1970-01-01'])
-        args3 = juliet.parse_arguments(base_args + ['--date', '9999-12-12'])
+        base_args = ['new', '--build-src', self.test_dir]
+        args = juliet.parse_arguments(base_args)
 
         # Try to generate article
-        for args in [args1, args2, args3]:
-            self.assertRaises(FileNotFoundError, juliet.init_new_article, args)
+        self.assertRaises(FileNotFoundError, juliet.init_new_article, args)

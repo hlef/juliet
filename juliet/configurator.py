@@ -22,16 +22,12 @@ def get_config(config_file):
 
     # Read config from file
     if(not os.path.isfile(config_file)):
-        sys.exit("Error: Could not find config file: " + config_file)
+        raise FileNotFoundError("could not find config file: " + config_file)
 
     with open(config_file, 'r') as stream:
         try:
             config = yaml.load(stream)
         except yaml.YAMLError as exc:
             sys.exit("Error: Failed to parse configuration file: " + str(exc))
-
-    # Process default config elements
-    if(not "file_naming_variable" in config.keys()):
-        config["file_naming_variable"] = defaults.DEFAULT_FILE_NAMING_VARIABLE
 
     return config
