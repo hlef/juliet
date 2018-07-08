@@ -59,20 +59,24 @@ class Builder:
     def _install_data(self):
         """ Install data and assets. """
 
-        assets_path = os.path.join(self.source, paths.ASSETS_PATH)
         data_path = os.path.join(self.source, paths.THEMES_PATH, self.build_args["site"]["theme"], "data")
+        assets_path = os.path.join(self.source, paths.ASSETS_PATH)
 
-        copy_tree(data_path, os.path.join(self.destination, paths.DATA_BUILDDIR))
-        copy_tree(assets_path, os.path.join(self.destination, paths.ASSETS_BUILDDIR))
+        if (os.path.exists(data_path)):
+            copy_tree(data_path, os.path.join(self.destination, paths.DATA_BUILDDIR))
+        if (os.path.exists(assets_path)):
+            copy_tree(assets_path, os.path.join(self.destination, paths.ASSETS_BUILDDIR))
 
     def _build_statics(self):
         """ Build static pages and install them. """
 
-        staticsdir = os.path.join(self.source, paths.THEMES_PATH, self.build_args["site"]["theme"], "statics")
+        statics_path = os.path.join(self.source, paths.THEMES_PATH, self.build_args["site"]["theme"], "statics")
 
-        for element in os.listdir(staticsdir):
-            html = self.jinja_env.get_template(os.path.join("statics", element)).render(self.build_args)
-            self._write(os.path.join(self.destination, element), html)
+        # statics folder might very well not exist if theme doesn't define one
+        if (os.path.exists(statics_path)):
+            for element in os.listdir(statics_path):
+                html = self.jinja_env.get_template(os.path.join("statics", element)).render(self.build_args)
+                self._write(os.path.join(self.destination, element), html)
 
     def _build_posts(self):
         """ Build posts and install them. """
@@ -115,5 +119,5 @@ class Builder:
         """ Check directories before writing to avoid directory traversal. """
 
         if follow_symlinks:
-            return os.path.realpath(path).startswith(self.destination)
-        return os.path.abspath(path).startswith(self.destination)
+            return os.path.realpath(path).startswith(os.path.realpath(self.destination))
+        return os.path.abspath(path).startswith(os.path.abspath(self.destination))
