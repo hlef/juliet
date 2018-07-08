@@ -9,6 +9,20 @@ class initSiteTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.test_dir)
 
+    def _check_config(self, path):
+        """ Check freshly installed config. """
+
+        config = juliet.configurator.get_config(path)
+        if ("baseurl" not in config.keys() or
+            "theme" not in config.keys()):
+            return False
+
+        if (config["baseurl"] == None or
+            config["theme"] == None):
+            return False
+
+        return True
+
     def test_without_dir(self):
         """ Make sure new article files are well generated with minimal set of options. """
 
@@ -26,6 +40,9 @@ class initSiteTest(unittest.TestCase):
         # Test site structure
         for directory in juliet.paths.SOURCE_DIRS:
             self.assertTrue(os.path.isdir(directory))
+
+        self.assertTrue(self._check_config(juliet.paths.CFG_FILE),
+            "default config was installed but doesn't contain valid content")
 
         # Go back to current directory
         os.chdir(self.cur_dir)
@@ -46,3 +63,6 @@ class initSiteTest(unittest.TestCase):
         for directory in juliet.paths.SOURCE_DIRS:
             dir_to_check = os.path.join(self.test_dir, directory)
             self.assertTrue(os.path.isdir(dir_to_check))
+
+        self.assertTrue(self._check_config(os.path.join(self.test_dir, juliet.paths.CFG_FILE)),
+            "default config was installed but doesn't contain valid content")
