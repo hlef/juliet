@@ -1,12 +1,11 @@
 import unittest, os, tempfile
 from juliet.builder import Builder
-from juliet import configurator
+from juliet import configurator, paths
 
 class builderTest(unittest.TestCase):
 
     TEST_THEME = "sample_theme"
-    DATA_FOLDER = os.path.join("juliet", "tests", "test_data")
-    CFG_FILE = "config.test.yml"
+    DATA_FOLDER = os.path.join("juliet", "tests", "test_data", "source")
     DEST_SUBFOLDER = "dest"
 
     def setUp(self):
@@ -15,15 +14,19 @@ class builderTest(unittest.TestCase):
         self.dest = os.path.join(self.test_dir, self.DEST_SUBFOLDER)
 
         self.test_data_path = os.path.join(self.cur_dir, self.DATA_FOLDER)
-        self.cfg_local_path = os.path.join(self.DATA_FOLDER, self.CFG_FILE)
+        self.cfg_local_path = os.path.join(self.DATA_FOLDER, paths.CFG_FILE)
         self.test_cfg_path = os.path.join(self.cur_dir, self.cfg_local_path)
 
-        jinja_env = configurator.configure_jinja(self.TEST_THEME, self.test_data_path)
-        build_args = configurator.get_config(self.test_cfg_path)
-        args = [jinja_env, build_args, self.test_data_path, self.dest]
+        self.jinja_env = configurator.configure_jinja(self.TEST_THEME, self.test_data_path)
+        self.build_args = configurator.get_config(self.test_cfg_path)
+        args = [self.jinja_env, self.build_args, self.test_data_path, self.dest]
 
         self.builderclean = Builder(*args, noclean=False)
         self.buildernoclean = Builder(*args, noclean=True)
+
+    def test_build_simple(self):
+        # TODO: test no assets / no statics folder
+        raise NotImplementedError()
 
     def test_is_safe_path(self):
         """ Make sure that the is_safe_path function acts as excepted when valid
@@ -47,6 +50,17 @@ class builderTest(unittest.TestCase):
         for path in invalids:
             self.assertFalse(self.builderclean._is_safe_path(path))
             self.assertFalse(self.buildernoclean._is_safe_path(path))
+
+    def test_is_safe_path_with_relative_paths(self):
+        """ Make sure that is_safe_path behaves well when it is passed relative
+        paths."""
+
+        relative_path = os.path.join("..", "whatever")
+        args = [self.jinja_env, self.build_args, self.test_data_path, relative_path]
+        builderrelative = Builder(*args, noclean=False)
+
+        path = os.path.join(relative_path, "hello")
+        self.assertTrue(builderrelative._is_safe_path(path))
 
     def test_write(self):
         """ Make sure that the internal write function is working well with
