@@ -15,69 +15,24 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init(args)
 
     def test_parse_valid_raw_header_entries(self):
-        """ Make sure valid command line passed raw header entries are well parsed. """
+        """ Make sure valid command line passed raw header entries are well
+        parsed. """
 
-        args1 = ["title=", "\"some title\"",
-                 "date   ", "=", "\"1997-12-11\"",
-                 "author", "=\"The Bird\""]
-        res1 = {"title": "some title", "date": "1997-12-11", "author": "The Bird"}
+        args1 = ["--", "title:", "a title", "date:", "1997-12-11", "author:", "Bird"]
+        res1 = {"title": "a title", "date": "1997-12-11", "author": "Bird"}
         self.assertEqual(juliet._parse_raw_header_entries(args1), res1)
 
-        args2 = [" title    =", "\"some title with escaped \\\"\"    "]
-        res2 = {"title": "some title with escaped \""}
-        self.assertEqual(juliet._parse_raw_header_entries(args2), res2)
-
-        args3 = ["title=", "    \"some title with escaped \\\\\""]
-        res3 = {"title": "some title with escaped \\"}
-        self.assertEqual(juliet._parse_raw_header_entries(args3), res3)
-
-        # Spaces should not be removed between the "s
-        args4 = ["title=", "\" some title with escaped \\\\\""]
-        res4 = {"title": " some title with escaped \\"}
-        self.assertEqual(juliet._parse_raw_header_entries(args4), res4)
+        # TODO more tests
 
     def test_parse_broken_raw_header_entries(self):
-        """ Make sure valid command line passed raw header entries are well parsed. """
-
-        # Missing "s
-        args1 = ["title=", "some title"]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args1)
-
-        # Missing '='
-        args2 = ["title", "\"some title\""]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args2)
-
-        # First two combined
-        args3 = ["title", "some title"]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args3)
-
-        # Only one "
-        args4 = ["title=", "\"some title"]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args4)
-
-        # Bad key
-        args5 = ["_title=", "\"some title\""]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args5)
-
-        # Bad key
-        args6 = ["title_=", "\"some title\""]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args6)
-
-        # Bad key
-        args7 = ["my title=", "\"some title\""]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args7)
-
-        # String doesn't start directly
-        args8 = ["my title=", " something \"some title\""]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args8)
-
-        # Several =s
-        args9 = ["my title=", " = \"some title\""]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args9)
+        """ Make sure valid command line passed raw header entries are well
+        parsed. """
 
         # Missing value
-        args10 = ["title="]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args10)
+        args1 = ["--", "title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args1)
+
+        # TODO more tests
 
     def test_generate(self):
         """ Make sure new article files are generated. Doesn't check for content. """
@@ -147,7 +102,7 @@ class newArticleFileTest(unittest.TestCase):
 
         # Prepare args
         b_file_name = 'hello_world.md'
-        base_args = ['new', b_file_name]
+        base_args = ['new', '-f', b_file_name]
         comp_args = ['new']
         b_args = juliet.parse_arguments(base_args)
         c_args = juliet.parse_arguments(comp_args)
@@ -170,6 +125,34 @@ class newArticleFileTest(unittest.TestCase):
         with open(b_article_path) as b_f:
             with open(c_article_path) as c_f:
                 self.assertEqual(b_f.read(), c_f.read(), "passing file name modifies article content")
+
+        # Go back to current directory
+        os.chdir(self.cur_dir)
+
+    def test_pass_filename_and_remainder(self):
+        """ Make sure new article files are generated when a destination folder
+        is specified together with a remainder (-- stuff). Doesn't check for
+        content. """
+
+        # Go to temporary directory
+        os.chdir(self.test_dir)
+
+        # Generate base site
+        self._init_juliet_structure_in_test_dir()
+
+        # Prepare args
+        file_name = 'my-new-article.md'
+        base_args = ['new', '-f', file_name, '--', 'title', 'value']
+        args = juliet.parse_arguments(base_args)
+
+        # Generate article
+        juliet.init_new_article(args)
+
+        # Make sure article was created
+        article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, file_name)
+        self.assertTrue(os.path.exists(article_path),
+            "Expected article to be generated at {} but couldn't find it"
+            .format(article_path))
 
         # Go back to current directory
         os.chdir(self.cur_dir)

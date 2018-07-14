@@ -94,8 +94,8 @@ def parse_arguments(args):
     parser_new.add_argument('--build-src', '-s', dest="src", type=str, default="",
                     help='juliet source directory where to initialize article')
 
-    parser_new.add_argument('file_name', nargs='?', default=None,
-                    help='optional file name for new article')
+    parser_new.add_argument('--file-name', '-f', dest="file_name", nargs='?',
+                            default=None, help='file name for new article')
 
     parser_new.add_argument('header_content', default=[],
     nargs=argparse.REMAINDER, help='header content of the new article')
@@ -106,69 +106,35 @@ def _parse_raw_header_entries(header_entries):
     """ TODO """
 
     def __check_key(key):
-        if ("_" in key or " " in key):
+        if ("_" in key or " " in key or ":" in key or not len(key)):
             return False
         return True
 
     result = {}
 
-    if (not header_entries):
+    if (len(header_entries) < 1):
         return result
 
-    joined = ' '.join(header_entries)
+    # Remove leading '--'
+    header_entries = header_entries[1:]
 
-    while (1):
-        # Retrieve key
-        key = joined.split('=', 1)[0]
-        joined = joined[len(key):].strip()
-        if (not joined):
-            raise ValueError("incorrectly formatted key value list (missing '=' at some point ?)")
+    while (len(header_entries)):
+        # Retrieve raw key
+        word = header_entries[0]
+        header_entries = header_entries[1:]
 
-        # Clean & check key
-        key = key.strip()
-        if (not __check_key(key)):
-            raise ValueError("invalid key {}: contains '_' or ' '". format(key))
+        if (not len(header_entries)):
+            raise ValueError("last key does not have a value")
 
-        # Remove leading '=' sign
-        joined = joined[1:].strip()
-        if (not joined):
-            raise ValueError("missing value for key {}".format(key))
+        # Try to trim equal
+        if (word[-1] == ':'):
+            word = word[:-1]
 
-        # Retrieve corresponding value
-        value = ""
-        escaped = False
-        value_size = 0
-        counter = 0
-        for c in joined:
-            value_size += 1
-            if (c == "\\"):
-                # Escaping
-                if escaped:
-                    value += c
-                    escaped = False
-                else:
-                    escaped = True
-            elif (c == "\""):
-                # Escaped " or end of string
-                if escaped:
-                    value += c
-                    escaped = False
-                else:
-                    counter += 1
-                    if (counter ==  2):
-                        break
-            else:
-                value += c
+            if(not __check_key(word)):
+                raise ValueError("invalid key '{}' in key value list".format(word))
 
-        if (counter != 2):
-            raise ValueError("Invalid key value list: missing \" (counted {} \"s)".format(counter))
-
-        # Add key-value to dictionary
-        result[key] = value
-
-        joined = joined[value_size:]
-        if(not len(joined)):
-            break
+        result[word] = header_entries[0]
+        header_entries = header_entries[1:]
 
     return result
 
@@ -188,7 +154,7 @@ def _get_article_path(args, user_config, processed_entries):
 def _get_new_article(final_header):
     """ Return default article matching passed args. """
 
-    default_article = "---\n" + yaml.dump(final_header, default_flow_style=False) + "\n---"
+    default_article = "---\n" + yaml.dump(final_header, default_flow_style=False) + "---"
     return default_article
 
 def _process_header_dict(theme_config, parsed_entries):
@@ -252,7 +218,7 @@ def init_new_article(args):
     logging.debug("Creating new article file at " + file_name)
 
     with open(file_name, 'w+') as stream:
-        stream.write(_get_new_article(processed_entries))
+        stream.write(_get_new_article(final_entries))
 
     logging.debug("Done creating article.")
 
