@@ -31,8 +31,15 @@ def build(args):
         sys.exit("Error during configuration, " + str(exc))
 
     logging.info("Loading and pre-processing content...")
-    config["posts"] = loader.get_from_folder(os.path.join(args.src, paths.POSTS_PATH), config)
-    config["pages"] = loader.get_from_folder(os.path.join(args.src, paths.PAGES_PATH), config)
+    if (os.path.isdir(os.path.join(args.src, paths.POSTS_PATH))):
+        config["posts"] = loader.get_from_folder(os.path.join(args.src, paths.POSTS_PATH), config)
+    else:
+        config["posts"] = {}
+
+    if (os.path.isdir(os.path.join(args.src, paths.PAGES_PATH))):
+        config["pages"] = loader.get_from_folder(os.path.join(args.src, paths.PAGES_PATH), config)
+    else:
+        config["pages"] = {}
 
     logging.debug("Configuring Jinja2 environment...")
     jinjaEnv = configurator.configure_jinja(config["site"]["theme"], args.src)

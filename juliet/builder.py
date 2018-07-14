@@ -81,6 +81,9 @@ class Builder:
     def _build_posts(self):
         """ Build posts and install them. """
 
+        if (not len(self.build_args["posts"])):
+            return
+
         builddir = os.path.join(self.destination, paths.POSTS_BUILDDIR)
         os.makedirs(builddir, exist_ok=True)
 
@@ -96,6 +99,9 @@ class Builder:
 
     def _build_pages(self):
         """ Build pages and install them. """
+
+        if (not len(self.build_args["pages"])):
+            return
 
         template = self.jinja_env.get_template(os.path.join("templates", "pages.html"))
 
