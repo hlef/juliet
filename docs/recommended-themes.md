@@ -1,5 +1,5 @@
 # Juliet *- Recommended themes*
 
-## [boots](https://github.com/hlef/juliet-boots-theme)
- * :link: `https://github.com/hlef/juliet-boots-theme`
- * Description: The clean Bootstrap theme for Juliet !
+## [gram](https://github.com/hlef/juliet-gram-theme)
+ * :link: `https://github.com/hlef/juliet-gram-theme`
+ * Description: A lightweight theme for Juliet
