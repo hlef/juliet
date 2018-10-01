@@ -19,7 +19,7 @@ Some examples of what Juliet can:
 
 Some sites using Juliet:
 
- * [Hugo's Haunt](https://www.owl.eu.com), *[boots](https://github.com/hlef/juliet-boots-theme)* theme
+ * [Hugo's Haunt](https://www.owl.eu.com), *[gram](https://github.com/hlef/juliet-gram-theme)* theme
 
 ## Dependencies
 
