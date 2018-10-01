@@ -36,13 +36,17 @@ class newArticleFileTest(unittest.TestCase):
         args_missing_value = ["--", "title"]
         self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_missing_value)
 
-        # Missing key
-        args_missing_key = ["--", ":", "title"]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_missing_key)
+        # Invalid key #1
+        args_invalid_key = ["--", "::", "hello"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_invalid_key)
 
-        # Missing key and value
-        args_missing_value_and_key = ["--", ":"]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_missing_value_and_key)
+        # Invalid key #2
+        args_invalid_key = ["--", "title_of_the_death:", "hello"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_invalid_key)
+
+        # Invalid key #3 (empty key)
+        args_empty_key = ["--", ":", "title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_empty_key)
 
         # Shifted colon (last key missing value!)
         args_shifted_colon = ["--", "title", ":", "a title"]
@@ -75,11 +79,9 @@ class newArticleFileTest(unittest.TestCase):
         raw_file = ""
         with open(path) as f:
             raw_file = f.read()
-        splitted_file = raw_file.splitlines()
-        header_limit = PageProcessor._get_header_limit(splitted_file)
-        parsed_header = PageProcessor._process_header("\n".join(splitted_file[1:header_limit]),
-                                                      filename,
-                                                      defaults.DEFAULT_FILE_NAMING_VARIABLE)
+
+        parsed_header = PageProcessor._get_parsed_header(raw_file, filename,
+                            defaults.DEFAULT_FILE_NAMING_VARIABLE)
 
         for key, value in defaults.DEFAULT_THEME_CFG.items():
             if (value[1] != None):
@@ -118,11 +120,9 @@ class newArticleFileTest(unittest.TestCase):
         raw_file = ""
         with open(path) as f:
             raw_file = f.read()
-        splitted_file = raw_file.splitlines()
-        header_limit = PageProcessor._get_header_limit(splitted_file)
-        parsed_header = PageProcessor._process_header("\n".join(splitted_file[1:header_limit]),
-                                                      filename,
-                                                      defaults.DEFAULT_FILE_NAMING_VARIABLE)
+
+        parsed_header = PageProcessor._get_parsed_header(raw_file, filename,
+                            defaults.DEFAULT_FILE_NAMING_VARIABLE)
 
         for key, value in parsed_header_entries.items():
             self.assertTrue(parsed_header[key] == value)

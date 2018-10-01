@@ -181,7 +181,18 @@ class PageProcessor:
 
         raise ValueError("Failed to parse header: Header never closed")
 
-    def process(self, raw_file, filename):
+    @staticmethod
+    def _get_parsed_header(raw_file, filename, file_naming_var):
+        """ TODO """
+
+        splitted_file = raw_file.splitlines()
+
+        # Find header, check and process it
+        header_limit = PageProcessor._get_header_limit(splitted_file)
+        return PageProcessor._process_header("\n"
+               .join(splitted_file[1:header_limit]), filename, file_naming_var)
+
+    def process(self, rawfile, filename):
         """ Return a parsed form of passed file.
 
         ### 1) Format
@@ -222,17 +233,17 @@ class PageProcessor:
 
         would be returned as {"key": "value", "body": "<p>bodyContent</p>", "slug": filename}. """
 
-        result = {}
-        splitted_file = raw_file.splitlines()
+        def _get_body(raw_file, filename, file_naming_var):
+            # Find header, check and process it
+            splitted_file = rawfile.splitlines()
+            header_limit = PageProcessor._get_header_limit(splitted_file)
+            return splitted_file[header_limit+1:]
 
-        # Find header, check and process it
-        header_limit = PageProcessor._get_header_limit(splitted_file)
-        parsed_header = PageProcessor._process_header("\n".join(splitted_file[1:header_limit]), filename, self.file_naming_var)
-        result.update(parsed_header)
+        result = PageProcessor._get_parsed_header(rawfile, filename, self.file_naming_var)
 
         # Find body, process it
-        splitted_body = splitted_file[header_limit+1:]
-        result["body"] = PageProcessor._process_body(splitted_body, self.baseurl)
+        body = _get_body(rawfile, filename, self.file_naming_var)
+        result["body"] = PageProcessor._process_body(body, self.baseurl)
 
         result["file-name"] = filename
 

@@ -118,20 +118,18 @@ def _parse_raw_header_entries(header_entries):
         return True
 
     result = {}
-
     if (len(header_entries) < 1):
         return result
 
     # Remove leading '--'
     header_entries = header_entries[1:]
+    if (not len(header_entries) % 2 == 0):
+        raise ValueError("last key does not have a value")
 
     while (len(header_entries)):
         # Retrieve raw key
         word = header_entries[0]
         header_entries = header_entries[1:]
-
-        if (not len(header_entries)):
-            raise ValueError("last key does not have a value")
 
         # Try to trim equal
         if (word[-1] == ':'):
@@ -157,12 +155,6 @@ def _get_article_path(args, user_config, processed_entries):
         article_filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(**processed_entries)
 
     return os.path.join(args.src, paths.POSTS_BUILDDIR, article_filename)
-
-def _get_new_article(final_header):
-    """ Return default article matching passed args. """
-
-    default_article = "---\n" + yaml.dump(final_header, default_flow_style=False) + "---"
-    return default_article
 
 def _process_header_dict(theme_config, parsed_entries):
     """ TODO """
@@ -193,11 +185,14 @@ def init_new_article(args):
 
     def _apply_theme_configuration(theme_config, processed_entries):
         result = {}
-
         for key, value in theme_config.items():
             result[key] = processed_entries[value[0]]
 
         return result
+
+    def _get_new_article(final_header):
+        default_article = "---\n" + yaml.dump(final_header, default_flow_style=False) + "---"
+        return default_article
 
     # Get configs
     user_config = configurator.get_config(os.path.join(args.src, paths.CFG_FILE))
