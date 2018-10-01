@@ -137,8 +137,8 @@ def _parse_raw_header_entries(header_entries):
         if (word[-1] == ':'):
             word = word[:-1]
 
-            if(not __check_key(word)):
-                raise ValueError("invalid key '{}' in key value list".format(word))
+        if(not __check_key(word)):
+            raise ValueError("invalid key '{}' in key value list".format(word))
 
         result[word] = header_entries[0]
         header_entries = header_entries[1:]
@@ -188,18 +188,16 @@ def _process_header_dict(theme_config, parsed_entries):
 
     return result
 
-def _finalize_header_dict(theme_config, processed_entries):
-    """ TODO """
-
-    result = {}
-
-    for key, value in theme_config.items():
-        result[key] = processed_entries[value[0]]
-
-    return result
-
 def init_new_article(args):
     """ Initialize a fresh, new article file. """
+
+    def _apply_theme_configuration(theme_config, processed_entries):
+        result = {}
+
+        for key, value in theme_config.items():
+            result[key] = processed_entries[value[0]]
+
+        return result
 
     # Get configs
     user_config = configurator.get_config(os.path.join(args.src, paths.CFG_FILE))
@@ -217,7 +215,7 @@ def init_new_article(args):
     # Parse remainder (header content)
     parsed_entries = _parse_raw_header_entries(args.header_content)
     processed_entries = _process_header_dict(theme_config, parsed_entries)
-    final_entries = _finalize_header_dict(theme_config, processed_entries)
+    final_entries = _apply_theme_configuration(theme_config, processed_entries)
 
     # Generate article file name from user / default template
     file_name = _get_article_path(args, user_config, processed_entries)
