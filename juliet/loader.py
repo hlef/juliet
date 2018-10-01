@@ -3,6 +3,21 @@
 import os, sys, logging, juliet
 from juliet.pageprocessor import PageProcessor
 
+def _load_from_file(processor, folder, path):
+    logging.debug("Loading file " + path)
+
+    element = {}
+    with open(os.path.join(folder, path), 'r') as stream:
+        raw = stream.read()
+
+        try:
+            element = processor.process(raw, path)
+        except ValueError as err:
+            # FIXME do not sys.exit
+            sys.exit("Error while loading " + path + ": " + str(err))
+
+    return element
+
 def get_from_folder(folder, config):
     """ Load files contained in passed folder, pre-process them using fileParser
     and return them as a list sorted in inverse alphabetical order.
@@ -17,19 +32,9 @@ def get_from_folder(folder, config):
         file_naming_var = config["site"]["file_naming_variable"]
     else:
         file_naming_var = juliet.defaults.DEFAULT_FILE_NAMING_VARIABLE
+
     processor = PageProcessor(config["site"]["baseurl"], file_naming_var)
+    for source_file in entries:
+        elements.append(_load_from_file(processor, folder, source_file))
 
-    for sourceFile in entries:
-        logging.debug("Loading file " + sourceFile)
-
-        element = {}
-        with open(os.path.join(folder, sourceFile), 'r') as stream:
-            raw = stream.read()
-
-            try:
-                element = processor.process(raw, sourceFile)
-            except ValueError as err:
-                sys.exit("Error while loading " + sourceFile + ": " + str(err))
-
-        elements.append(element)
     return elements

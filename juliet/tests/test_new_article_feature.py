@@ -1,5 +1,7 @@
 import unittest, shutil, tempfile, juliet, os
 from string import Template
+from juliet.pageprocessor import PageProcessor
+from juliet import defaults
 
 class newArticleFileTest(unittest.TestCase):
 
@@ -18,24 +20,36 @@ class newArticleFileTest(unittest.TestCase):
         """ Make sure valid command line passed raw header entries are well
         parsed. """
 
-        args1 = ["--", "title:", "a title", "date:", "1997-12-11", "author:", "Bird"]
-        res1 = {"title": "a title", "date": "1997-12-11", "author": "Bird"}
-        self.assertEqual(juliet._parse_raw_header_entries(args1), res1)
+        args_standard = ["--", "title:", "a title", "date:", "1997-12-11", "author:", "Bird"]
+        parsed_standard = {"title": "a title", "date": "1997-12-11", "author": "Bird"}
+        self.assertEqual(juliet._parse_raw_header_entries(args_standard), parsed_standard)
 
-        # TODO more tests
+        args_no_colon = ["--", "title", "a title"]
+        parsed_no_colon = {"title": "a title"}
+        self.assertEqual(juliet._parse_raw_header_entries(args_no_colon), parsed_no_colon)
 
     def test_parse_broken_raw_header_entries(self):
         """ Make sure valid command line passed raw header entries are well
         parsed. """
 
         # Missing value
-        args1 = ["--", "title"]
-        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args1)
+        args_missing_value = ["--", "title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_missing_value)
 
-        # TODO more tests
+        # Missing key
+        args_missing_key = ["--", ":", "title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_missing_key)
 
-    def test_generate(self):
-        """ Make sure new article files are generated. Doesn't check for content. """
+        # Missing key and value
+        args_missing_value_and_key = ["--", ":"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_missing_value_and_key)
+
+        # Shifted colon (last key missing value!)
+        args_shifted_colon = ["--", "title", ":", "a title"]
+        self.assertRaises(ValueError, juliet._parse_raw_header_entries, args_shifted_colon)
+
+    def test_generate_default(self):
+        """ Make sure new article files are generated. Check for default content. """
 
         # Go to temporary directory
         os.chdir(self.test_dir)
@@ -51,16 +65,72 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init_new_article(args)
 
         # Make sure article was created
-        file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
-        article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, file_name)
-        self.assertTrue(os.path.exists(article_path),
+        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
+        path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
+        self.assertTrue(os.path.exists(path),
             "Expected article to be generated at {} but couldn't find it"
-            .format(article_path))
+            .format(path))
+
+        # Retrieve and parse generated header
+        raw_file = ""
+        with open(path) as f:
+            raw_file = f.read()
+        splitted_file = raw_file.splitlines()
+        header_limit = PageProcessor._get_header_limit(splitted_file)
+        parsed_header = PageProcessor._process_header("\n".join(splitted_file[1:header_limit]),
+                                                      filename,
+                                                      defaults.DEFAULT_FILE_NAMING_VARIABLE)
+
+        for key, value in defaults.DEFAULT_THEME_CFG.items():
+            if (value[1] != None):
+                # TODO verify generated values as well
+                self.assertTrue(parsed_header[key] == value[1])
 
         # Go back to current directory
         os.chdir(self.cur_dir)
 
-    def test_with_dest_folder(self):
+    def test_generate_with_remainder(self):
+        """ Make sure new article files are generated correctly when a remainder
+        is passed. """
+
+        # Go to temporary directory
+        os.chdir(self.test_dir)
+
+        # Generate base site
+        self._init_juliet_structure_in_test_dir()
+
+        # Prepare args
+        base_args = ['new', '--', 'title', 'value']
+        args = juliet.parse_arguments(base_args)
+        parsed_header_entries = juliet._parse_raw_header_entries(['--', 'title', 'value'])
+
+        # Generate article
+        juliet.init_new_article(args)
+
+        # Make sure article was created
+        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, parsed_header_entries))
+        path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
+        self.assertTrue(os.path.exists(path),
+            "Expected article to be generated at {} but couldn't find it"
+            .format(path))
+
+        # Retrieve and parse generated header
+        raw_file = ""
+        with open(path) as f:
+            raw_file = f.read()
+        splitted_file = raw_file.splitlines()
+        header_limit = PageProcessor._get_header_limit(splitted_file)
+        parsed_header = PageProcessor._process_header("\n".join(splitted_file[1:header_limit]),
+                                                      filename,
+                                                      defaults.DEFAULT_FILE_NAMING_VARIABLE)
+
+        for key, value in parsed_header_entries.items():
+            self.assertTrue(parsed_header[key] == value)
+
+        # Go back to current directory
+        os.chdir(self.cur_dir)
+
+    def test_generate_default_with_dest_folder(self):
         """ Make sure new article files are generated when a destination folder
         is specified. Doesn't check for content. """
 
@@ -75,7 +145,7 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init_new_article(args)
 
         # Make sure article was created
-        file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
+        file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
         article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
         self.assertTrue(os.path.exists(article_path),
             "Expected article to be generated at {} but couldn't find it"
@@ -90,9 +160,20 @@ class newArticleFileTest(unittest.TestCase):
         # Go back to current directory
         os.chdir(self.cur_dir)
 
+    def test_missing_structure(self):
+        """ Make sure Juliet behaves correctly when folder content is missing. """
+
+        # Do *not* generate base site
+        base_args = ['new', '--build-src', self.test_dir]
+        args = juliet.parse_arguments(base_args)
+
+        # Try to generate article
+        self.assertRaises(FileNotFoundError, juliet.init_new_article, args)
+
     def test_pass_filename(self):
         """ Make sure new article is generated at the right place when file name
-        is passed."""
+        is passed. Make sure that passing a file name does not modify the actual
+        content."""
 
         # Go to temporary directory
         os.chdir(self.test_dir)
@@ -119,7 +200,7 @@ class newArticleFileTest(unittest.TestCase):
             .format(b_article_path))
 
         # Make sure it is the same as the default article (passing a file name should only change the file name)
-        c_file_name = Template(juliet.defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(juliet.defaults.DEFAULT_THEME_CFG, {}))
+        c_file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
         c_article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, c_file_name)
 
         with open(b_article_path) as b_f:
@@ -156,13 +237,3 @@ class newArticleFileTest(unittest.TestCase):
 
         # Go back to current directory
         os.chdir(self.cur_dir)
-
-    def test_missing_content(self):
-        """ Make sure Juliet behaves correctly when folder content is missing. """
-
-        # Do *not* generate base site
-        base_args = ['new', '--build-src', self.test_dir]
-        args = juliet.parse_arguments(base_args)
-
-        # Try to generate article
-        self.assertRaises(FileNotFoundError, juliet.init_new_article, args)

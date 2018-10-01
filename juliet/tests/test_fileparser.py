@@ -60,17 +60,17 @@ class fileParserTest(unittest.TestCase):
 
         result = {"key": "value", "key2": "value2", "foo": "bar", "slug": self.FILENAME}
 
-        self.assertEqual(result, self.processor._process_header(header, self.FILENAME))
+        self.assertEqual(result, self.processor._process_header(header, self.FILENAME, self.file_naming_variable))
 
     def test_process_header_with_file_naming_var_defined(self):
         """ Make sure that the _process_header() method is working well with
         simple headers defining the file naming variable."""
 
-        header = """key: value\nkey2: value2\nfoo: bar\ntitle: \"this\""""
+        header = """key: value\nkey2: value2\nfoo: bar\ntitle: 'this'"""
 
         result = {"key": "value", "key2": "value2", "foo": "bar", "title": "this", "slug": "this"}
 
-        self.assertEqual(result, self.processor._process_header(header, self.FILENAME))
+        self.assertEqual(result, self.processor._process_header(header, self.FILENAME, self.file_naming_variable))
 
     def test_process_header_with_permalink_defined(self):
         """ Make sure that the _process_header() method is working well with
@@ -82,8 +82,8 @@ class fileParserTest(unittest.TestCase):
         result = {"foo": "bar", "permalink": "perma", "slug": self.FILENAME}
         result2 = {"foo": "bar", "title": "this", "permalink": "perma", "slug": "this"}
 
-        self.assertEqual(result, self.processor._process_header(header, self.FILENAME))
-        self.assertEqual(result2, self.processor._process_header(header2, self.FILENAME))
+        self.assertEqual(result, self.processor._process_header(header, self.FILENAME, self.file_naming_variable))
+        self.assertEqual(result2, self.processor._process_header(header2, self.FILENAME, self.file_naming_variable))
 
     def test_parsing_simple_valid_file(self):
         """ Make sure that process() returns the excepted result when passing

@@ -7,11 +7,12 @@ from pygments.formatters import HtmlFormatter
 class PageProcessor:
     FORBIDDEN_HEADER_ENTRIES = {'body'}
 
-    def __init__(self, baseurl, file_naming_variable):
+    def __init__(self, baseurl, file_naming_var):
         self.baseurl = baseurl
-        self.file_naming_variable = file_naming_variable
+        self.file_naming_var = file_naming_var
 
-    def _process_pygments(self, splitted_body):
+    @staticmethod
+    def _process_pygments(splitted_body):
         """ Process highlight blocks in passed body. Raise ValueError if
         passed body contains invalid pygments blocks. """
 
@@ -35,8 +36,8 @@ class PageProcessor:
 
         for line in splitted_body:
             if(regex_escaped_endhighlight.match(line) is not None or regex_escaped_highlight.match(line) is not None):
-                line = self._unescape_tags(endhighlight, line)
-                line = self._unescape_tags(highlight, line)
+                line = PageProcessor._unescape_tags(endhighlight, line)
+                line = PageProcessor._unescape_tags(highlight, line)
 
             elif(regex_endhighlight.match(line) is not None):
                 if(not reached_endhighlight):
@@ -79,7 +80,8 @@ class PageProcessor:
 
         return result
 
-    def _process_baseurl_tags(self, splitted_body, baseurl):
+    @staticmethod
+    def _process_baseurl_tags(splitted_body, baseurl):
         """ Process {{ baseurl }} tags in passed body text. """
 
         result = []
@@ -89,18 +91,20 @@ class PageProcessor:
 
         for line in splitted_body:
             line = regex_baseurl_tag.sub(baseurl, line)
-            line = self._unescape_tags(baseurl_tag, line)
+            line = PageProcessor._unescape_tags(baseurl_tag, line)
             result.append(line)
 
         return result
 
-    def _unescape_tags(self, regex_as_string, line):
+    @staticmethod
+    def _unescape_tags(regex_as_string, line):
         """ Unescape tags matching passed regex in passed line. """
 
         regex_unescape_tag = re.compile(r"\\(" + regex_as_string + ")")
         return regex_unescape_tag.sub(r"\1", line)
 
-    def _process_body(self, splitted_body, baseurl):
+    @staticmethod
+    def _process_body(splitted_body, baseurl):
         """ Return fully HTML-converted passed body text.
         First preprocess it using Pygments and replace {{ baseurl }} tags,
         then markdown process it using markdown library. """
@@ -117,22 +121,24 @@ class PageProcessor:
         splitted_body = splitted_body[starter:]
 
         # Process Pygments blocks
-        splitted_body = self._process_pygments(splitted_body)
+        splitted_body = PageProcessor._process_pygments(splitted_body)
 
         # Process baseurl tags
-        splitted_body = self._process_baseurl_tags(splitted_body, baseurl)
+        splitted_body = PageProcessor._process_baseurl_tags(splitted_body, baseurl)
 
         return markdown.markdown("\n".join(splitted_body))
 
-    def _check_header_content(self, header):
+    @staticmethod
+    def _check_header_content(header):
         """ Raise ValueError if passed header contains invalid entries. """
 
         set_header = set(header.keys())
-        if(not self.FORBIDDEN_HEADER_ENTRIES.isdisjoint(set_header)):
-            invalid_entries = str(self.FORBIDDEN_HEADER_ENTRIES & set_header)
+        if(not PageProcessor.FORBIDDEN_HEADER_ENTRIES.isdisjoint(set_header)):
+            invalid_entries = str(PageProcessor.FORBIDDEN_HEADER_ENTRIES & set_header)
             raise ValueError("Header contains forbidden entries " + invalid_entries)
 
-    def _process_header(self, header, filename):
+    @staticmethod
+    def _process_header(header, filename, file_naming_var):
         """ Parse passed header. Raise ValueError if header can't be parsed
         properly. """
 
@@ -147,15 +153,16 @@ class PageProcessor:
             except yaml.YAMLError as exc:
                 raise ValueError("Failed to parse file header: " + str(exc))
 
-            self._check_header_content(parsed_header)
+            PageProcessor._check_header_content(parsed_header)
 
-            if(self.file_naming_variable in parsed_header.keys()):
+            if(file_naming_var in parsed_header.keys()):
                 # If there's a file_naming_variable entry, provide a slugified form of it.
-                parsed_header["slug"] = slugify.slugify(parsed_header[self.file_naming_variable])
+                parsed_header["slug"] = slugify.slugify(parsed_header[file_naming_var])
 
         return parsed_header
 
-    def _get_header_limit(self, splitted_file):
+    @staticmethod
+    def _get_header_limit(splitted_file):
         """ Return line number of the last header limiter "---" starting by 0.
         Raise ValueError if passed file is bad formatted. """
 
@@ -219,13 +226,13 @@ class PageProcessor:
         splitted_file = raw_file.splitlines()
 
         # Find header, check and process it
-        header_limit = self._get_header_limit(splitted_file)
-        parsed_header = self._process_header("\n".join(splitted_file[1:header_limit]), filename)
+        header_limit = PageProcessor._get_header_limit(splitted_file)
+        parsed_header = PageProcessor._process_header("\n".join(splitted_file[1:header_limit]), filename, self.file_naming_var)
         result.update(parsed_header)
 
         # Find body, process it
         splitted_body = splitted_file[header_limit+1:]
-        result["body"] = self._process_body(splitted_body, self.baseurl)
+        result["body"] = PageProcessor._process_body(splitted_body, self.baseurl)
 
         result["file-name"] = filename
 
