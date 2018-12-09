@@ -23,7 +23,7 @@ Some sites using Juliet:
 
 ## Dependencies
 
-Juliet requires Python **>= 3.3** to work properly ([why](http://jinja.pocoo.org/docs/2.9/faq/#why-is-there-no-python-2-3-2-4-2-5-3-1-3-2-support)).
+Juliet requires Python **>= 3.5**.
 
 Additionally, Juliet requires following dependencies (Debian dependencies in
 brackets):
@@ -51,8 +51,7 @@ implementation. Changing it is quite simple if you want to use Kramdown, for exa
 
 ## Contributing
 
-* Release blockers and improvements ideas are in `TODO`
 * Design themes for Juliet, and add it in `docs/recommended-themes.md` !
 * You are using Juliet ? Add a link to your website here !
 
-Bugs reports and pull-requests are welcome ! :smile:
+Contributions welcome ! :smile:
