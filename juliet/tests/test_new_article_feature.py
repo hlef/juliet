@@ -121,7 +121,6 @@ class newArticleFileTest(unittest.TestCase):
         parsed_header = PageProcessor._get_parsed_header(raw_file, filename,
                             defaults.DEFAULT_FILE_NAMING_VARIABLE)
 
-        print(parsed_header_entries)
         for key, value in parsed_header_entries.items():
             self.assertTrue(parsed_header[key] == value)
 
@@ -134,7 +133,6 @@ class newArticleFileTest(unittest.TestCase):
 
         self._test_generate_with_remainder(['--', 'title', 'hello world'])
         self._test_generate_with_remainder(['--', 'date', '2043-12-12'])
-        self._test_generate_with_remainder(['--', 'date', '2043-12-12', 'title', 'hello world', 'author', 'Dumas'])
 
     def test_generate_default_with_dest_folder(self):
         """ Make sure new article files are generated when a destination folder
