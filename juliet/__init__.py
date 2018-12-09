@@ -26,7 +26,7 @@ def build(args):
 
     logging.info("Parsing configuration...")
     try:
-        config = {"site": configurator.get_config(os.path.join(args.src, paths.CFG_FILE))}
+        config = {"site": configurator.get_config(os.path.join(args.src, args.configfile))}
     except:
         sys.exit("Error during configuration, " + str(exc))
 
@@ -64,7 +64,7 @@ def parse_arguments(args):
 
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument('--debug', '-d', action='count', default=0)
-    parent_parser.add_argument('--version', action='version',
+    parent_parser.add_argument('--version', '-v', action='version',
                        version='%(prog)s {version}'.format(version=version.__version__))
 
     main_parser = argparse.ArgumentParser(parents=[parent_parser],
@@ -87,6 +87,10 @@ def parse_arguments(args):
     parser_build.add_argument('--no-clean', '-nc', dest="noclean",
                     default=False, action='store_true',
                     help='do not clean build directory before installation')
+
+    parser_build.add_argument('--config-file', '-cf', dest="configfile",
+                    default=paths.CFG_FILE, type=str,
+                    help='use a non default config file')
 
     parser_init = subparsers.add_parser('init', parents=[parent_parser],
     help="Initialize a new, clean website in current directory.")
