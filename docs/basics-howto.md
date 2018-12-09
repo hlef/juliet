@@ -44,10 +44,6 @@ The set of required entries in the configuration file may vary depending on your
 theme. You can usually find more informations about it in your theme directory,
 under `themes/your_theme/README`.
 
-Also, some features define customization options which you can read about under
-
- * `dev/juliet-new` for `juliet new` (currently in development)
-
 ### :pencil: Blog posts, *posts/*
 
 Juliet posts go to the `posts/` directory and are divided in two parts:
@@ -184,9 +180,12 @@ You can also specify the source directory via `--build-src`.
         ├── ...
 
 Unless `permalink` is defined in page/post headers, pages are installed at the
-root of the build area, and posts under `posts/`. Unless `permalink` is defined,
-the name under which pages/posts will be installed is defined by the file naming
-variable. By default the file naming variable is defined as the "title" entry,
-but this can be changed by defining the `file_naming_variable` field in
-your `config.yml`. If the file naming variable is not present, the source file
-name will be used (but this is something you should rather consider avoiding).
+root of the build area, and posts under `posts/`.
+
+Also, unless `permalink` is defined the name under which pages/posts will be
+installed is defined by the file naming variable. By default the file naming
+variable is defined as the "title" entry, but this can be changed by defining
+the `file_naming_variable` field in your `config.yml`.
+
+If the file naming variable is not present, the source file name will be used
+(but this is something you should rather consider avoiding).
