@@ -91,10 +91,7 @@ class newArticleFileTest(unittest.TestCase):
         # Go back to current directory
         os.chdir(self.cur_dir)
 
-    def test_generate_with_remainder(self):
-        """ Make sure new article files are generated correctly when a remainder
-        is passed. """
-
+    def _test_generate_with_remainder(self, remainder):
         # Go to temporary directory
         os.chdir(self.test_dir)
 
@@ -102,9 +99,9 @@ class newArticleFileTest(unittest.TestCase):
         self._init_juliet_structure_in_test_dir()
 
         # Prepare args
-        base_args = ['new', '--', 'title', 'value']
+        base_args = ['new', *remainder]
         args = juliet.parse_arguments(base_args)
-        parsed_header_entries = juliet._parse_raw_header_entries(['--', 'title', 'value'])
+        parsed_header_entries = juliet._parse_raw_header_entries(remainder)
 
         # Generate article
         juliet.init_new_article(args)
@@ -124,11 +121,20 @@ class newArticleFileTest(unittest.TestCase):
         parsed_header = PageProcessor._get_parsed_header(raw_file, filename,
                             defaults.DEFAULT_FILE_NAMING_VARIABLE)
 
+        print(parsed_header_entries)
         for key, value in parsed_header_entries.items():
             self.assertTrue(parsed_header[key] == value)
 
         # Go back to current directory
         os.chdir(self.cur_dir)
+
+    def test_generate_with_remainder(self):
+        """ Make sure new article files are generated correctly when a remainder
+        is passed. """
+
+        self._test_generate_with_remainder(['--', 'title', 'hello world'])
+        self._test_generate_with_remainder(['--', 'date', '2043-12-12'])
+        self._test_generate_with_remainder(['--', 'date', '2043-12-12', 'title', 'hello world', 'author', 'Dumas'])
 
     def test_generate_default_with_dest_folder(self):
         """ Make sure new article files are generated when a destination folder
@@ -156,6 +162,34 @@ class newArticleFileTest(unittest.TestCase):
                          os.path.join(self.test_dir, juliet.paths.POSTS_PATH),
                              "Expected article to be generated in {} but in fact it was generated at {}"
                              .format(os.path.join(self.test_dir, juliet.paths.POSTS_PATH), os.path.dirname(article_path)))
+
+    def test_generate_default_with_filenaming_pattern(self):
+        """ Make sure new article files are generated with the right name when a
+        filenaming pattern is specified. Doesn't check for content. """
+
+        # Go to temporary directory
+        os.chdir(self.test_dir)
+
+        # Generate base site
+        self._init_juliet_structure_in_test_dir()
+
+        # Add filenaming pattern
+        with open(juliet.paths.CFG_FILE, "a") as cfgfile:
+            cfgfile.write("filenaming_pattern: 'article-$number.md'")
+
+        # Prepare args
+        base_args = ['new', '--', 'number', '12']
+        args = juliet.parse_arguments(base_args)
+
+        # Generate article
+        juliet.init_new_article(args)
+
+        # Make sure article was created
+        file_name = "article-12.md"
+        article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, file_name)
+        self.assertTrue(os.path.exists(article_path),
+            "Expected article to be generated at {} but couldn't find it"
+            .format(article_path))
 
         # Go back to current directory
         os.chdir(self.cur_dir)
