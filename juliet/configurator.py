@@ -18,6 +18,13 @@ def configure_jinja(theme, src):
 def get_config(config_file):
     """ Parse and return passed configuration file. """
 
+    def __check_config(config):
+        """ Raise exception if passed configuration is invalid. """
+
+        for key, value in defaults.CONFIG_REQUIRED_ENTRIES.items():
+            if (key not in config.keys()) or (config[key] == "" and not value):
+                raise ValueError("configuration file is missing required key " + key + " or invalid value was provided")
+
     config = {}
 
     # Read config from file
@@ -25,9 +32,8 @@ def get_config(config_file):
         raise FileNotFoundError("could not find config file: " + config_file)
 
     with open(config_file, 'r') as stream:
-        try:
-            config = yaml.load(stream)
-        except yaml.YAMLError as exc:
-            sys.exit("Error: Failed to parse configuration file: " + str(exc))
+        config = yaml.load(stream)
+
+    __check_config(config)
 
     return config
