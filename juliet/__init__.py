@@ -27,8 +27,8 @@ def build(args):
     logging.info("Parsing configuration...")
     try:
         config = {"site": configurator.get_config(os.path.join(args.src, args.configfile))}
-    except:
-        sys.exit("Error during configuration, " + str(exc))
+    except Exception as exc:
+        sys.exit("Error during configuration: " + str(exc))
 
     logging.info("Loading and pre-processing content...")
     if (os.path.isdir(os.path.join(args.src, paths.POSTS_PATH))):
