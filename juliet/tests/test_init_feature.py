@@ -12,13 +12,10 @@ class initSiteTest(unittest.TestCase):
     def _check_config(self, path):
         """ Check freshly installed config. """
 
-        config = juliet.configurator.get_config(path)
-        if ("baseurl" not in config.keys() or
-            "theme" not in config.keys()):
-            return False
-
-        if (config["baseurl"] == None or
-            config["theme"] == None):
+        try:
+            # get_config raises exception if config is invalid
+            config = juliet.configurator.get_config(path)
+        except:
             return False
 
         return True
@@ -35,7 +32,7 @@ class initSiteTest(unittest.TestCase):
 
         # Test config file
         with open(juliet.paths.CFG_FILE) as f:
-            self.assertEqual(f.read(), juliet.defaults.default_config)
+            self.assertEqual(f.read(), juliet.defaults.DEFAULT_CONFIG)
 
         # Test site structure
         for directory in juliet.paths.SOURCE_DIRS:
@@ -57,7 +54,7 @@ class initSiteTest(unittest.TestCase):
         # Test config file
         cfg_file = os.path.join(self.test_dir, juliet.paths.CFG_FILE)
         with open(cfg_file) as f:
-            self.assertEqual(f.read(), juliet.defaults.default_config)
+            self.assertEqual(f.read(), juliet.defaults.DEFAULT_CONFIG)
 
         # Test site structure
         for directory in juliet.paths.SOURCE_DIRS:

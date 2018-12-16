@@ -1,6 +1,7 @@
 import argparse, yaml, logging, os, slugify, datetime, sys
 from juliet import configurator, loader, paths, defaults, version
 from juliet.builder import Builder
+from pkg_resources import resource_isdir, resource_string, resource_listdir
 from string import Template
 
 def main():
@@ -55,9 +56,22 @@ def init(args):
     for directory in paths.SOURCE_DIRS:
         os.makedirs(os.path.join(args.dir, directory), exist_ok=True)
 
-    logging.debug("Importing default config.yml")
+    logging.debug("Installing default theme")
+    # FIXME this is an extremely dirty, temporary hack
+    os.makedirs(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "statics"), exist_ok=True)
+    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "statics", "index.html"), 'w+') as stream:
+        stream.write(resource_string("juliet", "data/statics-index.html").decode('utf-8'))
+    os.makedirs(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates"), exist_ok=True)
+    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates", "main.html"), 'w+') as stream:
+        stream.write(resource_string("juliet", "data/templates-main.html").decode('utf-8'))
+    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates", "posts.html"), 'w+') as stream:
+        stream.write(resource_string("juliet", "data/templates-posts.html").decode('utf-8'))
+    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates", "pages.html"), 'w+') as stream:
+        stream.write(resource_string("juliet", "data/templates-pages.html").decode('utf-8'))
+
+    logging.debug("Importing default config file")
     with open(os.path.join(args.dir, paths.CFG_FILE), 'w+') as stream:
-        stream.write(defaults.default_config)
+        stream.write(defaults.DEFAULT_CONFIG)
 
 def parse_arguments(args):
     """ Parse and return arguments. """
