@@ -6,6 +6,10 @@ POSTS_PATH = "posts"
 PAGES_PATH = "pages"
 SOURCE_DIRS = [ASSETS_PATH, THEMES_PATH, POSTS_PATH, PAGES_PATH]
 
+# data dirs
+DATA_PATH = "data"
+THEME_DESCRIPTOR_FILE_NAME = "{}/theme-descriptor.yml".format(DATA_PATH)
+
 # build dirs
 DEFAULT_BUILDDIR = "build-area"
 DEFAULT_INITDIR = ""

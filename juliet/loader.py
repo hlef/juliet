@@ -8,13 +8,7 @@ def _load_from_file(processor, folder, path):
 
     element = {}
     with open(os.path.join(folder, path), 'r') as stream:
-        raw = stream.read()
-
-        try:
-            element = processor.process(raw, path)
-        except ValueError as err:
-            # FIXME do not sys.exit
-            sys.exit("Error while loading " + path + ": " + str(err))
+        element = processor.process(stream.read(), path)
 
     return element
 

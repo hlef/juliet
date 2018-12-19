@@ -33,12 +33,18 @@ def build(args):
 
     logging.info("Loading and pre-processing content...")
     if (os.path.isdir(os.path.join(args.src, paths.POSTS_PATH))):
-        config["posts"] = loader.get_from_folder(os.path.join(args.src, paths.POSTS_PATH), config)
+        try:
+            config["posts"] = loader.get_from_folder(os.path.join(args.src, paths.POSTS_PATH), config)
+        except ValueError as exc:
+            sys.exit("Error loading posts: " + str(exc))
     else:
         config["posts"] = {}
 
     if (os.path.isdir(os.path.join(args.src, paths.PAGES_PATH))):
-        config["pages"] = loader.get_from_folder(os.path.join(args.src, paths.PAGES_PATH), config)
+        try:
+            config["pages"] = loader.get_from_folder(os.path.join(args.src, paths.PAGES_PATH), config)
+        except ValueError as exc:
+            sys.exit("Error loading pages: " + str(exc))
     else:
         config["pages"] = {}
 
@@ -52,22 +58,26 @@ def build(args):
 def init(args):
     """ Initialize a new, clean website in passed directory."""
 
+    def __install_theme_descriptor(path, descriptor):
+        for element in descriptor:
+            if isinstance(element, list):
+                with open(os.path.join(path, element[1]), "w+") as stream:
+                    stream.write(resource_string("juliet", paths.DATA_PATH + "/" + element[0]).decode('utf-8'))
+            else:
+                for key, value in element.items():
+                    new_dir = os.path.join(path, key)
+                    os.makedirs(new_dir, exist_ok=True)
+                    __install_theme_descriptor(new_dir, value)
+
     logging.debug("Creating source directories")
     for directory in paths.SOURCE_DIRS:
         os.makedirs(os.path.join(args.dir, directory), exist_ok=True)
 
     logging.debug("Installing default theme")
-    # FIXME this is an extremely dirty, temporary hack
-    os.makedirs(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "statics"), exist_ok=True)
-    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "statics", "index.html"), 'w+') as stream:
-        stream.write(resource_string("juliet", "data/statics-index.html").decode('utf-8'))
-    os.makedirs(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates"), exist_ok=True)
-    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates", "main.html"), 'w+') as stream:
-        stream.write(resource_string("juliet", "data/templates-main.html").decode('utf-8'))
-    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates", "posts.html"), 'w+') as stream:
-        stream.write(resource_string("juliet", "data/templates-posts.html").decode('utf-8'))
-    with open(os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME, "templates", "pages.html"), 'w+') as stream:
-        stream.write(resource_string("juliet", "data/templates-pages.html").decode('utf-8'))
+    descriptor = yaml.load(resource_string("juliet", paths.THEME_DESCRIPTOR_FILE_NAME).decode('utf-8'))
+    default_theme_path = os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME)
+    os.makedirs(default_theme_path, exist_ok=True)
+    __install_theme_descriptor(default_theme_path, descriptor)
 
     logging.debug("Importing default config file")
     with open(os.path.join(args.dir, paths.CFG_FILE), 'w+') as stream:
