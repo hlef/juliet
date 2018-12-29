@@ -95,7 +95,7 @@ class Builder:
             if("permalink" in post.keys()):
                 self._build_permalinked(post, html)
             else:
-                self._write(os.path.join(builddir, post["slug"]), html)
+                self._write(os.path.join(builddir, post["slug"] + ".html"), html)
 
     def _build_pages(self):
         """ Build pages and install them. """
@@ -111,7 +111,7 @@ class Builder:
             if("permalink" in page.keys()):
                 self._build_permalinked(page, html)
             else:
-                self._write(os.path.join(self.destination, post["slug"]), html)
+                self._write(os.path.join(self.destination, post["slug"] + ".html"), html)
 
     def _build_permalinked(self, p, html):
         """ Build page/post to permalink. """
@@ -119,7 +119,7 @@ class Builder:
         if(not "permalink" in p.keys()):
             raise ValueError("Called _build_permalinked with header that doesn't define permalink entry")
 
-        self._write(os.path.join(self.destination, p["permalink"]), html)
+        self._write(os.path.join(self.destination, p["permalink"] + ".html"), html)
 
     def _is_safe_path(self, path, follow_symlinks=False):
         """ Check directories before writing to avoid directory traversal. """
