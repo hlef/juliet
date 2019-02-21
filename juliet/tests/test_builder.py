@@ -69,6 +69,15 @@ class builderTest(unittest.TestCase):
         path = os.path.join(relative_path, "hello")
         self.assertTrue(builderrelative._is_safe_path(path))
 
+    def test_write_to_unsafe_path(self):
+        """ Make sure that the internal write function refuses to write to
+        unsafe paths. """
+
+        path = os.path.join("etc", "hello")
+        string = "This is a string."
+
+        self.assertRaises(ValueError, self.builderclean._write, path, string)
+
     def test_write(self):
         """ Make sure that the internal write function is working well with
         simple tasks. """
