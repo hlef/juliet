@@ -132,7 +132,9 @@ class newArticleFileTest(unittest.TestCase):
         is passed. """
 
         self._test_generate_with_remainder(['--', 'title', 'hello world'])
-        self._test_generate_with_remainder(['--', 'date', '2043-12-12'])
+        self._test_generate_with_remainder(['--', 'author', 'M. John Hacker'])
+        self._test_generate_with_remainder(['--', 'city', 'Karlsruhe'])
+        self._test_generate_with_remainder(['--', 'joking', 'False'])
 
     def test_generate_default_with_dest_folder(self):
         """ Make sure new article files are generated when a destination folder
