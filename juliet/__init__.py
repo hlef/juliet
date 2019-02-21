@@ -211,10 +211,11 @@ def _process_header_dict(theme_config, parsed_entries):
 def init_new_article(args):
     """ Initialize a fresh, new article file. """
 
-    def _apply_theme_configuration(theme_config, processed_entries):
+    def _remove_temporary_entries(entries):
         result = {}
-        for key, value in theme_config.items():
-            result[key] = processed_entries[value[0]]
+        for key, value in processed_entries.items():
+            if (not "_" in key):
+                result[key] = value
 
         return result
 
@@ -238,7 +239,7 @@ def init_new_article(args):
     # Parse remainder (header content)
     parsed_entries = _parse_raw_header_entries(args.header_content)
     processed_entries = _process_header_dict(theme_config, parsed_entries)
-    final_entries = _apply_theme_configuration(theme_config, processed_entries)
+    final_entries = _remove_temporary_entries(processed_entries)
 
     # Generate article file name from user / default template
     file_name = _get_article_path(args, user_config, processed_entries)
