@@ -6,7 +6,7 @@ import os
 
 name = 'juliet'
 packages = ['juliet']
-requires = ['jinja2>=2.7', 'pygments', 'pyyaml>=3.11', 'markdown', 'python-slugify']
+requires = ['jinja2>=2.7', 'pygments', 'pyyaml>=3.11', 'markdown', 'python-slugify', 'python-dateutil']
 
 main_ns = {}
 with open(convert_path(os.path.join(packages[0], 'version.py'))) as ver_file:

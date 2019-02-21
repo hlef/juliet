@@ -32,6 +32,7 @@ brackets):
  * [pyyaml](https://github.com/yaml/pyyaml), version >= 3.12 (python3-yaml)
  * [python-markdown](https://github.com/waylan/Python-Markdown), version >= 2.6.8 (python3-markdown)
  * [python-slugify](https://github.com/un33k/python-slugify), version >= 1.2.1 (python3-slugify)
+ * [python-dateutil](https://github.com/dateutil/dateutil) (python3-dateutil)
  * [Pygments](http://pygments.org/), version >= 2.2.0 (python3-pygments)
 
 You may also need to install [setuptools](https://github.com/pypa/setuptools) to

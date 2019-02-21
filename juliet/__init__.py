@@ -3,6 +3,7 @@ from juliet import configurator, loader, paths, defaults, version
 from juliet.builder import Builder
 from pkg_resources import resource_isdir, resource_string, resource_listdir
 from string import Template
+from dateutil import parser
 
 def main():
     """ Parse command line arguments and execute passed subcommands. """
@@ -191,20 +192,30 @@ def _process_header_dict(theme_config, parsed_entries):
     merged = parsed_entries.copy()
 
     # Fix missing entries with theme's defaults
+    gen_date = False
     for key, value in theme_config.items():
         if (value[0] not in merged.keys() and value[1]):
             merged[key] = value[1]
+        elif (key == "date"):
+            gen_date = True
+            if (key in merged.keys()):
+                try:
+                    merged["date_"] = merged["date"] = parser.parse(merged["date"]).date()
+                except (ValueError, OverflowError):
+                    pass
 
     # Apply modifiers
     result = merged.copy()
     for key, value in merged.items():
-        result["slug_" + key] = slugify.slugify(value)
-        if (key == "date"):
-            result["date_"] = merged[key]
+        if(isinstance(value, str)):
+            result["slug_" + key] = slugify.slugify(value)
 
     # Generate date_ if not already in result
     if ("date_" not in result.keys()):
-        result["date_"] = datetime.date.today().strftime("%Y-%m-%d")
+        result["date_"] = datetime.date.today()
+
+    if (gen_date):
+        result["date"] = result["date_"]
 
     return result
 

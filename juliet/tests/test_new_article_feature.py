@@ -1,4 +1,4 @@
-import unittest, shutil, tempfile, juliet, os
+import unittest, shutil, tempfile, juliet, os, datetime
 from string import Template
 from juliet.pageprocessor import PageProcessor
 from juliet import defaults
@@ -85,8 +85,10 @@ class newArticleFileTest(unittest.TestCase):
 
         for key, value in defaults.DEFAULT_THEME_CFG.items():
             if (value[1] != None):
-                # TODO verify generated values as well
                 self.assertTrue(parsed_header[key] == value[1])
+            elif (key == "date"):
+                # We did not pass date, so expect it to be the current day
+                self.assertEqual(parsed_header[key], datetime.date.today())
 
         # Go back to current directory
         os.chdir(self.cur_dir)
