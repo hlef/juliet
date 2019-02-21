@@ -1,9 +1,8 @@
-import argparse, yaml, logging, os, slugify, datetime, sys
+import argparse, yaml, logging, os, slugify, datetime, dateutil.parser, sys
 from juliet import configurator, loader, paths, defaults, version
 from juliet.builder import Builder
 from pkg_resources import resource_isdir, resource_string, resource_listdir
 from string import Template
-from dateutil import parser
 
 def main():
     """ Parse command line arguments and execute passed subcommands. """
@@ -11,14 +10,14 @@ def main():
     args = parse_arguments(sys.argv[1:])
     configure_logging(args.debug)
 
-    if(args.subcommand == "build"):
+    if(args.subcommand):
         logging.debug("Executing sub-command " + args.subcommand)
+
+    if(args.subcommand == "build"):
         build(args)
     elif(args.subcommand == "init"):
-        logging.debug("Executing sub-command " + args.subcommand)
         init(args)
     elif(args.subcommand == "new"):
-        logging.debug("Executing sub-command " + args.subcommand)
         init_new_article(args)
 
     logging.debug("Done. Exiting.")
@@ -53,8 +52,7 @@ def build(args):
     jinjaEnv = configurator.configure_jinja(config["site"]["theme"], args.src)
 
     logging.debug("Initializing builder...")
-    builder = Builder(jinjaEnv, config, args.src, args.dest, args.noclean)
-    builder.build()
+    Builder(jinjaEnv, config, args.src, args.dest, args.noclean).build()
 
 def init(args):
     """ Initialize a new, clean website in passed directory."""
@@ -142,9 +140,7 @@ def _parse_raw_header_entries(header_entries):
     """ TODO """
 
     def __check_key(key):
-        if ("_" in key or " " in key or ":" in key or not len(key)):
-            return False
-        return True
+        return not("_" in key or " " in key or ":" in key or not len(key))
 
     result = {}
     if (len(header_entries) < 1):
@@ -157,6 +153,7 @@ def _parse_raw_header_entries(header_entries):
 
     while (len(header_entries)):
         # Retrieve raw key
+        logging.debug("current header content " + str(header_entries))
         word = header_entries[0]
         header_entries = header_entries[1:]
 
@@ -185,28 +182,27 @@ def _get_article_path(args, user_config, processed_entries):
 
     return os.path.join(args.src, paths.POSTS_BUILDDIR, article_filename)
 
-def _process_header_dict(theme_config, parsed_entries):
+def _process_header_dict(theme_config, raw_entries):
     """ TODO """
 
-    # Add parsed entries
-    merged = parsed_entries.copy()
+    entries = _parse_raw_header_entries(raw_entries)
 
-    # Fix missing entries with theme's defaults
     gen_date = False
     for key, value in theme_config.items():
-        if (value[0] not in merged.keys() and value[1]):
-            merged[key] = value[1]
+        if (value[0] not in entries.keys() and value[1]):
+            # Fix missing entries with theme's defaults
+            entries[key] = value[1]
         elif (key == "date"):
             gen_date = True
-            if (key in merged.keys()):
+            if (key in entries.keys()):
                 try:
-                    merged["date_"] = merged["date"] = parser.parse(merged["date"]).date()
+                    entries["date_"] = entries["date"] = dateutil.parser.parse(entries["date"]).date()
                 except (ValueError, OverflowError):
                     pass
 
     # Apply modifiers
-    result = merged.copy()
-    for key, value in merged.items():
+    result = entries.copy()
+    for key, value in entries.items():
         if(isinstance(value, str)):
             result["slug_" + key] = slugify.slugify(value)
 
@@ -240,16 +236,13 @@ def init_new_article(args):
         logging.error("Error, could not find user config at {}".format(os.path.join(args.src, paths.CFG_FILE)))
         return
 
-    theme_config = {}
+    theme_config = defaults.DEFAULT_THEME_CFG
     theme_cfg_file = os.path.join(args.src, paths.THEMES_PATH, user_config["theme"], paths.CFG_FILE)
     if (os.path.isfile(theme_cfg_file)):
         theme_config = configurator.get_config(theme_cfg_file)
-    else:
-        theme_config = defaults.DEFAULT_THEME_CFG
 
     # Parse remainder (header content)
-    parsed_entries = _parse_raw_header_entries(args.header_content)
-    processed_entries = _process_header_dict(theme_config, parsed_entries)
+    processed_entries = _process_header_dict(theme_config, args.header_content)
     final_entries = _remove_temporary_entries(processed_entries)
 
     # Generate article file name from user / default template

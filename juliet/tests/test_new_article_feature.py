@@ -109,7 +109,8 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init_new_article(args)
 
         # Make sure article was created
-        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, parsed_header_entries))
+        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+            juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, remainder))
         path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
         self.assertTrue(os.path.exists(path),
             "Expected article to be generated at {} but couldn't find it"

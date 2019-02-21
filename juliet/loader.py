@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import os, sys, logging, juliet
 from juliet.pageprocessor import PageProcessor
 

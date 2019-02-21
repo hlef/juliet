@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import os, re, yaml, slugify, markdown, pygments
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter

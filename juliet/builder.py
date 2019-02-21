@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import os, logging, shutil
 from distutils.dir_util import copy_tree
 from jinja2 import Template, FileSystemLoader

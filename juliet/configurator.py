@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import yaml, os, sys, logging
 from jinja2 import Environment, FileSystemLoader
 from juliet import paths, defaults
@@ -23,13 +21,14 @@ def get_config(config_file):
 
         for key, value in defaults.CONFIG_REQUIRED_ENTRIES.items():
             if (key not in config.keys()) or (config[key] == "" and not value):
-                raise ValueError("configuration file is missing required key " + key + " or invalid value was provided")
-
-    config = {}
+                raise ValueError("configuration file is missing required key " + key +
+                                 " or invalid value was provided")
 
     # Read config from file
     if(not os.path.isfile(config_file)):
         raise FileNotFoundError("could not find config file: " + config_file)
+
+    config = {}
 
     with open(config_file, 'r') as stream:
         config = yaml.load(stream)
