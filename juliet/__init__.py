@@ -31,6 +31,9 @@ def build(args):
     except Exception as exc:
         sys.exit("Error during configuration: " + str(exc))
 
+    if (args.autobaseurl):
+        config["site"]["baseurl"] = os.path.abspath(args.dest)
+
     logging.info("Loading and pre-processing content...")
     if (os.path.isdir(os.path.join(args.src, paths.POSTS_PATH))):
         try:
@@ -114,6 +117,10 @@ def parse_arguments(args):
     parser_build.add_argument('--config-file', '-cf', dest="configfile",
                     default=paths.CFG_FILE, type=str,
                     help='use a non default config file')
+
+    parser_build.add_argument('--auto-baseurl', dest="autobaseurl",
+                    default=False, action='store_true',
+                    help='override baseurl and set it to build destination (useful for local builds)')
 
     parser_init = subparsers.add_parser('init', parents=[parent_parser],
     help="Initialize a new, clean website in current directory.")
