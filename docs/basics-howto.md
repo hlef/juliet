@@ -55,11 +55,11 @@ Juliet posts go to the `posts/` directory and are divided in two parts:
 For example:
 
     ---
-    title: "Hello, world !"
+    title: "Hello, world!"
     date: 2016-04-06 16:07:35
     ---
 
-    Hello, **world** !
+    Hello, **world**!
 
 Juliet defines some special entries which will alter the behavior of the engine:
  * `permalink` allows you to specify *where exactly* to install the article.
@@ -70,14 +70,14 @@ on your theme. You can find more informations about it in your theme directory,
 under `themes/your_theme/README`.
 
 Please, note that even if it is empty, the header has to be present. Otherwise,
-Juliet might get upset ! :)
+Juliet might get upset!
 
 #### Creating a fresh article file
 
 Because creating a fresh article structure each and every time you write a new
 article is repetitive and annoying, Juliet >= 0.2 adds support for the
 `juliet new` feature which takes care of it for you (pro tip: you can get
-more information about this feature via `juliet new --help` !).
+more information about this feature via `juliet new --help`!).
 
 ### :bookmark: Preprocessor tags
 #### Pygments syntax highlighting

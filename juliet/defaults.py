@@ -4,8 +4,6 @@ DEFAULT_CONFIG = (
 baseurl: ""
 
 # the directory in themes/ that contain your theme
-# WARNING: No theme under themes/ yet ! More informations in the documentation:
-# https://github.com/hlef/juliet
 theme: "{}"
 """).format(DEFAULT_THEME_NAME)
 

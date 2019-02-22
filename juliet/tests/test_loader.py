@@ -17,7 +17,7 @@ class loaderTest(unittest.TestCase):
         juliet.init(args)
 
         # Generate a few articles
-        args = juliet.parse_arguments(['new', '--', 'title', 'Hello, World !'])
+        args = juliet.parse_arguments(['new', '--', 'title', 'Hello, World!'])
         juliet.init_new_article(args)
         args = juliet.parse_arguments(['new', '--', 'title', 'First article'])
         juliet.init_new_article(args)
