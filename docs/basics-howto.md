@@ -20,11 +20,12 @@ Juliet website sources are organized as following:
 
 `juliet init` can initialize this file structure for you in the current directory.
 
-Please, note that Juliet won't install a theme in `themes/`. You'll have to pick one
-somewhere and install it, or design it by yourself (more informations available in
-`docs/themes-howto.md`).
+By default juliet install a very rough theme skeleton to `themes/`. It works, but
+it is probably not what you will want to use for your blog.
 
-We also provide a list of recommended themes in `docs/recommended-themes.md`.
+We recommend you to either pick and install one of our recommended themes (see
+`docs/recommended-themes.md`), or be creative and design your own one! You will
+find more information about theme design in `docs/themes-howto.md`.
 
 ### :wrench: Build configuration, *config.yml*
 
@@ -148,7 +149,7 @@ Most important things:
 
 You can find more informations about theming in `docs/themes-howto.md`.
 
-## Building the website
+## Building the beast
 
 Build the website using the `juliet build` command. It will build the website
 in `build-area` by default. Alternatively, you may want to specify a destination
