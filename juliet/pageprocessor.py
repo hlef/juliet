@@ -142,8 +142,8 @@ class PageProcessor:
 
         parsed_header = {}
 
-        # Set up fallback value for slug, which has to be defined anyways
-        parsed_header["slug"] = slugify.slugify(os.path.splitext(filename)[0])
+        # Set up fallback value for installed_filename, which has to be defined anyways
+        parsed_header["installed_filename"] = slugify.slugify(os.path.splitext(filename)[0])
 
         if(header != ""):
             try:
@@ -155,7 +155,9 @@ class PageProcessor:
 
             if(file_naming_var in parsed_header.keys()):
                 # If there's a file_naming_variable entry, provide a slugified form of it.
-                parsed_header["slug"] = slugify.slugify(parsed_header[file_naming_var])
+                parsed_header["installed_filename"] = slugify.slugify(parsed_header[file_naming_var])
+
+        parsed_header["installed_filename"] += ".html"
 
         return parsed_header
 
@@ -229,7 +231,9 @@ class PageProcessor:
           ---
           bodyContent""
 
-        would be returned as {"key": "value", "body": "<p>bodyContent</p>", "slug": filename}. """
+        would be returned as {"key": "value", "body": "<p>bodyContent</p>",
+                              "installed_filename": filename.html}.
+        """
 
         def _get_body(raw_file, filename, file_naming_var):
             # Find header, check and process it

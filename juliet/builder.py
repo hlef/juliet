@@ -93,7 +93,7 @@ class Builder:
             if("permalink" in post.keys()):
                 self._build_permalinked(post, html)
             else:
-                self._write(os.path.join(builddir, post["slug"] + ".html"), html)
+                self._write(os.path.join(builddir, post["installed_filename"]), html)
 
     def _build_pages(self):
         """ Build pages and install them. """
@@ -109,7 +109,7 @@ class Builder:
             if("permalink" in page.keys()):
                 self._build_permalinked(page, html)
             else:
-                self._write(os.path.join(self.destination, post["slug"] + ".html"), html)
+                self._write(os.path.join(self.destination, post["installed_filename"]), html)
 
     def _build_permalinked(self, p, html):
         """ Build page/post to permalink. """
