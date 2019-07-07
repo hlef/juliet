@@ -1,4 +1,4 @@
-__version__ = '0.2-alpha2'
+__version__ = '0.2'
 __author__ = 'Hugo Lefeuvre'
 __author_email__ = 'hle@owl.eu.com'
 __license__ = 'MIT'

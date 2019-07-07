@@ -77,5 +77,3 @@ This directory is perfect to include your site-wide ressources, like:
 * fonts
 * javascript files
 * favicons
-
-so one and so forth.

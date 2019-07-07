@@ -8,8 +8,6 @@ Juliet website sources are organized as following:
     ├── assets
     │   └── ...
     ├── config.yml
-    ├── .addons
-    │   └── ...
     ├── pages
     │   └── ...
     ├── posts
@@ -20,8 +18,7 @@ Juliet website sources are organized as following:
 
 `juliet init` can initialize this file structure for you in the current directory.
 
-By default juliet install a very rough theme skeleton to `themes/`. It works, but
-it is probably not what you will want to use for your blog.
+The default theme is [gram](https://github.com/hlef/juliet-gram-theme).
 
 We recommend you to either pick and install one of our recommended themes (see
 `docs/recommended-themes.md`), or be creative and design your own one! You will
@@ -39,7 +36,7 @@ any Juliet config file:
     baseurl: ""
 
     # the directory in themes/ that contain your theme
-    theme: sample
+    theme: sample_theme
 
 The set of required entries in the configuration file may vary depending on your
 theme. You can usually find more informations about it in your theme directory,
@@ -69,15 +66,15 @@ Apart from these, the set of required entries in post headers varies depending
 on your theme. You can find more informations about it in your theme directory,
 under `themes/your_theme/README`.
 
-Please, note that even if it is empty, the header has to be present. Otherwise,
-Juliet might get upset!
+Please, note that even if it is empty, the header has to be present.
 
 #### Creating a fresh article file
 
 Because creating a fresh article structure each and every time you write a new
 article is repetitive and annoying, Juliet >= 0.2 adds support for the
-`juliet new` feature which takes care of it for you (pro tip: you can get
-more information about this feature via `juliet new --help`!).
+`juliet new` feature which takes care of it for you.
+
+Pro tip: you can get more information about this feature via `juliet new --help`.
 
 ### :bookmark: Preprocessor tags
 #### Pygments syntax highlighting
@@ -85,9 +82,9 @@ more information about this feature via `juliet new --help`!).
 Juliet provides native integration of [Pygments](http://pygments.org/) syntax
 highlighting.
 
-To highlight code using Pygments, you'll simply need to embrace your code with
-Jinja-like `{% highlight LANG %}` and `{% endhighlight %}` tags (replace *LANG*
-by a lexer name).
+To highlight code using Pygments, simply embrace your code with Jinja-like `{%
+highlight LANG %}` and `{% endhighlight %}` tags (replace *LANG* by a lexer
+name).
 
 For example, highlighting a shell script works as following:
 
@@ -124,8 +121,6 @@ Juliet themes are organized as following:
     ├── data
     │   ├── css
     │   │   └── ...
-    │   ├── fonts
-    │   │   └── ...
     │   └── js
     │       └── ...
     ├── includes
@@ -160,10 +155,10 @@ You can also specify the source directory via `--build-src`.
 ### :file_folder: Installed structure
 
     .
-    ├── page1
-    ├── page2
+    ├── page1.html
+    ├── page2.html
     ├── ...
-    ├── static1.html
+    ├── index.html
     ├── static2.html
     ├── ...
     ├── assets
@@ -186,7 +181,4 @@ root of the build area, and posts under `posts/`.
 Also, unless `permalink` is defined the name under which pages/posts will be
 installed is defined by the file naming variable. By default the file naming
 variable is defined as the "title" entry, but this can be changed by defining
-the `file_naming_variable` field in your `config.yml`.
-
-If the file naming variable is not present, the source file name will be used
-(but this is something you should rather consider avoiding).
+the `file_naming_variable` field in `config.yml`.
