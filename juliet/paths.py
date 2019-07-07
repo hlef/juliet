@@ -17,3 +17,6 @@ POSTS_BUILDDIR = "posts"
 PAGES_BUILDDIR = ""
 DATA_BUILDDIR = ""
 ASSETS_BUILDDIR = "assets"
+
+# theme dirs
+EXAMPLE_CFG_FILE = CFG_FILE + ".EX"

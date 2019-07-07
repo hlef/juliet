@@ -67,11 +67,13 @@ def init(args):
     logging.debug("Installing default theme")
     default_theme_path = os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME)
     os.makedirs(default_theme_path, exist_ok=True)
-    with zipfile.ZipFile(resource_filename(__name__, "resources/gram.zip")) as zipped_theme:
+    with zipfile.ZipFile(resource_filename(__name__, "resources/" +
+                         defaults.DEFAULT_THEME_NAME + ".zip")) as zipped_theme:
         zipped_theme.extractall(path=default_theme_path)
 
     logging.debug("Importing default config file")
-    shutil.copyfile(os.path.join(default_theme_path, "config.yml.EX"), os.path.join(args.dir, paths.CFG_FILE))
+    shutil.copyfile(os.path.join(default_theme_path, paths.EXAMPLE_CFG_FILE),
+                    os.path.join(args.dir, paths.CFG_FILE))
 
 def parse_arguments(args):
     """ Parse and return arguments. """
