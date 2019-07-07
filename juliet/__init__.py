@@ -1,7 +1,7 @@
-import argparse, yaml, logging, os, slugify, datetime, dateutil.parser, sys
+import shutil, zipfile, argparse, yaml, logging, os, slugify, datetime, dateutil.parser, sys
 from juliet import configurator, loader, paths, defaults, version
 from juliet.builder import Builder
-from pkg_resources import resource_isdir, resource_string, resource_listdir
+from pkg_resources import resource_filename
 from string import Template
 
 def main():
@@ -60,30 +60,18 @@ def build(args):
 def init(args):
     """ Initialize a new, clean website in passed directory."""
 
-    def __install_theme_descriptor(path, descriptor):
-        for element in descriptor:
-            if isinstance(element, list):
-                with open(os.path.join(path, element[1]), "w+") as stream:
-                    stream.write(resource_string("juliet", paths.DATA_PATH + "/" + element[0]).decode('utf-8'))
-            else:
-                for key, value in element.items():
-                    new_dir = os.path.join(path, key)
-                    os.makedirs(new_dir, exist_ok=True)
-                    __install_theme_descriptor(new_dir, value)
-
     logging.debug("Creating source directories")
     for directory in paths.SOURCE_DIRS:
         os.makedirs(os.path.join(args.dir, directory), exist_ok=True)
 
     logging.debug("Installing default theme")
-    descriptor = yaml.load(resource_string("juliet", paths.THEME_DESCRIPTOR_FILE_NAME).decode('utf-8'))
     default_theme_path = os.path.join(args.dir, paths.THEMES_PATH, defaults.DEFAULT_THEME_NAME)
     os.makedirs(default_theme_path, exist_ok=True)
-    __install_theme_descriptor(default_theme_path, descriptor)
+    with zipfile.ZipFile(resource_filename(__name__, "resources/gram.zip")) as zipped_theme:
+        zipped_theme.extractall(path=default_theme_path)
 
     logging.debug("Importing default config file")
-    with open(os.path.join(args.dir, paths.CFG_FILE), 'w+') as stream:
-        stream.write(defaults.DEFAULT_CONFIG)
+    shutil.copyfile(os.path.join(default_theme_path, "config.yml.EX"), os.path.join(args.dir, paths.CFG_FILE))
 
 def parse_arguments(args):
     """ Parse and return arguments. """

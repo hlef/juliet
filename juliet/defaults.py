@@ -1,11 +1,4 @@
-DEFAULT_THEME_NAME = "bare"
-DEFAULT_CONFIG = (
-"""# useful when your website isn't located at the root of your server
-baseurl: ""
-
-# the directory in themes/ that contain your theme
-theme: "{}"
-""").format(DEFAULT_THEME_NAME)
+DEFAULT_THEME_NAME = "gram"
 
 # "config.yml required entry": can be empty
 CONFIG_REQUIRED_ENTRIES = {"baseurl": True, "theme": False}

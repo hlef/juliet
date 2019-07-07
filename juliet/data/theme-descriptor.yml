@@ -1,6 +1,0 @@
-- statics:
-  - ["statics-index.html", "index.html"]
-- templates:
-  - ["templates-main.html", "main.html"]
-  - ["templates-pages.html", "pages.html"]
-  - ["templates-posts.html", "posts.html"]

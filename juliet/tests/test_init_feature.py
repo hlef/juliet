@@ -31,15 +31,12 @@ class initSiteTest(unittest.TestCase):
         juliet.init(args)
 
         # Test config file
-        with open(juliet.paths.CFG_FILE) as f:
-            self.assertEqual(f.read(), juliet.defaults.DEFAULT_CONFIG)
+        self.assertTrue(self._check_config(juliet.paths.CFG_FILE),
+            "default config was installed but doesn't contain valid content")
 
         # Test site structure
         for directory in juliet.paths.SOURCE_DIRS:
             self.assertTrue(os.path.isdir(directory))
-
-        self.assertTrue(self._check_config(juliet.paths.CFG_FILE),
-            "default config was installed but doesn't contain valid content")
 
         # Go back to current directory
         os.chdir(self.cur_dir)
@@ -53,8 +50,8 @@ class initSiteTest(unittest.TestCase):
 
         # Test config file
         cfg_file = os.path.join(self.test_dir, juliet.paths.CFG_FILE)
-        with open(cfg_file) as f:
-            self.assertEqual(f.read(), juliet.defaults.DEFAULT_CONFIG)
+        self.assertTrue(self._check_config(cfg_file),
+            "default config was installed but doesn't contain valid content")
 
         # Test site structure
         for directory in juliet.paths.SOURCE_DIRS:
