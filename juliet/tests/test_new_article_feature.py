@@ -146,6 +146,9 @@ class newArticleFileTest(unittest.TestCase):
         for key, value in parsed_header_entries.items():
             self.assertTrue(parsed_header[key] == value)
 
+        # Avoid interferences with future calls by deleting generated file
+        os.remove(path)
+
     def test_generate_with_remainder(self):
         """ Make sure new article files are generated correctly when a remainder
         is passed. """

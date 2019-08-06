@@ -177,7 +177,11 @@ def _get_article_path(args, user_config, processed_entries):
     else:
         article_filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(**processed_entries)
 
-    return os.path.join(args.src, paths.POSTS_BUILDDIR, article_filename)
+    final_path = os.path.join(args.src, paths.POSTS_BUILDDIR, article_filename)
+    if os.path.exists(final_path):
+        raise ValueError("can't create new article at " + final_path + ": file already does already exist")
+
+    return final_path
 
 def _process_header_dict(theme_config, raw_entries):
     """ TODO """
