@@ -9,7 +9,12 @@ class newArticleFileTest(unittest.TestCase):
         self.cur_dir = os.getcwd()
         self.test_dir = tempfile.mkdtemp()
 
+        # Go to temporary directory
+        os.chdir(self.test_dir)
+
     def tearDown(self):
+        # Go back to current directory
+        os.chdir(self.cur_dir)
         shutil.rmtree(self.test_dir)
 
     def _init_juliet_structure_in_test_dir(self):
@@ -55,9 +60,6 @@ class newArticleFileTest(unittest.TestCase):
     def test_generate_default(self):
         """ Make sure new article files are generated. Check for default content. """
 
-        # Go to temporary directory
-        os.chdir(self.test_dir)
-
         # Generate base site
         self._init_juliet_structure_in_test_dir()
 
@@ -90,13 +92,30 @@ class newArticleFileTest(unittest.TestCase):
                 # We did not pass date, so expect it to be the current day
                 self.assertEqual(parsed_header[key], datetime.date.today())
 
-        # Go back to current directory
-        os.chdir(self.cur_dir)
+    def test_overwrite(self):
+        """ Make sure new article files don't overwrite existing files. """
+
+        # Generate base site
+        self._init_juliet_structure_in_test_dir()
+
+        # Prepare args
+        file_name = "file-name.md"
+        base_args = ['new', '-f', file_name]
+        args = juliet.parse_arguments(base_args)
+
+        # Generate article
+        juliet.init_new_article(args)
+
+        # Make sure article was created
+        path = os.path.join(juliet.paths.POSTS_BUILDDIR, file_name)
+        self.assertTrue(os.path.exists(path),
+            "Expected article to be generated at {} but couldn't find it"
+            .format(path))
+
+        # Try to generate file a second time
+        self.assertRaises(ValueError, juliet.init_new_article, args)
 
     def _test_generate_with_remainder(self, remainder):
-        # Go to temporary directory
-        os.chdir(self.test_dir)
-
         # Generate base site
         self._init_juliet_structure_in_test_dir()
 
@@ -126,9 +145,6 @@ class newArticleFileTest(unittest.TestCase):
 
         for key, value in parsed_header_entries.items():
             self.assertTrue(parsed_header[key] == value)
-
-        # Go back to current directory
-        os.chdir(self.cur_dir)
 
     def test_generate_with_remainder(self):
         """ Make sure new article files are generated correctly when a remainder
@@ -170,9 +186,6 @@ class newArticleFileTest(unittest.TestCase):
         """ Make sure new article files are generated with the right name when a
         filenaming pattern is specified. Doesn't check for content. """
 
-        # Go to temporary directory
-        os.chdir(self.test_dir)
-
         # Generate base site
         self._init_juliet_structure_in_test_dir()
 
@@ -194,9 +207,6 @@ class newArticleFileTest(unittest.TestCase):
             "Expected article to be generated at {} but couldn't find it"
             .format(article_path))
 
-        # Go back to current directory
-        os.chdir(self.cur_dir)
-
     def test_missing_structure(self):
         """ Make sure Juliet behaves correctly when folder content is missing. """
 
@@ -212,17 +222,15 @@ class newArticleFileTest(unittest.TestCase):
         is passed. Make sure that passing a file name does not modify the actual
         content."""
 
-        # Go to temporary directory
-        os.chdir(self.test_dir)
-
         # Generate base site
         self._init_juliet_structure_in_test_dir()
 
         # Prepare args
         b_file_name = 'hello_world.md'
         base_args = ['new', '-f', b_file_name]
-        comp_args = ['new']
         b_args = juliet.parse_arguments(base_args)
+
+        comp_args = ['new']
         c_args = juliet.parse_arguments(comp_args)
 
         # Generate articles
@@ -244,16 +252,10 @@ class newArticleFileTest(unittest.TestCase):
             with open(c_article_path) as c_f:
                 self.assertEqual(b_f.read(), c_f.read(), "passing file name modifies article content")
 
-        # Go back to current directory
-        os.chdir(self.cur_dir)
-
     def test_pass_filename_and_remainder(self):
         """ Make sure new article files are generated when a destination folder
         is specified together with a remainder (-- stuff). Doesn't check for
         content. """
-
-        # Go to temporary directory
-        os.chdir(self.test_dir)
 
         # Generate base site
         self._init_juliet_structure_in_test_dir()
@@ -271,6 +273,3 @@ class newArticleFileTest(unittest.TestCase):
         self.assertTrue(os.path.exists(article_path),
             "Expected article to be generated at {} but couldn't find it"
             .format(article_path))
-
-        # Go back to current directory
-        os.chdir(self.cur_dir)
