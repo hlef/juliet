@@ -87,12 +87,9 @@ highlighting, via the [python-markdown library](https://python-markdown.github.i
 If you want to refer to the baseurl variable specified in the config file,
 simply use the Jinja-like `{{ baseurl }}` tag.
 
-#### Tag escaping
-
 Escaping with backslash is supported. For example if you want to write
-`{% endhighlight %}` without having it replaced by the preprocessor, you'll
-simply have to write it `\{% endhighlight %}`, same for base url tags:
-`\{{ baseurl }}`.
+`{{ baseurl }}` without having it replaced by the preprocessor, you'll
+simply have to write `\{{ baseurl }}`.
 
 ### :house: Site pages, *pages/*
 

@@ -24,6 +24,6 @@ setup(name=name,
       entry_points={'console_scripts': ['juliet = juliet:main']},
       zip_safe=False,
       install_requires = requires,
-      extra_requires = {"codehilite": 'pygments'}
+      extra_requires = {"codehilite": 'pygments'},
       test_suite='nose.collector',
       tests_require=['nose'])
