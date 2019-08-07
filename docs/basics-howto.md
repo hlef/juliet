@@ -80,18 +80,7 @@ Pro tip: you can get more information about this feature via `juliet new --help`
 #### Pygments syntax highlighting
 
 Juliet provides native integration of [Pygments](http://pygments.org/) syntax
-highlighting.
-
-To highlight code using Pygments, simply embrace your code with Jinja-like `{%
-highlight LANG %}` and `{% endhighlight %}` tags (replace *LANG* by a lexer
-name).
-
-For example, highlighting a shell script works as following:
-
-    {% highlight shell %}
-    # This is a shell script.
-    echo "Hello, World"
-    {% endhighlight %}
+highlighting, via the [python-markdown library](https://python-markdown.github.io/extensions/code_hilite/).
 
 #### Base url inclusion
 

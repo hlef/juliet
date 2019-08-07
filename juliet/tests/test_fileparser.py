@@ -144,111 +144,36 @@ class fileParserTest(unittest.TestCase):
         self.assertEqual(result1, self.processor._process_baseurl_tags(body_with_baseurl1, self.baseurl))
         self.assertEqual(result2, self.processor._process_baseurl_tags(body_with_baseurl2, self.baseurl))
 
-    def test_escape_pygments_blocks(self):
-        """ Make sure that pygments blocks escaping works. """
+    def test_codehilite_integration(self):
+        """ Make sure that code highlighting is integrated as expected. """
 
-        body_with_pygments_blocks1 = [r"\{% highlight shell %}\{% endhighlight %}"]
-        result1 = [r"{% highlight shell %}{% endhighlight %}"]
+        file1 = """---\n---\n\t:::shell\n\tcat file"""
 
-        body_with_pygments_blocks2 = [r"\\{% highlight shell %}\\{% endhighlight %}"]
-        result2 = [r"\{% highlight shell %}\{% endhighlight %}"]
+        result1 = {
+            "installed_filename": self.FILENAME,
+            "body": """<div class="codehilite"><pre><span></span>cat file\n</pre></div>""",
+            "file-name": self.FILENAME
+        }
 
-        body_with_pygments_blocks3 = [r"\\\{% highlight shell %}\\\{% endhighlight %}"]
-        result3 = [r"\\{% highlight shell %}\\{% endhighlight %}"]
+        file2 = """---\n---\n\t:::shell\n\t# this is a comment"""
 
-        self.assertEqual(result1, self.processor._process_pygments(body_with_pygments_blocks1))
-        self.assertEqual(result2, self.processor._process_pygments(body_with_pygments_blocks2))
-        self.assertEqual(result3, self.processor._process_pygments(body_with_pygments_blocks3))
+        self.maxDiff = None
+        result2 = {
+            "installed_filename": self.FILENAME,
+            "body": """<div class="codehilite"><pre><span></span><span class="c1"># this is a comment</span>\n</pre></div>""",
+            "file-name": self.FILENAME
+        }
 
-    def test_invalid_pygments(self):
-        """ Make sure that parsing hangs on invalid pygments blocks."""
+        self.assertEqual(result2, self.processor.process(file2, self.FILENAME))
 
-        opened_but_never_closed = r"""---
----
+        file3 = """---\n---\n\t#!sh\n\t# this is a comment"""
+        result3 = {
+            "installed_filename": self.FILENAME,
+            "body": """<table class="codehilitetable"><tr><td class="linenos">"""
+                + """<div class="linenodiv"><pre>1</pre></div></td><td class="code">"""
+                + """<div class="codehilite"><pre><span></span><span class="c1"># this is a comment</span>\n"""
+                + """</pre></div>\n</td></tr></table>""",
+            "file-name": self.FILENAME
+        }
 
-{% highlight shell %}
-cat file"""
-
-        self.assertRaises(ValueError, self.processor.process, opened_but_never_closed, self.FILENAME)
-
-        closed_but_never_opened = """---
----
-
-cat file
-{%endhighlight%}"""
-
-        self.assertRaises(ValueError, self.processor.process, closed_but_never_opened, self.FILENAME)
-
-        both_on_the_same_line1 = """---
----
-
-{% highlight shell %}{%endhighlight%}"""
-
-        both_on_the_same_line2 = """---
----
-
-{%endhighlight%}{% highlight shell %}
-{%endhighlight%}{% highlight shell %}"""
-
-        both_on_the_same_line3 = """---
----
-
-{%endhighlight%}{% highlight shell %}
-{% highlight shell %}{%endhighlight%}"""
-
-        self.assertRaises(ValueError, self.processor.process, both_on_the_same_line1, self.FILENAME)
-        self.assertRaises(ValueError, self.processor.process, both_on_the_same_line2, self.FILENAME)
-        self.assertRaises(ValueError, self.processor.process, both_on_the_same_line3, self.FILENAME)
-
-    def test_pygments_integration(self):
-        """ Make sure that pygments is well integrated in the main process method."""
-
-        file1 = """---
----
-
-{% highlight shell %}
-cat file
-{% endhighlight  %}
-{%highlight shell %}
-cat file
-{%endhighlight%}"""
-
-        result1 = {"installed_filename": self.FILENAME, "body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
-</pre></div>
-</td></tr></table>
-
-<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
-</pre></div>
-</td></tr></table>""", 'file-name': self.FILENAME}
-
-        self.assertEqual(result1, self.processor.process(file1, self.FILENAME))
-
-        invalid_inclusion = """---
----
-
-{% highlight shell %}
-cat file
-{% endhighlight  %}
-{% endhighlight  %}"""
-
-        result_invalid_inclusion = {"installed_filename": self.FILENAME, "body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file
-<span class="o">{</span>% endhighlight  %<span class="o">}</span>
-</pre></div>
-</td></tr></table>""", 'file-name': self.FILENAME}
-
-        self.assertEqual(result_invalid_inclusion, self.processor.process(invalid_inclusion, self.FILENAME))
-
-        inclusion = """---
----
-
-{% highlight shell %}
-cat file
-{%highlight shell %}
-{% endhighlight  %}
-cat file
-{%endhighlight%}"""
-
-        result_inclusion = {"installed_filename": self.FILENAME, "body": """<table class="sourcetable"><tr><td class="linenos"><div class="linenodiv"><pre>1\n2\n3\n4</pre></div></td><td class="code"><div class="source"><pre><span></span>cat file\n<span class="o">{</span>%highlight shell %<span class="o">}</span>\n<span class="o">{</span>% endhighlight  %<span class="o">}</span>\ncat file\n</pre></div>\n</td></tr></table>""", 'file-name': self.FILENAME}
-
-        self.assertEqual(result_inclusion, self.processor.process(inclusion, self.FILENAME))
+        self.assertEqual(result3, self.processor.process(file3, self.FILENAME))

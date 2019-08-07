@@ -1,82 +1,12 @@
-import os, re, yaml, slugify, markdown, pygments
-from pygments.lexers import get_lexer_by_name
-from pygments.formatters import HtmlFormatter
+import os, re, yaml, slugify, markdown
 
 class PageProcessor:
     FORBIDDEN_HEADER_ENTRIES = {'body'}
+    MARKDOWN_EXTENSIONS = ["codehilite", "tables", "footnotes"]
 
     def __init__(self, baseurl, file_naming_var):
         self.baseurl = baseurl
         self.file_naming_var = file_naming_var
-
-    @staticmethod
-    def _process_pygments(splitted_body):
-        """ Process highlight blocks in passed body. Raise ValueError if
-        passed body contains invalid pygments blocks. """
-
-        # FIXME Ugly looking method. This is way too big, and pretty ununderstandable.
-
-        escaped = r"(\\)+"
-        highlight = r"\{%\s*?highlight (\w+)\s*?%\}"
-        endhighlight = r"\{%\s*?endhighlight\s*?%\}"
-        regex_highlight = re.compile(highlight)
-        regex_endhighlight = re.compile(endhighlight)
-        regex_escaped_highlight = re.compile(escaped + highlight)
-        regex_escaped_endhighlight = re.compile(escaped + endhighlight)
-        formatter = HtmlFormatter(linenos=True, cssclass="source")
-
-        result = []
-        open_blocks = 0
-        reached_endhighlight = False
-        current_lexer = None
-        current_buffer = ""
-        temporary_buffer = ""
-
-        for line in splitted_body:
-            if(regex_escaped_endhighlight.match(line) is not None or regex_escaped_highlight.match(line) is not None):
-                line = PageProcessor._unescape_tags(endhighlight, line)
-                line = PageProcessor._unescape_tags(highlight, line)
-
-            elif(regex_endhighlight.match(line) is not None):
-                if(not reached_endhighlight):
-                    open_blocks -= 1
-                    if(open_blocks < 0):
-                        raise ValueError("Failed to parse pygments block: A pygments block was closed, but never opened")
-                    elif(open_blocks == 0):
-                        reached_endhighlight = True
-                else:
-                    current_buffer += temporary_buffer
-                    temporary_buffer = ""
-
-            elif(regex_highlight.match(line) is not None):
-                if(reached_endhighlight):
-                    result.append(pygments.highlight(current_buffer, current_lexer, formatter))
-                    result += temporary_buffer.splitlines()[1:]
-                    reached_endhighlight = False
-                    current_buffer = ""
-                    temporary_buffer = ""
-
-                open_blocks += 1
-                if(open_blocks == 1):
-                    block_type = regex_highlight.match(line).groups()[0]
-                    current_lexer = get_lexer_by_name(block_type, stripall=True)
-                    continue
-
-            if(reached_endhighlight):
-                temporary_buffer += line + "\n"
-            elif(open_blocks != 0):
-                current_buffer += line + "\n"
-            else:
-                result.append(line)
-
-        if(reached_endhighlight):
-            result.append(pygments.highlight(current_buffer, current_lexer, formatter))
-            result += temporary_buffer.splitlines()[1:]
-
-        if(open_blocks != 0):
-            raise ValueError("Failed to parse pygments block: A pygments block was opened, but never closed")
-
-        return result
 
     @staticmethod
     def _process_baseurl_tags(splitted_body, baseurl):
@@ -118,13 +48,10 @@ class PageProcessor:
 
         splitted_body = splitted_body[starter:]
 
-        # Process Pygments blocks
-        splitted_body = PageProcessor._process_pygments(splitted_body)
-
         # Process baseurl tags
         splitted_body = PageProcessor._process_baseurl_tags(splitted_body, baseurl)
 
-        return markdown.markdown("\n".join(splitted_body))
+        return markdown.markdown("\n".join(splitted_body), extensions=PageProcessor.MARKDOWN_EXTENSIONS)
 
     @staticmethod
     def _check_header_content(header):

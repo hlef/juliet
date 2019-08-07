@@ -6,7 +6,7 @@ import os
 
 name = 'juliet'
 packages = ['juliet']
-requires = ['jinja2>=2.7', 'pygments', 'pyyaml>=3.11', 'markdown', 'python-slugify', 'python-dateutil']
+requires = ['jinja2>=2.7', 'pyyaml>=3.11', 'markdown', 'python-slugify', 'python-dateutil']
 
 main_ns = {}
 with open(convert_path(os.path.join(packages[0], 'version.py'))) as ver_file:
@@ -24,5 +24,6 @@ setup(name=name,
       entry_points={'console_scripts': ['juliet = juliet:main']},
       zip_safe=False,
       install_requires = requires,
+      extra_requires = {"codehilite": 'pygments'}
       test_suite='nose.collector',
       tests_require=['nose'])
