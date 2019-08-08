@@ -16,18 +16,18 @@ Juliet website sources are organized as following:
         └── yourtheme
             └── ...
 
-`juliet init` can initialize this file structure for you in the current directory.
+`juliet init` can initialize this file structure in the current directory.
 
 The default theme is [gram](https://github.com/hlef/juliet-gram-theme).
 
-We recommend you to either pick and install one of our recommended themes (see
-`docs/recommended-themes.md`), or be creative and design your own one! You will
-find more information about theme design in `docs/themes-howto.md`.
+Tip: You can either pick and install one of our recommended themes (see
+`docs/recommended-themes.md`), or design your own one! You will find more
+information about theme design in `docs/themes-howto.md`.
 
 ### :wrench: Build configuration, *config.yml*
 
-`config.yml` is the configuration file of your website. It defines *variables*
-needed by the build system, by your theme, and static pages.
+Every juliet source has a `config.yml` file. It defines *variables* needed by
+the build system, theme, and static pages.
 
 Following variables are required by the build system and are thus mandatory for
 any Juliet config file:
@@ -38,16 +38,16 @@ any Juliet config file:
     # the directory in themes/ that contain your theme
     theme: sample_theme
 
-The set of required entries in the configuration file may vary depending on your
-theme. You can usually find more informations about it in your theme directory,
-under `themes/your_theme/README`.
+Required entries may vary depending on the theme. You can usually find more
+informations about it in your theme directory, under
+`themes/your_theme/README`!
 
 ### :pencil: Blog posts, *posts/*
 
-Juliet posts go to the `posts/` directory and are divided in two parts:
+Juliet posts are stored in `posts/`. Posts are organized in two parts:
  * The *header*, containing YAML-formatted informations about the post
  * The post's *body*, in in the original [Markdown syntax](https://daringfireball.net/projects/markdown/syntax) with
- preprocessor tags (see dedicated paragraph)
+   additions from [python-markdown](https://python-markdown.github.io/)
 
 For example:
 
@@ -62,34 +62,32 @@ Juliet defines some special entries which will alter the behavior of the engine:
  * `permalink` allows you to specify *where exactly* to install the article.
    Works for both posts and pages.
 
-Apart from these, the set of required entries in post headers varies depending
-on your theme. You can find more informations about it in your theme directory,
-under `themes/your_theme/README`.
+Required entries in post headers varies depending on your theme. You can find
+more informations about it in your theme directory, under
+`themes/your_theme/README`.
 
 Please, note that even if it is empty, the header has to be present.
 
 #### Creating a fresh article file
 
-Because creating a fresh article structure each and every time you write a new
-article is repetitive and annoying, Juliet >= 0.2 adds support for the
-`juliet new` feature which takes care of it for you.
+`juliet new` initializes a fresh article file.
 
-Pro tip: you can get more information about this feature via `juliet new --help`.
+For example:
 
-### :bookmark: Preprocessor tags
-#### Pygments syntax highlighting
+    $ juliet new -- title "Karlsruhe, a beautiful city"
+    $ cat posts/2019-08-08-karlsruhe-a-beautiful-city.md
+    ---
+    date: 2019-08-08
+    title: Karlsruhe, a beautiful city
+    ---
 
-Juliet provides native integration of [Pygments](http://pygments.org/) syntax
-highlighting, via the [python-markdown library](https://python-markdown.github.io/extensions/code_hilite/).
-
-#### Base url inclusion
-
-If you want to refer to the baseurl variable specified in the config file,
-simply use the Jinja-like `{{ baseurl }}` tag.
-
-Escaping with backslash is supported. For example if you want to write
-`{{ baseurl }}` without having it replaced by the preprocessor, you'll
-simply have to write `\{{ baseurl }}`.
+    $ juliet new -- title "Le Cuisinier françois" author "François Pierre La Varenne" date "21/12/1651"
+    $ cat posts/1651-12-21-le-cuisinier-francois.md
+    ---
+    author: "François Pierre La Varenne"
+    date: 1651-12-21
+    title: "Le Cuisinier françois"
+    ---
 
 ### :house: Site pages, *pages/*
 
@@ -130,13 +128,36 @@ Most important things:
 
 You can find more informations about theming in `docs/themes-howto.md`.
 
-## Building the beast
+### Markdown extensions
 
-Build the website using the `juliet build` command. It will build the website
-in `build-area` by default. Alternatively, you may want to specify a destination
-using `--build-dst`.
+#### Tables and footnotes
 
-You can also specify the source directory via `--build-src`.
+Tables and footnotes support is provided via python-markdown:
+[tables](https://python-markdown.github.io/extensions/tables/),
+[footnotes](https://python-markdown.github.io/extensions/footnotes/).
+
+#### Pygments syntax highlighting
+
+Juliet provides native integration of [Pygments](http://pygments.org/) syntax
+highlighting, via the [python-markdown](https://python-markdown.github.io/extensions/code_hilite/).
+
+#### Base url inclusion
+
+If you want to refer to the baseurl variable specified in the config file,
+simply use the Jinja-like `{{ baseurl }}` tag.
+
+Escaping with backslash is supported. For example if you want to write
+`{{ baseurl }}` without having it replaced by the preprocessor, you'll
+simply have to write `\{{ baseurl }}`.
+
+## Building juliet websites
+
+Build the website using the `juliet build` command.
+
+`juliet build` builds the website in `build-area` by default. An alternative
+destination can be specified using `--build-dst`.
+
+Source directory can also be passed using `--build-src`.
 
 ### :file_folder: Installed structure
 
