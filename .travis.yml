@@ -17,7 +17,7 @@ matrix:
 
 before_install:
     - sudo apt-get -qq update
-    - sudo apt-get install -y python3-setuptools
+    - sudo apt-get install -y python3-setuptools python3-pygments
     - pip install coveralls
 
 install: "pip install ."
