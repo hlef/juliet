@@ -31,7 +31,7 @@ def get_config(config_file):
     config = {}
 
     with open(config_file, 'r') as stream:
-        config = yaml.load(stream)
+        config = yaml.safe_load(stream)
 
     __check_config(config)
 
