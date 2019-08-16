@@ -228,7 +228,8 @@ def init_new_article(args):
         return result
 
     def _get_new_article(final_header):
-        default_article = "---\n" + yaml.dump(final_header, default_flow_style=False) + "---"
+        default_article = "---\n" + yaml.dump(final_header, allow_unicode=True,
+            default_flow_style=False) + "---"
         return default_article
 
     # Get configs

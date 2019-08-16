@@ -115,48 +115,61 @@ class newArticleFileTest(unittest.TestCase):
         # Try to generate file a second time
         self.assertRaises(ValueError, juliet.init_new_article, args)
 
-    def _test_generate_with_remainder(self, remainder):
-        # Generate base site
-        self._init_juliet_structure_in_test_dir()
-
-        # Prepare args
-        base_args = ['new', *remainder]
-        args = juliet.parse_arguments(base_args)
-        parsed_header_entries = juliet._parse_raw_header_entries(remainder)
-
-        # Generate article
-        juliet.init_new_article(args)
-
-        # Make sure article was created
-        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
-            juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, remainder))
-        path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
-        self.assertTrue(os.path.exists(path),
-            "Expected article to be generated at {} but couldn't find it"
-            .format(path))
-
-        # Retrieve and parse generated header
-        raw_file = ""
-        with open(path) as f:
-            raw_file = f.read()
-
-        parsed_header = PageProcessor._get_parsed_header(raw_file, filename,
-                            defaults.DEFAULT_FILE_NAMING_VARIABLE)
-
-        for key, value in parsed_header_entries.items():
-            self.assertTrue(parsed_header[key] == value)
-
-        # Avoid interferences with future calls by deleting generated file
-        os.remove(path)
-
     def test_generate_with_remainder(self):
         """ Make sure new article files are generated correctly when a remainder
         is passed. """
 
-        self._test_generate_with_remainder(['--', 'title', 'hello world'])
-        self._test_generate_with_remainder(['--', 'author', 'M. John Hacker'])
-        self._test_generate_with_remainder(['--', 'city', 'Karlsruhe'])
-        self._test_generate_with_remainder(['--', 'joking', 'False'])
+        def _test_generate_with_remainder(remainder_dict):
+            # Generate base site
+            self._init_juliet_structure_in_test_dir()
+
+            remainder = ["--"]
+            for key, value in remainder_dict.items():
+                remainder.append(key)
+                remainder.append(value)
+
+            # Prepare args
+            base_args = ['new', *remainder]
+            args = juliet.parse_arguments(base_args)
+            parsed_header_entries = juliet._parse_raw_header_entries(remainder)
+
+            # Generate article
+            juliet.init_new_article(args)
+
+            # Make sure article was created
+            filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+                juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, remainder))
+            path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
+            self.assertTrue(os.path.exists(path),
+                "Expected article to be generated at {} but couldn't find it"
+                .format(path))
+
+            # Retrieve and parse generated header
+            raw_file = ""
+            with open(path) as f:
+                raw_file = f.read()
+
+            parsed_header = PageProcessor._get_parsed_header(raw_file, filename,
+                                defaults.DEFAULT_FILE_NAMING_VARIABLE)
+
+            for key, value in parsed_header_entries.items():
+                self.assertTrue(remainder_dict[key] == value)
+
+            for key, value in remainder_dict.items():
+                self.assertTrue(parsed_header_entries[key] == value)
+
+                # catches bugs in unicode support
+                self.assertTrue(raw_file.count(key) == 1)
+                self.assertTrue(raw_file.count(value) == 1)
+
+            # Avoid interferences with future calls by deleting generated file
+            os.remove(path)
+
+        _test_generate_with_remainder({'title':  'Maïs Châle Éléphant'})
+        _test_generate_with_remainder({'title':  'Straße Käse Trüb'})
+        _test_generate_with_remainder({'author': 'M. John Hacker'})
+        _test_generate_with_remainder({'city':   'Karlsruhe'})
+        _test_generate_with_remainder({'joking': 'False'})
 
     def test_generate_default_with_dest_folder(self):
         """ Make sure new article files are generated when a destination folder
@@ -173,17 +186,18 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init_new_article(args)
 
         # Make sure article was created
-        file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
+        file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+            juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
         article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
         self.assertTrue(os.path.exists(article_path),
             "Expected article to be generated at {} but couldn't find it"
             .format(article_path))
 
         # Make sure it was created at the right place
-        self.assertEqual(os.path.dirname(article_path),
-                         os.path.join(self.test_dir, juliet.paths.POSTS_PATH),
-                             "Expected article to be generated in {} but in fact it was generated at {}"
-                             .format(os.path.join(self.test_dir, juliet.paths.POSTS_PATH), os.path.dirname(article_path)))
+        self.assertEqual(os.path.dirname(article_path), os.path.join(self.test_dir,
+            juliet.paths.POSTS_PATH), "Expected article to be generated in {} but in fact "
+            + "it was generated at {}".format(os.path.join(self.test_dir,
+             juliet.paths.POSTS_PATH), os.path.dirname(article_path)))
 
     def test_generate_default_with_filenaming_pattern(self):
         """ Make sure new article files are generated with the right name when a
@@ -247,8 +261,10 @@ class newArticleFileTest(unittest.TestCase):
             "Expected article to be generated at {} but couldn't find it"
             .format(b_article_path))
 
-        # Make sure it is the same as the default article (passing a file name should only change the file name)
-        c_file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
+        # Make sure it is the same as the default article (passing a file
+        # name should only change the file name)
+        c_file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+            juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
         c_article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, c_file_name)
 
         with open(b_article_path) as b_f:
