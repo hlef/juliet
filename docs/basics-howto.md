@@ -66,7 +66,7 @@ Required entries in post headers varies depending on your theme. You can find
 more informations about it in your theme directory, under
 `themes/your_theme/README`.
 
-Please, note that even if it is empty, the header has to be present.
+Even if it is empty, the header has to be present.
 
 #### Creating a fresh article file
 
@@ -128,7 +128,7 @@ Most important things:
 
 You can find more informations about theming in `docs/themes-howto.md`.
 
-### Markdown extensions
+### :muscle: Markdown extensions
 
 #### Tables and footnotes
 
@@ -139,7 +139,7 @@ Tables and footnotes support is provided via python-markdown:
 #### Pygments syntax highlighting
 
 Juliet provides native integration of [Pygments](http://pygments.org/) syntax
-highlighting, via the [python-markdown](https://python-markdown.github.io/extensions/code_hilite/).
+highlighting via [python-markdown](https://python-markdown.github.io/extensions/code_hilite/).
 
 #### Base url inclusion
 
