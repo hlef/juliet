@@ -25,8 +25,22 @@ def get_from_folder(folder, config):
     else:
         file_naming_var = juliet.defaults.DEFAULT_FILE_NAMING_VARIABLE
 
+    theme_headers = juliet.defaults.DEFAULT_THEME_HEADERS
+    theme_headers_file = os.path.join(config["site"]["baseurl"], juliet.paths.THEMES_PATH,
+        config["site"]["theme"], juliet.paths.THEME_HEADERS_FILE)
+    if (os.path.isfile(theme_headers_file)):
+        tmp = juliet.configurator.get_yaml(theme_headers_file)
+        # theme headers file might only define entries for posts/pages
+        if (tmp[folder]):
+            theme_headers = tmp
+
     processor = PageProcessor(config["site"]["baseurl"], file_naming_var)
     for source_file in entries:
         elements.append(_load_from_file(processor, folder, source_file))
+
+        for key, value in theme_headers.items():
+            if (key not in elements[-1].keys() and value):
+                # Fix missing entries with theme's defaults
+                elements[-1][key] = value
 
     return elements
