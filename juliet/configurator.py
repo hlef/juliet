@@ -13,16 +13,8 @@ def configure_jinja(theme, src):
 
     return Environment(loader=FileSystemLoader(theme_path), autoescape=False)
 
-def get_config(config_file):
+def get_yaml(config_file):
     """ Parse and return passed configuration file. """
-
-    def __check_config(config):
-        """ Raise exception if passed configuration is invalid. """
-
-        for key, value in defaults.CONFIG_REQUIRED_ENTRIES.items():
-            if (key not in config.keys()) or (config[key] == "" and not value):
-                raise ValueError("configuration file is missing required key " + key +
-                                 " or invalid value was provided")
 
     # Read config from file
     if(not os.path.isfile(config_file)):
@@ -32,6 +24,22 @@ def get_config(config_file):
 
     with open(config_file, 'r') as stream:
         config = yaml.safe_load(stream)
+
+    return config
+
+def get_config(config_file):
+    """ Parse and return passed configuration file, with checks for sitewide
+        config files. """
+
+    def __check_config(config):
+        """ Raise exception if passed configuration is invalid. """
+
+        for key, value in defaults.CONFIG_REQUIRED_ENTRIES.items():
+            if (key not in config.keys()) or (config[key] == "" and not value):
+                raise ValueError("configuration file is missing required key " + key +
+                                 " or invalid value was provided")
+
+    config = get_yaml(config_file)
 
     __check_config(config)
 

@@ -134,7 +134,7 @@ def parse_arguments(args):
     return main_parser.parse_args(args)
 
 def _parse_raw_header_entries(header_entries):
-    """ TODO """
+    """ Parse header entries passed by the user as command line argument. """
 
     def __check_key(key):
         return not("_" in key or " " in key or ":" in key or not len(key))
@@ -183,21 +183,19 @@ def _get_article_path(args, user_config, processed_entries):
 
     return final_path
 
-def _process_header_dict(theme_config, raw_entries):
+def _process_header_dict(theme_headers, raw_entries):
     """ TODO """
 
     entries = _parse_raw_header_entries(raw_entries)
 
-    gen_date = False
-    for key, value in theme_config.items():
-        if (value[0] not in entries.keys() and value[1]):
+    for key, value in theme_headers.items():
+        if (key not in entries.keys() and value):
             # Fix missing entries with theme's defaults
-            entries[key] = value[1]
+            entries[key] = value
         elif (key == "date"):
-            gen_date = True
             if (key in entries.keys()):
                 try:
-                    entries["date_"] = entries["date"] = dateutil.parser.parse(entries["date"]).date()
+                    entries["date_"] = entries[key] = dateutil.parser.parse(entries[key]).date()
                 except (ValueError, OverflowError):
                     pass
 
@@ -210,9 +208,10 @@ def _process_header_dict(theme_config, raw_entries):
     # Generate date_ if not already in result
     if ("date_" not in result.keys()):
         result["date_"] = datetime.date.today()
-
-    if (gen_date):
-        result["date"] = result["date_"]
+        if ("date" in theme_headers.keys()):
+            # this happens when dateutil.parser.parse failed
+            # or 'date' was not in entries
+            result["date"] = result["date_"]
 
     return result
 
@@ -235,16 +234,21 @@ def init_new_article(args):
     # Get configs
     user_config = configurator.get_config(os.path.join(args.src, paths.CFG_FILE))
     if (not user_config):
-        logging.error("Error, could not find user config at {}".format(os.path.join(args.src, paths.CFG_FILE)))
+        logging.error("Error, could not find user config at {}".format(
+            os.path.join(args.src, paths.CFG_FILE)))
         return
 
-    theme_config = defaults.DEFAULT_THEME_CFG
-    theme_cfg_file = os.path.join(args.src, paths.THEMES_PATH, user_config["theme"], paths.CFG_FILE)
-    if (os.path.isfile(theme_cfg_file)):
-        theme_config = configurator.get_config(theme_cfg_file)
+    theme_headers = defaults.DEFAULT_THEME_HEADERS
+    theme_headers_file = os.path.join(args.src, paths.THEMES_PATH,
+        user_config["theme"], paths.THEME_HEADERS_FILE)
+    if (os.path.isfile(theme_headers_file)):
+        tmp = configurator.get_yaml(theme_headers_file)
+        # theme headers file might only define entries for pages
+        if (tmp["posts"]):
+            theme_headers = tmp
 
     # Parse remainder (header content)
-    processed_entries = _process_header_dict(theme_config, args.header_content)
+    processed_entries = _process_header_dict(theme_headers["posts"], args.header_content)
     final_entries = _remove_temporary_entries(processed_entries)
 
     # Generate article file name from user / default template

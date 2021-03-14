@@ -20,3 +20,4 @@ ASSETS_BUILDDIR = "assets"
 
 # theme dirs
 EXAMPLE_CFG_FILE = CFG_FILE + ".EX"
+THEME_HEADERS_FILE = "headers.yml"

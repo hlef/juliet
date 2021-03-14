@@ -71,7 +71,8 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init_new_article(args)
 
         # Make sure article was created
-        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
+        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+            juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], {}))
         path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
         self.assertTrue(os.path.exists(path),
             "Expected article to be generated at {} but couldn't find it"
@@ -85,9 +86,9 @@ class newArticleFileTest(unittest.TestCase):
         parsed_header = PageProcessor._get_parsed_header(raw_file, filename,
                             defaults.DEFAULT_FILE_NAMING_VARIABLE)
 
-        for key, value in defaults.DEFAULT_THEME_CFG.items():
-            if (value[1] != None):
-                self.assertTrue(parsed_header[key] == value[1])
+        for key, value in defaults.DEFAULT_THEME_HEADERS["posts"].items():
+            if (value != None):
+                self.assertEqual(parsed_header[key], value)
             elif (key == "date"):
                 # We did not pass date, so expect it to be the current day
                 self.assertEqual(parsed_header[key], datetime.date.today())
@@ -138,7 +139,7 @@ class newArticleFileTest(unittest.TestCase):
 
             # Make sure article was created
             filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
-                juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, remainder))
+                juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], remainder))
             path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
             self.assertTrue(os.path.exists(path),
                 "Expected article to be generated at {} but couldn't find it"
@@ -187,7 +188,7 @@ class newArticleFileTest(unittest.TestCase):
 
         # Make sure article was created
         file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
-            juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
+            juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], {}))
         article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
         self.assertTrue(os.path.exists(article_path),
             "Expected article to be generated at {} but couldn't find it"
@@ -264,7 +265,7 @@ class newArticleFileTest(unittest.TestCase):
         # Make sure it is the same as the default article (passing a file
         # name should only change the file name)
         c_file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
-            juliet._process_header_dict(defaults.DEFAULT_THEME_CFG, {}))
+            juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], {}))
         c_article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, c_file_name)
 
         with open(b_article_path) as b_f:

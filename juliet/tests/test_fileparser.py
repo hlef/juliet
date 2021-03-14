@@ -151,16 +151,18 @@ class fileParserTest(unittest.TestCase):
 
         result1 = {
             "installed_filename": self.FILENAME,
-            "body": """<div class="codehilite"><pre><span></span>cat file\n</pre></div>""",
+            "body": """<div class="codehilite"><pre><span></span><code>cat file\n</code></pre></div>""",
             "file-name": self.FILENAME
         }
+
+        self.assertEqual(result1, self.processor.process(file1, self.FILENAME))
 
         file2 = """---\n---\n\t:::shell\n\t# this is a comment"""
 
         self.maxDiff = None
         result2 = {
             "installed_filename": self.FILENAME,
-            "body": """<div class="codehilite"><pre><span></span><span class="c1"># this is a comment</span>\n</pre></div>""",
+            "body": """<div class="codehilite"><pre><span></span><code><span class="c1"># this is a comment</span>\n</code></pre></div>""",
             "file-name": self.FILENAME
         }
 
@@ -171,8 +173,8 @@ class fileParserTest(unittest.TestCase):
             "installed_filename": self.FILENAME,
             "body": """<table class="codehilitetable"><tr><td class="linenos">"""
                 + """<div class="linenodiv"><pre>1</pre></div></td><td class="code">"""
-                + """<div class="codehilite"><pre><span></span><span class="c1"># this is a comment</span>\n"""
-                + """</pre></div>\n</td></tr></table>""",
+                + """<div class="codehilite"><pre><span></span><code><span class="c1"># this is a comment</span>\n"""
+                + """</code></pre></div>\n</td></tr></table>""",
             "file-name": self.FILENAME
         }
 

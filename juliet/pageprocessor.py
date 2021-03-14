@@ -74,7 +74,7 @@ class PageProcessor:
 
         if(header != ""):
             try:
-                parsed_header.update(yaml.load(header))
+                parsed_header.update(yaml.load(header, Loader=yaml.FullLoader))
             except yaml.YAMLError as exc:
                 raise ValueError("Failed to parse file header: " + str(exc))
 
