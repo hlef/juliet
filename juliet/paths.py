@@ -14,7 +14,7 @@ THEME_DESCRIPTOR_FILE_NAME = "{}/theme-descriptor.yml".format(DATA_PATH)
 DEFAULT_BUILDDIR = "build-area"
 DEFAULT_INITDIR = ""
 POSTS_BUILDDIR = "posts"
-PAGES_BUILDDIR = "pages"
+PAGES_BUILDDIR = ""
 DATA_BUILDDIR = ""
 ASSETS_BUILDDIR = "assets"
 

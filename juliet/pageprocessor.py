@@ -80,7 +80,9 @@ class PageProcessor:
 
             PageProcessor._check_header_content(parsed_header)
 
-            if(file_naming_var in parsed_header.keys()):
+            if("permalink" in parsed_header.keys()):
+                parsed_header["installed_filename"] = parsed_header["permalink"]
+            elif(file_naming_var in parsed_header.keys()):
                 # If there's a file_naming_variable entry, provide a slugified form of it.
                 parsed_header["installed_filename"] = slugify.slugify(parsed_header[file_naming_var])
 

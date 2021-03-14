@@ -79,8 +79,8 @@ class fileParserTest(unittest.TestCase):
         header = """foo: bar\npermalink: \"perma\""""
         header2 = """foo: bar\npermalink: \"perma\"\ntitle: this"""
 
-        result = {"foo": "bar", "permalink": "perma", "installed_filename": self.FILENAME}
-        result2 = {"foo": "bar", "title": "this", "permalink": "perma", "installed_filename": "this.html"}
+        result = {"foo": "bar", "permalink": "perma", "installed_filename": "perma.html"}
+        result2 = {"foo": "bar", "title": "this", "permalink": "perma", "installed_filename": "perma.html"}
 
         self.assertEqual(result, self.processor._process_header(header, self.FILENAME, self.file_naming_variable))
         self.assertEqual(result2, self.processor._process_header(header2, self.FILENAME, self.file_naming_variable))

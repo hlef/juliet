@@ -79,45 +79,26 @@ class Builder:
     def _build_posts(self):
         """ Build posts and install them. """
 
-        if (not len(self.build_args["posts"])):
-            return
-
-        builddir = os.path.join(self.destination, paths.POSTS_BUILDDIR)
-        os.makedirs(builddir, exist_ok=True)
-
-        template = self.jinja_env.get_template(os.path.join("templates", "posts.html"))
-
-        for post in self.build_args["posts"]:
-            html = self._format_args_and_render(post, template)
-
-            if("permalink" in post.keys()):
-                self._build_permalinked(post, html)
-            else:
-                self._write(os.path.join(builddir, post["installed_filename"]), html)
+        self._build_entry_common("posts", paths.POSTS_BUILDDIR)
 
     def _build_pages(self):
         """ Build pages and install them. """
 
-        if (not len(self.build_args["pages"])):
+        self._build_entry_common("pages", paths.PAGES_BUILDDIR)
+
+    def _build_entry_common(self, entrytype, builddir):
+        if (not len(self.build_args[entrytype])):
             return
 
-        template = self.jinja_env.get_template(os.path.join("templates", "pages.html"))
+        builddir = os.path.join(self.destination, builddir)
+        os.makedirs(builddir, exist_ok=True)
 
-        for page in self.build_args["pages"]:
-            html = self._format_args_and_render(page, template)
+        template = self.jinja_env.get_template(os.path.join("templates", entrytype + ".html"))
 
-            if("permalink" in page.keys()):
-                self._build_permalinked(page, html)
-            else:
-                self._write(os.path.join(self.destination, page["installed_filename"]), html)
-
-    def _build_permalinked(self, p, html):
-        """ Build page/post to permalink. """
-
-        if(not "permalink" in p.keys()):
-            raise ValueError("Called _build_permalinked with header that doesn't define permalink entry")
-
-        self._write(os.path.join(self.destination, p["permalink"] + ".html"), html)
+        for entry in self.build_args[entrytype]:
+            html = self._format_args_and_render(entry, template)
+            os.makedirs(os.path.dirname(os.path.abspath(entry["installed_filename"])), exist_ok=True)
+            self._write(os.path.join(builddir, entry["installed_filename"]), html)
 
     def _is_safe_path(self, path, follow_symlinks=False):
         """ Check directories before writing to avoid directory traversal. """

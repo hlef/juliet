@@ -185,9 +185,9 @@ def _get_new_entry_path(args, user_config, processed_entries, page=False):
         entry_filename = Template(defaults.DEFAULT_PAGE_NAMING_PATTERN).substitute(**processed_entries)
 
     if (not page):
-        subfolder = paths.POSTS_BUILDDIR
+        subfolder = paths.POSTS_PATH
     else:
-        subfolder = paths.PAGES_BUILDDIR
+        subfolder = paths.PAGES_PATH
 
     final_path = os.path.join(args.src, subfolder, entry_filename)
 
