@@ -5,8 +5,10 @@ from juliet import configurator, paths
 class builderTest(unittest.TestCase):
 
     TEST_THEME = "sample_theme"
-    DATA_FOLDER = os.path.join("juliet", "tests", "test_data", "source")
-    BUILT_FOLDER = os.path.join("juliet", "tests", "test_data", "built")
+    DATA_FOLDER = os.path.join("juliet", "tests", "test_data", "site1", "source")
+    BUILT_FOLDER = os.path.join("juliet", "tests", "test_data", "site1", "built")
+    DATA_FOLDER2 = os.path.join("juliet", "tests", "test_data", "site2", "source")
+    BUILT_FOLDER2 = os.path.join("juliet", "tests", "test_data", "site2", "built")
     DEST_SUBFOLDER = "dest"
 
     def setUp(self):
@@ -17,6 +19,8 @@ class builderTest(unittest.TestCase):
 
         self.test_data_path = os.path.join(self.cur_dir, self.DATA_FOLDER)
         self.test_built_path = os.path.join(self.cur_dir, self.BUILT_FOLDER)
+        self.test_data_path2 = os.path.join(self.cur_dir, self.DATA_FOLDER2)
+        self.test_built_path2 = os.path.join(self.cur_dir, self.BUILT_FOLDER2)
         self.cfg_local_path = os.path.join(self.DATA_FOLDER, paths.CFG_FILE)
         self.test_cfg_path = os.path.join(self.cur_dir, self.cfg_local_path)
 
@@ -27,13 +31,21 @@ class builderTest(unittest.TestCase):
         self.builderclean = Builder(*args, noclean=False)
         self.buildernoclean = Builder(*args, noclean=True)
 
-    def test_build_simple(self):
+    def test_build_simple_with_permalinks(self):
         """ Make sure that juliet is able to build a simple source correctly. """
 
         args = juliet.parse_arguments(['build', '--build-src', self.test_data_path,
                                                 '--build-dst', self.dest])
         juliet.build(args)
         self.assertTrue(self._dir_trees_identical(self.test_built_path, self.dest))
+
+    def test_build_simple_no_permalinks(self):
+        """ Make sure that juliet is able to build a simple source correctly. """
+
+        args = juliet.parse_arguments(['build', '--build-src', self.test_data_path2,
+                                                '--build-dst', self.dest])
+        juliet.build(args)
+        self.assertTrue(self._dir_trees_identical(self.test_built_path2, self.dest))
 
     def test_is_safe_path(self):
         """ Make sure that the is_safe_path function acts as excepted when valid

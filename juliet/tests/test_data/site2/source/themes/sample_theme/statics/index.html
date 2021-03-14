@@ -1,0 +1,12 @@
+{% extends "templates/main.html" %}
+
+{% block content %}
+    <i>Last blog entries:</i>
+    <ul>
+        {% for post in posts %}
+            <li>
+                <span>{{ post.date.strftime("%b %-d, %Y") }}</span> <a href="{{ site.baseurl }}/posts/{{ post.installed_filename }}">{{ post.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
