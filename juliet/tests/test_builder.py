@@ -9,6 +9,8 @@ class builderTest(unittest.TestCase):
     BUILT_FOLDER = os.path.join("juliet", "tests", "test_data", "site1", "built")
     DATA_FOLDER2 = os.path.join("juliet", "tests", "test_data", "site2", "source")
     BUILT_FOLDER2 = os.path.join("juliet", "tests", "test_data", "site2", "built")
+    DATA_FOLDER3 = os.path.join("juliet", "tests", "test_data", "site3", "source")
+    BUILT_FOLDER3 = os.path.join("juliet", "tests", "test_data", "site3", "built")
     DEST_SUBFOLDER = "dest"
 
     def setUp(self):
@@ -21,6 +23,8 @@ class builderTest(unittest.TestCase):
         self.test_built_path = os.path.join(self.cur_dir, self.BUILT_FOLDER)
         self.test_data_path2 = os.path.join(self.cur_dir, self.DATA_FOLDER2)
         self.test_built_path2 = os.path.join(self.cur_dir, self.BUILT_FOLDER2)
+        self.test_data_path3 = os.path.join(self.cur_dir, self.DATA_FOLDER3)
+        self.test_built_path3 = os.path.join(self.cur_dir, self.BUILT_FOLDER3)
         self.cfg_local_path = os.path.join(self.DATA_FOLDER, paths.CFG_FILE)
         self.test_cfg_path = os.path.join(self.cur_dir, self.cfg_local_path)
 
@@ -31,14 +35,6 @@ class builderTest(unittest.TestCase):
         self.builderclean = Builder(*args, noclean=False)
         self.buildernoclean = Builder(*args, noclean=True)
 
-    def test_build_simple_with_permalinks(self):
-        """ Make sure that juliet is able to build a simple source correctly. """
-
-        args = juliet.parse_arguments(['build', '--build-src', self.test_data_path,
-                                                '--build-dst', self.dest])
-        juliet.build(args)
-        self.assertTrue(self._dir_trees_identical(self.test_built_path, self.dest))
-
     def test_build_simple_no_permalinks(self):
         """ Make sure that juliet is able to build a simple source correctly. """
 
@@ -46,6 +42,24 @@ class builderTest(unittest.TestCase):
                                                 '--build-dst', self.dest])
         juliet.build(args)
         self.assertTrue(self._dir_trees_identical(self.test_built_path2, self.dest))
+
+    def test_build_simple_with_permalinks(self):
+        """ Make sure that juliet is able to build a simple source correctly
+            with permalinks. """
+
+        args = juliet.parse_arguments(['build', '--build-src', self.test_data_path,
+                                                '--build-dst', self.dest])
+        juliet.build(args)
+        self.assertTrue(self._dir_trees_identical(self.test_built_path, self.dest))
+
+    def test_build_header_yml(self):
+        """ Make sure that juliet is able to build a source correctly with a
+            somewhat more complicated theme that features a headers.yml. """
+
+        args = juliet.parse_arguments(['build', '--build-src', self.test_data_path3,
+                                                '--build-dst', self.dest])
+        juliet.build(args)
+        self.assertTrue(self._dir_trees_identical(self.test_built_path3, self.dest))
 
     def test_is_safe_path(self):
         """ Make sure that the is_safe_path function acts as excepted when valid

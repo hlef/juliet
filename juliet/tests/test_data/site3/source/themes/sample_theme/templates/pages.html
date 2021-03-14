@@ -1,0 +1,7 @@
+{% extends "templates/main.html" %}
+{% block content %}
+    {% if page.star %} This article is starred! {% endif %}
+    <article>
+        {{ content }}
+    </article>
+{% endblock %}
