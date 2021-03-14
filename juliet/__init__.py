@@ -18,7 +18,7 @@ def main():
     elif(args.subcommand == "init"):
         init(args)
     elif(args.subcommand == "new"):
-        init_new_article(args)
+        init_new_article(args, args.buildpage)
 
     logging.debug("Done. Exiting.")
 
@@ -123,10 +123,13 @@ def parse_arguments(args):
     help="Initialize a fresh, new article file.")
 
     parser_new.add_argument('--build-src', '-s', dest="src", type=str, default="",
-                    help='juliet source directory where to initialize article')
+                    help='juliet source directory where to initialize post/page')
 
     parser_new.add_argument('--file-name', '-f', dest="file_name", nargs='?',
-                            default=None, help='file name for new article')
+                            default=None, help='file name for new post/page')
+
+    parser_new.add_argument('--page', dest="buildpage", default=False, action='store_true',
+                            help='build a new page (instead of a new post)')
 
     parser_new.add_argument('header_content', default=[],
     nargs=argparse.REMAINDER, help='header content of the new article')
@@ -166,18 +169,25 @@ def _parse_raw_header_entries(header_entries):
 
     return result
 
-def _get_article_path(args, user_config, processed_entries):
+def _get_article_path(args, user_config, processed_entries, page=False):
     """ Return article path matching passed args. """
 
     article_filename = ""
-    if (args.file_name):
-        article_filename = args.file_name
-    elif ("filenaming_pattern" in user_config.keys()):
-        article_filename = Template(user_config["filenaming_pattern"]).substitute(**processed_entries)
+    if (not page):
+        if (args.file_name):
+            article_filename = args.file_name
+        elif ("filenaming_pattern" in user_config.keys()):
+            article_filename = Template(user_config["filenaming_pattern"]).substitute(**processed_entries)
+        else:
+            article_filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(**processed_entries)
     else:
-        article_filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(**processed_entries)
+        article_filename = Template(defaults.DEFAULT_PAGE_NAMING_PATTERN).substitute(**processed_entries)
 
-    final_path = os.path.join(args.src, paths.POSTS_BUILDDIR, article_filename)
+    if (not page):
+        final_path = os.path.join(args.src, paths.POSTS_BUILDDIR, article_filename)
+    else:
+        final_path = os.path.join(args.src, paths.PAGES_BUILDDIR, article_filename)
+
     if os.path.exists(final_path):
         raise ValueError("can't create new article at " + final_path + ": file already does already exist")
 
@@ -215,8 +225,12 @@ def _process_header_dict(theme_headers, raw_entries):
 
     return result
 
-def init_new_article(args):
-    """ Initialize a fresh, new article file. """
+def init_new_article(args, page=False):
+    """ Initialize a fresh, new post/page file. """
+
+    buildingfor = "posts"
+    if (page):
+        buildingfor = "pages"
 
     def _remove_temporary_entries(entries):
         result = {}
@@ -244,15 +258,15 @@ def init_new_article(args):
     if (os.path.isfile(theme_headers_file)):
         tmp = configurator.get_yaml(theme_headers_file)
         # theme headers file might only define entries for pages
-        if (tmp["posts"]):
+        if (tmp[buildingfor]):
             theme_headers = tmp
 
     # Parse remainder (header content)
-    processed_entries = _process_header_dict(theme_headers["posts"], args.header_content)
+    processed_entries = _process_header_dict(theme_headers[buildingfor], args.header_content)
     final_entries = _remove_temporary_entries(processed_entries)
 
     # Generate article file name from user / default template
-    file_name = _get_article_path(args, user_config, processed_entries)
+    file_name = _get_article_path(args, user_config, processed_entries, page)
 
     logging.debug("Creating new article file at " + file_name)
 
