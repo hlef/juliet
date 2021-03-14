@@ -109,7 +109,7 @@ class Builder:
             if("permalink" in page.keys()):
                 self._build_permalinked(page, html)
             else:
-                self._write(os.path.join(self.destination, post["installed_filename"]), html)
+                self._write(os.path.join(self.destination, page["installed_filename"]), html)
 
     def _build_permalinked(self, p, html):
         """ Build page/post to permalink. """
