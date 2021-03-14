@@ -4,7 +4,7 @@ DEFAULT_THEME_NAME = "gram"
 CONFIG_REQUIRED_ENTRIES = {"baseurl": True, "theme": False}
 
 DEFAULT_FILE_NAMING_VARIABLE = "title"
-DEFAULT_FILE_NAMING_PATTERN = "$date_-$slug_title.md"
+DEFAULT_POST_NAMING_PATTERN = "$date_-$slug_title.md"
 DEFAULT_PAGE_NAMING_PATTERN = "$slug_title.md"
 DEFAULT_THEME_HEADERS = {
     "posts": {

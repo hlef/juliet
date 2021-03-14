@@ -71,7 +71,7 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init_new_entry(args)
 
         # Make sure article was created
-        filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+        filename = Template(defaults.DEFAULT_POST_NAMING_PATTERN).substitute(
             juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], {}))
         path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
         self.assertTrue(os.path.exists(path),
@@ -138,7 +138,7 @@ class newArticleFileTest(unittest.TestCase):
             juliet.init_new_entry(args)
 
             # Make sure article was created
-            filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+            filename = Template(defaults.DEFAULT_POST_NAMING_PATTERN).substitute(
                 juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], remainder))
             path = os.path.join(juliet.paths.POSTS_BUILDDIR, filename)
             self.assertTrue(os.path.exists(path),
@@ -187,7 +187,7 @@ class newArticleFileTest(unittest.TestCase):
         juliet.init_new_entry(args)
 
         # Make sure article was created
-        file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+        file_name = Template(defaults.DEFAULT_POST_NAMING_PATTERN).substitute(
             juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], {}))
         article_path = os.path.join(args.src, juliet.paths.POSTS_BUILDDIR, file_name)
         self.assertTrue(os.path.exists(article_path),
@@ -264,7 +264,7 @@ class newArticleFileTest(unittest.TestCase):
 
         # Make sure it is the same as the default article (passing a file
         # name should only change the file name)
-        c_file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
+        c_file_name = Template(defaults.DEFAULT_POST_NAMING_PATTERN).substitute(
             juliet._process_header_dict(defaults.DEFAULT_THEME_HEADERS["posts"], {}))
         c_article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, c_file_name)
 
