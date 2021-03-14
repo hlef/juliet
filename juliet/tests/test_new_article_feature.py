@@ -68,7 +68,7 @@ class newArticleFileTest(unittest.TestCase):
         args = juliet.parse_arguments(base_args)
 
         # Generate article
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
 
         # Make sure article was created
         filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
@@ -105,7 +105,7 @@ class newArticleFileTest(unittest.TestCase):
         args = juliet.parse_arguments(base_args)
 
         # Generate article
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
 
         # Make sure article was created
         path = os.path.join(juliet.paths.POSTS_BUILDDIR, file_name)
@@ -114,7 +114,7 @@ class newArticleFileTest(unittest.TestCase):
             .format(path))
 
         # Try to generate file a second time
-        self.assertRaises(ValueError, juliet.init_new_article, args)
+        self.assertRaises(ValueError, juliet.init_new_entry, args)
 
     def test_generate_with_remainder(self):
         """ Make sure new article files are generated correctly when a remainder
@@ -135,7 +135,7 @@ class newArticleFileTest(unittest.TestCase):
             parsed_header_entries = juliet._parse_raw_header_entries(remainder)
 
             # Generate article
-            juliet.init_new_article(args)
+            juliet.init_new_entry(args)
 
             # Make sure article was created
             filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
@@ -184,7 +184,7 @@ class newArticleFileTest(unittest.TestCase):
         args = juliet.parse_arguments(base_args)
 
         # Generate article
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
 
         # Make sure article was created
         file_name = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(
@@ -216,7 +216,7 @@ class newArticleFileTest(unittest.TestCase):
         args = juliet.parse_arguments(base_args)
 
         # Generate article
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
 
         # Make sure article was created
         file_name = "article-12.md"
@@ -233,7 +233,7 @@ class newArticleFileTest(unittest.TestCase):
         args = juliet.parse_arguments(base_args)
 
         # Try to generate article
-        self.assertRaises(FileNotFoundError, juliet.init_new_article, args)
+        self.assertRaises(FileNotFoundError, juliet.init_new_entry, args)
 
     def test_pass_filename(self):
         """ Make sure new article is generated at the right place when file name
@@ -252,8 +252,8 @@ class newArticleFileTest(unittest.TestCase):
         c_args = juliet.parse_arguments(comp_args)
 
         # Generate articles
-        juliet.init_new_article(b_args)
-        juliet.init_new_article(c_args)
+        juliet.init_new_entry(b_args)
+        juliet.init_new_entry(c_args)
 
         # Make sure article was created where it is expected to be created
         b_article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, b_file_name)
@@ -286,7 +286,7 @@ class newArticleFileTest(unittest.TestCase):
         args = juliet.parse_arguments(base_args)
 
         # Generate article
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
 
         # Make sure article was created
         article_path = os.path.join(juliet.paths.POSTS_BUILDDIR, file_name)

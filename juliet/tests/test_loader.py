@@ -18,11 +18,11 @@ class loaderTest(unittest.TestCase):
 
         # Generate a few articles
         args = juliet.parse_arguments(['new', '--', 'title', 'Hello, World!'])
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
         args = juliet.parse_arguments(['new', '--', 'title', 'First article'])
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
         args = juliet.parse_arguments(['new', '--', 'title', 'Trip to France'])
-        juliet.init_new_article(args)
+        juliet.init_new_entry(args)
 
         # Make sure are articles can be loaded as expected
         config = {"site": juliet.configurator.get_config(juliet.paths.CFG_FILE)}

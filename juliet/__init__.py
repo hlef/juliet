@@ -18,7 +18,7 @@ def main():
     elif(args.subcommand == "init"):
         init(args)
     elif(args.subcommand == "new"):
-        init_new_article(args, args.buildpage)
+        init_new_entry(args, args.buildpage)
 
     logging.debug("Done. Exiting.")
 
@@ -120,7 +120,7 @@ def parse_arguments(args):
                     help='Initialize website in passed directory')
 
     parser_new = subparsers.add_parser('new', parents=[parent_parser],
-    help="Initialize a fresh, new article file.")
+    help="Initialize a fresh, new post file (--page for a page).")
 
     parser_new.add_argument('--build-src', '-s', dest="src", type=str, default="",
                     help='juliet source directory where to initialize post/page')
@@ -132,7 +132,7 @@ def parse_arguments(args):
                             help='build a new page (instead of a new post)')
 
     parser_new.add_argument('header_content', default=[],
-    nargs=argparse.REMAINDER, help='header content of the new article')
+    nargs=argparse.REMAINDER, help='header content of the new post/page')
 
     return main_parser.parse_args(args)
 
@@ -169,27 +169,27 @@ def _parse_raw_header_entries(header_entries):
 
     return result
 
-def _get_article_path(args, user_config, processed_entries, page=False):
-    """ Return article path matching passed args. """
+def _get_new_entry_path(args, user_config, processed_entries, page=False):
+    """ Return entry path matching passed args. """
 
-    article_filename = ""
+    entry_filename = ""
     if (not page):
         if (args.file_name):
-            article_filename = args.file_name
+            entry_filename = args.file_name
         elif ("filenaming_pattern" in user_config.keys()):
-            article_filename = Template(user_config["filenaming_pattern"]).substitute(**processed_entries)
+            entry_filename = Template(user_config["filenaming_pattern"]).substitute(**processed_entries)
         else:
-            article_filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(**processed_entries)
+            entry_filename = Template(defaults.DEFAULT_FILE_NAMING_PATTERN).substitute(**processed_entries)
     else:
-        article_filename = Template(defaults.DEFAULT_PAGE_NAMING_PATTERN).substitute(**processed_entries)
+        entry_filename = Template(defaults.DEFAULT_PAGE_NAMING_PATTERN).substitute(**processed_entries)
 
     if (not page):
-        final_path = os.path.join(args.src, paths.POSTS_BUILDDIR, article_filename)
+        final_path = os.path.join(args.src, paths.POSTS_BUILDDIR, entry_filename)
     else:
-        final_path = os.path.join(args.src, paths.PAGES_BUILDDIR, article_filename)
+        final_path = os.path.join(args.src, paths.PAGES_BUILDDIR, entry_filename)
 
     if os.path.exists(final_path):
-        raise ValueError("can't create new article at " + final_path + ": file already does already exist")
+        raise ValueError("can't create new entry at " + final_path + ": file already does already exist")
 
     return final_path
 
@@ -225,7 +225,7 @@ def _process_header_dict(theme_headers, raw_entries):
 
     return result
 
-def init_new_article(args, page=False):
+def init_new_entry(args, page=False):
     """ Initialize a fresh, new post/page file. """
 
     buildingfor = "posts"
@@ -240,10 +240,10 @@ def init_new_article(args, page=False):
 
         return result
 
-    def _get_new_article(final_header):
-        default_article = "---\n" + yaml.dump(final_header, allow_unicode=True,
+    def _get_new_entry(final_header):
+        default_entry = "---\n" + yaml.dump(final_header, allow_unicode=True,
             default_flow_style=False) + "---"
-        return default_article
+        return default_entry
 
     # Get configs
     user_config = configurator.get_config(os.path.join(args.src, paths.CFG_FILE))
@@ -265,15 +265,15 @@ def init_new_article(args, page=False):
     processed_entries = _process_header_dict(theme_headers[buildingfor], args.header_content)
     final_entries = _remove_temporary_entries(processed_entries)
 
-    # Generate article file name from user / default template
-    file_name = _get_article_path(args, user_config, processed_entries, page)
+    # Generate entry file name from user / default template
+    file_name = _get_new_entry_path(args, user_config, processed_entries, page)
 
-    logging.debug("Creating new article file at " + file_name)
+    logging.debug("Creating new entry file at " + file_name)
 
     with open(file_name, 'w+') as stream:
-        stream.write(_get_new_article(final_entries))
+        stream.write(_get_new_entry(final_entries))
 
-    logging.debug("Done creating article.")
+    logging.debug("Done creating entry.")
 
 def configure_logging(debugLevel):
     """ Configure logging according to passed debug level. """
