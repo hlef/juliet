@@ -172,7 +172,7 @@ class fileParserTest(unittest.TestCase):
         result3 = {
             "installed_filename": self.FILENAME,
             "body": """<table class="codehilitetable"><tr><td class="linenos">"""
-                + """<div class="linenodiv"><pre>1</pre></div></td><td class="code">"""
+                + """<div class="linenodiv"><pre><span class="normal">1</span></pre></div></td><td class="code">"""
                 + """<div class="codehilite"><pre><span></span><code><span class="c1"># this is a comment</span>\n"""
                 + """</code></pre></div>\n</td></tr></table>""",
             "file-name": self.FILENAME
